@@ -3,12 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAreaModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetChargeAreaModel.dart';
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_helper.dart';
 
-class MaintenanceHttpHelper{
+import '../domain/model/GetAreaModel.dart';
+import '../domain/model/GetChargeAreaModel.dart';
+
+class CreateAlertFormHttpHelper{
   static Future<List<GetChargeAreaModel>?> getChargeAreaListApi({required BuildContext context}) async {
     String schema = await SharedPref.getString(key: PrefsValue.schema,);
     Map<String, String> para = {

@@ -1,31 +1,33 @@
 import 'dart:io';
+
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAreaModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAssetModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetChargeAreaModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetControlRoomModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentIndicationModel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetLocationSourceModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetModuleTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetPriorityTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 
-abstract class MaintenanceAlertState extends Equatable {}
+import '../model/GetAreaModel.dart';
+import '../model/GetAssetModel.dart';
+import '../model/GetChargeAreaModel.dart';
+import '../model/GetControlRoomModel.dart';
+import '../model/GetIncidentIndicationModel.dart';
 
-class MaintenanceAlertInitialState extends MaintenanceAlertState {
+abstract class CreateAlertFormState extends Equatable {}
+
+class CreateAlertFormInitialState extends CreateAlertFormState {
   @override
   List<Object> get props => [];
 }
 
-class MaintenanceAlertPageLoadState extends MaintenanceAlertState {
+class CreateAlertFormPageLoadState extends CreateAlertFormState {
   @override
   List<Object> get props => [];
 }
 
 
-class FetchMaintenanceAlertDataState extends MaintenanceAlertState {
+class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final File photo;
   final bool isLoader;
   final bool isBtnLoader;
@@ -70,6 +72,10 @@ class FetchMaintenanceAlertDataState extends MaintenanceAlertState {
   final GetControlRoomModel controlRoomModel;
   final GetControlRoomData controlRoomValue;
   final List<GetControlRoomData> listOfControlRoom;
+  final TextEditingController markerLatitudeController;
+  final TextEditingController markerLongitudeController;
+  final TextEditingController currentLatitudeController;
+  final TextEditingController currentLongitudeController;
   final TextEditingController addressController;
   final TextEditingController landmarkController;
   final TextEditingController descriptionController;
@@ -85,7 +91,7 @@ class FetchMaintenanceAlertDataState extends MaintenanceAlertState {
   final TextEditingController infoOtherNameController;
 
 
-  FetchMaintenanceAlertDataState({
+  FetchCreateAlertFormDataState({
     required this.photo,
     required this.isLoader,
     required this.isBtnLoader,
@@ -130,6 +136,10 @@ class FetchMaintenanceAlertDataState extends MaintenanceAlertState {
     required this.controlRoomModel,
     required this.controlRoomValue,
     required this.listOfControlRoom,
+    required this.markerLatitudeController,
+    required this.markerLongitudeController,
+    required this.currentLatitudeController,
+    required this.currentLongitudeController,
     required this.addressController,
     required this.landmarkController,
     required this.descriptionController,
@@ -190,6 +200,10 @@ class FetchMaintenanceAlertDataState extends MaintenanceAlertState {
     controlRoomModel,
     controlRoomValue,
     listOfControlRoom,
+    markerLatitudeController,
+   markerLongitudeController,
+    currentLatitudeController,
+    currentLongitudeController,
     addressController,
     landmarkController,
     descriptionController,

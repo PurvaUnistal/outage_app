@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/common_style.dart';
@@ -13,10 +14,11 @@ import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.d
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:igl_outage_app/Utils/common_widgets/row_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/text_form_widget.dart';
-import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_bloc.dart';
-import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_event.dart';
-import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_state.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_event.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAreaModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAssetModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetChargeAreaModel.dart';
@@ -26,19 +28,21 @@ import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/mode
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetLocationSourceModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetModuleTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetPriorityTypeModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 
-class MaintenanceAlertView extends StatefulWidget {
-  const MaintenanceAlertView({super.key});
+class CreateAlertFormView extends StatefulWidget {
+  const CreateAlertFormView({super.key});
 
   @override
-  State<MaintenanceAlertView> createState() => _MaintenanceAlertViewState();
+  State<CreateAlertFormView> createState() => _CreateAlertFormViewState();
 }
 
-class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
+class _CreateAlertFormViewState extends State<CreateAlertFormView> {
   @override
   void initState() {
-    BlocProvider.of<MaintenanceAlertBloc>(context).add(MaintenanceAlertLoadEvent(context: context));
+/*    LatLng  _latLngDate =   BlocProvider.of<ReportAlertBloc>(context).latLngData;*/
+    BlocProvider.of<CreateAlertFormBloc>(context).add(CreateAlertFormLoadEvent(context: context));
     super.initState();
   }
 
@@ -46,9 +50,9 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocBuilder<MaintenanceAlertBloc, MaintenanceAlertState>(
+        child: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
           builder: (context, state) {
-            if (state is FetchMaintenanceAlertDataState) {
+            if (state is FetchCreateAlertFormDataState) {
               return  _itemBuilder(dataState: state);
             } else {
               return const Center(child: SpinLoader());
@@ -62,16 +66,16 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     return (await showDialog(
         context: context,
         builder: (BuildContext mContext) =>
-            MessageBoxTwoButtonPopWidget(message: "Do you want to Maintenance Alert?", okButtonText: "Exit", onPressed: () => Navigator.of(context).pop(true)))) ??
+            MessageBoxTwoButtonPopWidget(message: "Do you want to Create Alert Form?", okButtonText: "Exit", onPressed: () => Navigator.of(context).pop(true)))) ??
         false;
   }
 
-  Widget _itemBuilder({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _itemBuilder({required FetchCreateAlertFormDataState dataState}) {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBarWidget(
-          title: AppString.maintenanceAlert,
+          title: AppString.createAlertForm,
           boolLeading: true,
           actions: [
             Column(
@@ -98,6 +102,16 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
             child: ListView(
               children: [
                 CommonStyle.vertical(context: context),
+                RowWidget(
+                    widget1: _currentLatController(dataState: dataState),
+                    widget2: _currentLongController(dataState: dataState)
+                ),
+                CommonStyle.vertical(context: context),
+               /* RowWidget(
+                    widget1: _markerLatController(dataState: dataState),
+                    widget2: _markerLongController(dataState: dataState)
+                ),
+                CommonStyle.vertical(context: context),
                 _moduleDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _incidentTypeDropdown(dataState: dataState),
@@ -123,17 +137,19 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
                 _addressController(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _landmarkController(dataState: dataState),
-                CommonStyle.vertical(context: context),
+                CommonStyle.vertical(context: context),*/
                 _incidentIndicationDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
-                _chargeAreaDropdown(dataState: dataState),
+                _addressController(dataState: dataState),
+                CommonStyle.vertical(context: context),
+                /*_chargeAreaDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _areaDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _controlRoomDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _descriptionController(dataState: dataState),
-                CommonStyle.vertical(context: context),
+                CommonStyle.vertical(context: context),*/
                 _remarksController(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _image(dataState: dataState),
@@ -149,8 +165,44 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       ),
     );
   }
+  Widget _currentLatController({required FetchCreateAlertFormDataState dataState}){
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.currentLat,
+        hintText: AppString.currentLat,
+        enabled: true,
+        controller:dataState.currentLatitudeController
+    );
+  }
+  Widget _currentLongController({required FetchCreateAlertFormDataState dataState}){
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.currentLong,
+        hintText: AppString.currentLong,
+        enabled: true,
+        controller:dataState.currentLongitudeController
+    );
+  }
+  Widget _markerLatController({required FetchCreateAlertFormDataState dataState}){
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.markerLat,
+        hintText: AppString.markerLat,
+        enabled: true,
+        controller:dataState.markerLatitudeController
+    );
+  }
+  Widget _markerLongController({required FetchCreateAlertFormDataState dataState}){
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.markerLong,
+        hintText: AppString.markerLong,
+        enabled: true,
+        controller:dataState.markerLongitudeController
+    );
+  }
 
-  Widget _moduleDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _moduleDropdown({required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetModuleTypeData>(
       star: AppString.star,
       label: AppString.module,
@@ -158,12 +210,12 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.moduleTypeValue.id == null ? null : dataState.moduleTypeValue,
       items: dataState.listOfModuleType,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectModuleValueEvent(moduleTypeValue: val!,context: context));
       },
     );
   }
-  Widget _incidentTypeDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _incidentTypeDropdown({required FetchCreateAlertFormDataState dataState}) {
     return dataState.isModuleLoader == false ?  DropdownWidget<GetIncidentTypeData>(
       star: AppString.star,
       label: AppString.incidentType,
@@ -171,12 +223,12 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.incidentTypeValue.id == null ? null : dataState.incidentTypeValue,
       items: dataState.listOfIncidentType,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectIncidentTypeValueEvent(incidentTypeValue: val!,context: context));
       },
     ) : DottedLoaderWidget();
   }
-  Widget _incidentPriorityDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _incidentPriorityDropdown({required FetchCreateAlertFormDataState dataState}) {
     return dataState.isModuleLoader == false ?  DropdownWidget<GetPriorityTypeData>(
       star: AppString.star,
       label: AppString.incidentPriority,
@@ -184,12 +236,12 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.priorityTypeValue.id == null ? null : dataState.priorityTypeValue,
       items: dataState.listOfPriorityType,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectPriorityTypeValueEvent(priorityTypeValue: val!,context: context));
       },
     ) : DottedLoaderWidget();
   }
-  Widget _locationSourceDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _locationSourceDropdown({required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetLocationSourceModel>(
       star: AppString.star,
       label: AppString.locationSource,
@@ -197,12 +249,12 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.locationSourceValue.key == null ? null : dataState.locationSourceValue,
       items: dataState.listOfLocationSource,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectLocationSourceValueEvent(locationSourceValue: val!,context: context));
       },
     );
   }
-  Widget _customerTypeDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _customerTypeDropdown({required FetchCreateAlertFormDataState dataState}) {
     return dataState.locationSourceValue.key == "1" ? CommonStyle.col(
       context: context,
       child: DropdownWidget<GetLocationSourceModel>(
@@ -212,50 +264,50 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
         dropdownValue: dataState.customerTypeValue.key == null ? null : dataState.customerTypeValue,
         items: dataState.listOfCustomerType,
         onChanged: (val) {
-          BlocProvider.of<MaintenanceAlertBloc>(context)
+          BlocProvider.of<CreateAlertFormBloc>(context)
               .add(SelectCustomerTypeValueEvent(customerTypeValue: val!,context: context));
         },
       ),
     ) : Container();
   }
 
-  Widget _searchNumberController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _searchNumberController({required FetchCreateAlertFormDataState dataState}) {
     if(dataState.isCustomerTypeLoader == false){
-     if(dataState.locationSourceValue.key == "1"){
-       if(dataState.customerTypeValue.key == "1" || dataState.customerTypeValue.key == "2" || dataState.customerTypeValue.key == "3"){
-         return CommonStyle.col(
-           context: context,
-           child: AutoCompleteTextFieldWidget(
-             star: AppString.star,
-             label:dataState.customerTypeValue.key == "1" ? AppString.bpNumber
-                 : dataState.customerTypeValue.key == "2" ? AppString.mobileNumber
-                 : dataState.customerTypeValue.key == "3" ? AppString.meterNumber : AppString.bpNumber,
-             hintText:dataState.customerTypeValue.key == "1" ? AppString.bpNumber
-                 : dataState.customerTypeValue.key == "2" ? AppString.mobileNumber
-                 : dataState.customerTypeValue.key == "3" ? AppString.meterNumber : AppString.bpNumber,
-             controller:dataState.searchNumberController,
-             suggestions: dataState.listOfSearchNumber,
-             onSelected: (val) {
-               BlocProvider.of<MaintenanceAlertBloc>(context).add(SelectSearchNumberControllerEvent(context: context, searchNumberValue: val));
-             },
-             onChanged: (val) {
-               BlocProvider.of<MaintenanceAlertBloc>(context).add(SelectSearchNumberControllerEvent(context: context, searchNumberValue: val));
-             },
-           ),
-         );
-       }else{
-         return Container();
-       }
-     }
-    else {
-      return Container();
-    }
+      if(dataState.locationSourceValue.key == "1"){
+        if(dataState.customerTypeValue.key == "1" || dataState.customerTypeValue.key == "2" || dataState.customerTypeValue.key == "3"){
+          return CommonStyle.col(
+            context: context,
+            child: AutoCompleteTextFieldWidget(
+              star: AppString.star,
+              label:dataState.customerTypeValue.key == "1" ? AppString.bpNumber
+                  : dataState.customerTypeValue.key == "2" ? AppString.mobileNumber
+                  : dataState.customerTypeValue.key == "3" ? AppString.meterNumber : AppString.bpNumber,
+              hintText:dataState.customerTypeValue.key == "1" ? AppString.bpNumber
+                  : dataState.customerTypeValue.key == "2" ? AppString.mobileNumber
+                  : dataState.customerTypeValue.key == "3" ? AppString.meterNumber : AppString.bpNumber,
+              controller:dataState.searchNumberController,
+              suggestions: dataState.listOfSearchNumber,
+              onSelected: (val) {
+                BlocProvider.of<CreateAlertFormBloc>(context).add(SelectSearchNumberControllerEvent(context: context, searchNumberValue: val));
+              },
+              onChanged: (val) {
+                BlocProvider.of<CreateAlertFormBloc>(context).add(SelectSearchNumberControllerEvent(context: context, searchNumberValue: val));
+              },
+            ),
+          );
+        }else{
+          return Container();
+        }
+      }
+      else {
+        return Container();
+      }
     }else {
       return DottedLoaderWidget();
     }
-    }
+  }
 
-  Widget _assetsDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _assetsDropdown({required FetchCreateAlertFormDataState dataState}) {
     return dataState.locationSourceValue.key == "2" ? CommonStyle.col(
       context: context,
       child: DropdownWidget<GetAssetData>(
@@ -265,13 +317,13 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
         dropdownValue: dataState.assetDataValue.assetId == null ? null : dataState.assetDataValue,
         items: dataState.listOfAssetData,
         onChanged: (val) {
-          BlocProvider.of<MaintenanceAlertBloc>(context)
+          BlocProvider.of<CreateAlertFormBloc>(context)
               .add(SelectAssetValueEvent(assetDataValue: val!,context: context));
         },
       ),
     ) : Container();
   }
-  Widget _assetTypeIdDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _assetTypeIdDropdown({required FetchCreateAlertFormDataState dataState}) {
     return dataState.locationSourceValue.key == "2" ? CommonStyle.col(
       context: context,
       child: DropdownWidget<TfGisData>(
@@ -281,14 +333,14 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
         dropdownValue: dataState.assetTypeIdValue.id == null ? null : dataState.assetTypeIdValue,
         items: dataState.listOfAssetTypeId,
         onChanged: (val) {
-          BlocProvider.of<MaintenanceAlertBloc>(context)
+          BlocProvider.of<CreateAlertFormBloc>(context)
               .add(SelectAssetTypeIdValueEvent(assetTypeIdValue: val!,context: context));
         },
       ),
     ) : Container();
   }
 
-  Widget _locationController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _locationController({required FetchCreateAlertFormDataState dataState}) {
     return dataState.locationSourceValue.key  == "3" ? CommonStyle.col(
       context: context,
       child: TextFieldWidget(
@@ -300,7 +352,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     ) : Container();
   }
 
-  Widget _addressController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _addressController({required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
         star: AppString.star,
         label: AppString.address,
@@ -309,7 +361,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     );
   }
 
-  Widget _informationSourceDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _informationSourceDropdown({required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetPriorityTypeData>(
       star: AppString.star,
       label: AppString.informationSource,
@@ -317,13 +369,13 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.informationSourceValue.id == null ? null : dataState.informationSourceValue,
       items: dataState.listOfInformationSource,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectInformationSourceValueEvent(informationSourceValue: val!,context: context));
       },
     );
   }
 
-  Widget _infoSecurityNameController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _infoSecurityNameController({required FetchCreateAlertFormDataState dataState}) {
     return dataState.informationSourceValue.id == "1"
         ? CommonStyle.col(
       context: context,
@@ -336,7 +388,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     ) : Container();
   }
 
-  Widget _infoSecurityNumberController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _infoSecurityNumberController({required FetchCreateAlertFormDataState dataState}) {
     return dataState.informationSourceValue.id == "1"
         ? CommonStyle.col(
       context: context,
@@ -349,7 +401,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     ) : Container();
   }
 
-  Widget _infoSecurityMobileController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _infoSecurityMobileController({required FetchCreateAlertFormDataState dataState}) {
     return dataState.informationSourceValue.id == "1"
         ? CommonStyle.col(
       context: context,
@@ -361,7 +413,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       ),
     ) : Container();
   }
-  Widget _infoCustomerNameController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _infoCustomerNameController({required FetchCreateAlertFormDataState dataState}) {
     return  dataState.informationSourceValue.id == "2"
         ? CommonStyle.col(
       context: context,
@@ -374,7 +426,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     ) : Container();
   }
 
-  Widget _infoCustomerNumberController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _infoCustomerNumberController({required FetchCreateAlertFormDataState dataState}) {
     return  dataState.informationSourceValue.id == "2"
         ? CommonStyle.col(
       context: context,
@@ -387,7 +439,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     ) : Container();
   }
 
-  Widget _infoCustomerMobileController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _infoCustomerMobileController({required FetchCreateAlertFormDataState dataState}) {
     return dataState.informationSourceValue.id == "2"
         ? CommonStyle.col(
       context: context,
@@ -400,7 +452,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     ) : Container();
   }
 
-  Widget _infoOtherNameController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _infoOtherNameController({required FetchCreateAlertFormDataState dataState}) {
     return dataState.informationSourceValue.id == "4"
         ? CommonStyle.col(
       context: context,
@@ -413,7 +465,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     ) : Container();
   }
 
-  Widget _landmarkController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _landmarkController({required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
         star: AppString.star,
         label: AppString.landmark,
@@ -422,7 +474,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     );
   }
 
-  Widget _incidentIndicationDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _incidentIndicationDropdown({required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetIncidentIndicationData>(
       star: AppString.star,
       label: AppString.incidentIndication,
@@ -430,13 +482,13 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.incidentIndicationValue.id == null ? null : dataState.incidentIndicationValue,
       items: dataState.listOfIncidentIndication,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectIncidentIndicationValueEvent(incidentIndicationValue: val!,context: context));
       },
     );
   }
 
-  Widget _chargeAreaDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _chargeAreaDropdown({required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetChargeAreaModel>(
       star: AppString.star,
       label: AppString.chargeArea,
@@ -444,13 +496,13 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.chargeAreaValue.gid == null ? null : dataState.chargeAreaValue,
       items: dataState.listOfChargeArea,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectChargeAreaValueEvent(chargeAreaValue: val!,context: context));
       },
     );
   }
 
-  Widget _areaDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _areaDropdown({required FetchCreateAlertFormDataState dataState}) {
     return dataState.isChargeAreaLoader == false ?  DropdownWidget<GetAreaModel>(
       star: AppString.star,
       label: AppString.area,
@@ -458,13 +510,13 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.areaValue.gid == null ? null : dataState.areaValue,
       items: dataState.listOfArea,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectAreaValueEvent(areaValue: val!,context: context));
       },
     ) : DottedLoaderWidget();
   }
 
-  Widget _controlRoomDropdown({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _controlRoomDropdown({required FetchCreateAlertFormDataState dataState}) {
     return dataState.isAreaLoader == false ?  DropdownWidget<GetControlRoomData>(
       star: AppString.star,
       label: AppString.controlRoom,
@@ -472,14 +524,14 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
       dropdownValue: dataState.controlRoomValue.areaId == null ? null : dataState.controlRoomValue,
       items: dataState.listOfControlRoom,
       onChanged: (val) {
-        BlocProvider.of<MaintenanceAlertBloc>(context)
+        BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectControlRoomValueEvent(controlRoomValue: val!,context: context));
       },
     ) : DottedLoaderWidget();
   }
 
 
-  Widget _descriptionController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _descriptionController({required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
       //   star: AppString.star,
         label: AppString.description,
@@ -488,7 +540,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     );
   }
 
-  Widget _remarksController({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _remarksController({required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
       //   star: AppString.star,
         label: AppString.remarks,
@@ -497,7 +549,7 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     );
   }
 
-  Widget _image({required FetchMaintenanceAlertDataState dataState}){
+  Widget _image({required FetchCreateAlertFormDataState dataState}){
     return ImageWidget(
       star: AppString.star,
       title: AppString.photo,
@@ -511,11 +563,11 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
               return ImagePopWidget(
                 onTapCamera: () async {
                   Navigator.of(context).pop();
-                  BlocProvider.of<MaintenanceAlertBloc>(context).add(CaptureCameraPhotoEvent());
+                  BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureCameraPhotoEvent());
                 },
                 onTapGallery: () async {
                   Navigator.of(context).pop();
-                  BlocProvider.of<MaintenanceAlertBloc>(context).add(CaptureGalleryPhotoEvent());
+                  BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureGalleryPhotoEvent());
                 },
               );
             });
@@ -523,12 +575,12 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
     );
   }
 
-  Widget _button({required FetchMaintenanceAlertDataState dataState}) {
+  Widget _button({required FetchCreateAlertFormDataState dataState}) {
     return dataState.isBtnLoader == false
         ? ButtonWidget(
         text: AppString.submit,
         onPressed: () {
-          BlocProvider.of<MaintenanceAlertBloc>(context).add(SubmitAddIncidentBtnEvent(context: context));
+          BlocProvider.of<CreateAlertFormBloc>(context).add(SubmitAddIncidentBtnEvent(context: context));
         })
         : DottedLoaderWidget();
   }

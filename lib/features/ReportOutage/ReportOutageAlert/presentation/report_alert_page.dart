@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,13 +23,25 @@ class ReportAlertView extends StatefulWidget {
 }
 
 class _ReportAlertViewState extends State<ReportAlertView> {
-
+  Completer<GoogleMapController> mapController = Completer();
   @override
   void initState() {
     BlocProvider.of<ReportAlertBloc>(context).add(ReportAlertLoadEvent(context: context));
     super.initState();
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    _disposeController();
+    super.dispose();
+  }
+
+  Future<void> _disposeController() async {
+    final GoogleMapController controller = await mapController.future;
+    controller.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -115,6 +129,9 @@ class _ReportAlertViewState extends State<ReportAlertView> {
         target: dataState.loginPosition,
         zoom: 12.0,
       ),
+      onMapCreated: (GoogleMapController controller){
+        // mapController.complete(controller);
+      },
     ) : Center(child: SpinLoader());
   }
 

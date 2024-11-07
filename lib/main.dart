@@ -5,7 +5,9 @@ import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:igl_outage_app/features/Login/domain/bloc/login_bloc.dart';
 import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_bloc.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
 import 'Utils/common_widgets/Routes/routes.dart';
 import 'Utils/common_widgets/Routes/routes_name.dart';
 import 'features/MagageOutage/ManageAlert/domain/manage_alert_bloc.dart';
@@ -14,6 +16,7 @@ import 'features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ReportAlertHelper.clearCache();
   await Future.delayed(Duration(seconds: 1));
   runApp(MyApp());
 }
@@ -38,6 +41,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (BuildContext context) => LoginBloc()),
           BlocProvider(create: (BuildContext context) => HomeBloc()),
           BlocProvider(create: (BuildContext context) => ManageAlertBloc()),
+          BlocProvider(create: (BuildContext context) => CreateAlertFormBloc()),
           BlocProvider(create: (BuildContext context) => MaintenanceAlertBloc()),
           BlocProvider(create: (BuildContext context) => NavigateAlertBloc()),
           BlocProvider(create: (BuildContext context) => ReportAlertBloc()),

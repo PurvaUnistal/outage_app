@@ -25,6 +25,7 @@ class FetchReportAlertDataState extends ReportAlertState {
   final String nameofLocation;
   final String role;
   final String baseUrl;
+  GoogleMapController? googleMapController;
   final TextEditingController tfGisController;
   final TextEditingController gasValveGISController;
   final List<String> listOfGasValveGISId;
@@ -50,6 +51,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.userName,
     required this.nameofLocation,
     required this.role,
+    required this.googleMapController,
     required this.tfGisController,
     required this.gasValveGISController,
     required this.listOfTfGisId,
@@ -67,7 +69,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.listOfGasValueGIS,
   });
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
     isLoader,
     isPipelineLoader,
     scheme,
@@ -75,6 +77,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     nameofLocation,
     role,
     baseUrl,
+    googleMapController,
     tfGisController,
     gasValveGISController,
     listOfTfGisId,

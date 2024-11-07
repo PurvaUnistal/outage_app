@@ -27,7 +27,12 @@ class AppString {
   static const String navigateAlert = 'Navigate Alert';
   static const String reportAlert = 'Report Alert';
   static const String maintenanceAlert = 'Maintenance Alert';
+  static const String createAlertForm = 'Create Alert Form';
 
+  static const String currentLat = 'Current Latitude';
+  static const String currentLong = 'Current Longitude';
+  static const String markerLat = 'marker Latitude';
+  static const String markerLong = 'marker Longitude';
   static const String module = 'Module';
   static const String incidentType = 'Incident Type';
   static const String incidentPriority = 'Incident Priority';

@@ -4,9 +4,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/Utils.dart';
+import 'package:igl_outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:igl_outage_app/Utils/common_widgets/GetImage/get_image_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Routes/routes_name.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_event.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAreaModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAssetModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetChargeAreaModel.dart';
@@ -17,18 +22,16 @@ import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/mode
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetLocationSourceModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetModuleTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetPriorityTypeModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/helper/create_alert_form_helper.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/helper/create_alert_form_http_helper.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/preference_utils.dart';
-import '../../helper/maintenance_alert_helper.dart';
-import '../../helper/maintenance_http_helper.dart';
-import 'maintenance_alert_event.dart';
-import 'maintenance_alert_state.dart';
 
-class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertState> {
-  MaintenanceAlertBloc() : super(MaintenanceAlertInitialState()) {
-    on<MaintenanceAlertLoadEvent>(_pageLoad);
+class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormState> {
+  CreateAlertFormBloc() : super(CreateAlertFormInitialState()) {
+    on<CreateAlertFormLoadEvent>(_pageLoad);
     on<SelectModuleValueEvent>(_selectModuleValue);
     on<SelectIncidentTypeValueEvent>(_selectIncidentTypeValue);
     on<SelectPriorityTypeValueEvent>(_selectPriorityTypeValue);
@@ -60,6 +63,10 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   String baseUrl = '';
   String accessRightData = '';
 
+  TextEditingController markerLatitudeController = TextEditingController();
+  TextEditingController markerLongitudeController = TextEditingController();
+  TextEditingController currentLatitudeController = TextEditingController();
+  TextEditingController currentLongitudeController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController landmarkController = TextEditingController();
   TextEditingController searchNumberController = TextEditingController();
@@ -126,8 +133,8 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
 
 
 
-  _pageLoad(MaintenanceAlertLoadEvent event, emit) async {
-    emit(MaintenanceAlertInitialState());
+  _pageLoad(CreateAlertFormLoadEvent event, emit) async {
+    emit(CreateAlertFormInitialState());
     photo = File('');
     isLoader =  false;
     isBtnLoader =  false;
@@ -174,7 +181,8 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
     controlRoomModel = GetControlRoomModel();
     controlRoomValue = GetControlRoomData();
     listOfControlRoom = [];
-
+    currentLatitudeController.text = "";
+    currentLongitudeController.text = "";
     addressController.text = "";
     landmarkController.text = "";
     searchNumberController.text = "";
@@ -188,23 +196,30 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
     infoOtherNameController.text = "";
     descriptionController.text = "";
     remarksController.text = "";
+    markerLatitudeController.text = await SharedPref.getString(key: PrefsValue.markerLat);
+    markerLongitudeController.text = await SharedPref.getString(key: PrefsValue.markerLong);
     scheme = await SharedPref.getString(key: PrefsValue.schema);
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-    await fetchOutageModuleApi(context: event.context);
+    await _getCurrentPosition();
+   /* await fetchOutageModuleApi(context: event.context);
     await fetchLocationSourceApi(context: event.context);
     await fetchCustomerLocationSourceApi(context: event.context);
-    await fetchInformationSourceApi(context: event.context);
+    await fetchInformationSourceApi(context: event.context);*/
     await fetchIncidentIndicationApi(context: event.context);
-    await fetchChargeAreaListApi(context: event.context);
+   /* await fetchChargeAreaListApi(context: event.context);
     await fetchAssetLocationSourceApi(context: event.context);
-    await fetchGasValueGisApi(context: event.context);
+    await fetchGasValueGisApi(context: event.context);*/
     _eventCompleted(emit);
   }
-
+  _getCurrentPosition() async {
+    Position? currentPoint = await CurrentLocation.getCurrentLocation();
+  currentLatitudeController.text = currentPoint!.latitude.toString();
+  currentLongitudeController.text= currentPoint.longitude.toString();
+  }
   fetchOutageModuleApi({required BuildContext context}) async {
-    var res = await MaintenanceAlertHelper.getOutageModuleApi(context: context);
+    var res = await CreateAlertFormHelper.getOutageModuleApi(context: context);
     if (res != null) {
       moduleTypeModel = res;
       if(moduleTypeModel.data != null){
@@ -214,7 +229,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
     }
   }
   fetchIncidentTypeApi({required BuildContext context, required String moduleId}) async {
-    var res = await MaintenanceAlertHelper.getIncidentTypeApi(context: context,moduleId: moduleId);
+    var res = await CreateAlertFormHelper.getIncidentTypeApi(context: context,moduleId: moduleId);
     if (res != null) {
       incidentTypeModel = res;
       if(incidentTypeModel.data != null){
@@ -225,7 +240,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   }
 
   fetchIncidentPriorityApi({required BuildContext context, required String moduleId}) async {
-    var res = await MaintenanceAlertHelper.getIncidentPriorityApi(context: context,moduleId: moduleId);
+    var res = await CreateAlertFormHelper.getIncidentPriorityApi(context: context,moduleId: moduleId);
     if (res != null) {
       priorityTypeModel = res;
       if(priorityTypeModel.data != null){
@@ -235,14 +250,14 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
     }
   }
   fetchLocationSourceApi({required BuildContext context,}) async {
-    var res = await MaintenanceAlertHelper.getLocationSourceApi(context: context,);
+    var res = await CreateAlertFormHelper.getLocationSourceApi(context: context,);
     if(res != null){
       listOfLocationSource = res;
     }
     return res;
   }
   fetchCustomerLocationSourceApi({required BuildContext context,}) async {
-    var res = await MaintenanceAlertHelper.getCustomerLocationSourceApi(context: context,);
+    var res = await CreateAlertFormHelper.getCustomerLocationSourceApi(context: context,);
     if(res != null){
       listOfCustomerType = res;
     }
@@ -250,7 +265,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   }
 
   fetchInformationSourceApi({required BuildContext context,}) async {
-    var res = await MaintenanceAlertHelper.getInformationSourceApi(context: context,);
+    var res = await CreateAlertFormHelper.getInformationSourceApi(context: context,);
     if (res != null) {
       informationSourceModel = res;
       if(informationSourceModel.data != null){
@@ -261,7 +276,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   }
 
   fetchIncidentIndicationApi({required BuildContext context,}) async {
-    var res = await MaintenanceAlertHelper.getIncidentIndicationApi(context: context,);
+    var res = await CreateAlertFormHelper.getIncidentIndicationApi(context: context,);
     if (res != null) {
       incidentIndicationModel = res;
       if(incidentIndicationModel.data != null){
@@ -272,7 +287,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   }
 
   fetchChargeAreaListApi({required BuildContext context,}) async {
-    var res = await MaintenanceHttpHelper.getChargeAreaListApi(context: context,);
+    var res = await CreateAlertFormHttpHelper.getChargeAreaListApi(context: context,);
     if(res != null){
       listOfChargeArea = res;
     }
@@ -280,7 +295,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   }
 
   fetchAllAreaApi({required BuildContext context,required String gid}) async {
-    var res = await MaintenanceHttpHelper.getAllAreaApi(context: context,gid: gid);
+    var res = await CreateAlertFormHttpHelper.getAllAreaApi(context: context,gid: gid);
     if(res != null){
       listOfArea = res;
     }
@@ -288,7 +303,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   }
 
   fetchAssetLocationSourceApi({required BuildContext context,}) async {
-    var res = await MaintenanceAlertHelper.getAssetLocationSourceApi(context: context,);
+    var res = await CreateAlertFormHelper.getAssetLocationSourceApi(context: context,);
     if (res != null) {
       assetModel = res;
       if(assetModel.data != null){
@@ -311,7 +326,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
 
   fetchCustomerDetailByLocationApi({required BuildContext context, required String locationSource, required String search}) async {
     listOfCustomerLocationData = [];
-    var res = await MaintenanceAlertHelper.getCustomerDetailByLocationApi(
+    var res = await CreateAlertFormHelper.getCustomerDetailByLocationApi(
         context: context, locationSource: locationSource, search: search);
     if (res != null) {
       customerLocationModel = res;
@@ -333,7 +348,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
 
   fetchControlRoomApi({required BuildContext context, required String areaId}) async {
     listOfCustomerLocationData = [];
-    var res = await MaintenanceAlertHelper.getControlRoomApi(context: context, areaId: areaId,);
+    var res = await CreateAlertFormHelper.getControlRoomApi(context: context, areaId: areaId,);
     if (res != null) {
       controlRoomModel = res;
       if(controlRoomModel.data != null){
@@ -343,7 +358,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
     }
   }
 
-  _selectModuleValue(SelectModuleValueEvent event, Emitter<MaintenanceAlertState> emit) async {
+  _selectModuleValue(SelectModuleValueEvent event, Emitter<CreateAlertFormState> emit) async {
     incidentTypeModel = GetIncidentTypeModel();
     incidentTypeValue = GetIncidentTypeData();
     listOfIncidentType = [];
@@ -488,7 +503,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
 
   _submitBtn(SubmitAddIncidentBtnEvent event, emit) async {
   //  try{
-      var validationCheck = await MaintenanceAlertHelper.validationSubmit(
+      var validationCheck = await CreateAlertFormHelper.validationSubmit(
           context: event.context,
           moduleType: moduleTypeValue,
           incidentType: incidentTypeValue,
@@ -518,7 +533,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
       if(await validationCheck == true){
         isBtnLoader = false;
         _eventCompleted(emit);
-        var res = await MaintenanceAlertHelper.addIncidentData(
+        var res = await CreateAlertFormHelper.addIncidentData(
           context: event.context,
           moduleType: moduleTypeValue,
           incidentType: incidentTypeValue,
@@ -544,8 +559,10 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
           area: areaValue,
           controlRoom: controlRoomValue,
           photo: photo,
-          latitude: '',
-          longitude: "",
+          currentLat: currentLatitudeController.text.trim().toString(),
+          currentLong: currentLongitudeController.text.trim().toString(),
+          markerLat: markerLatitudeController.text.trim().toString(),
+          markerLong: markerLongitudeController.text.trim().toString(),
           remarks: remarksController.text.trim().toString(),
           description: descriptionController.text.trim().toString(),
         );
@@ -569,8 +586,8 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
     }*/
   }
 
-  _eventCompleted(Emitter<MaintenanceAlertState> emit) {
-    emit(FetchMaintenanceAlertDataState(
+  _eventCompleted(Emitter<CreateAlertFormState> emit) {
+    emit(FetchCreateAlertFormDataState(
       photo: photo,
       isLoader: isLoader,
       isBtnLoader: isBtnLoader,
@@ -615,6 +632,10 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
       controlRoomModel: controlRoomModel,
       controlRoomValue: controlRoomValue,
       listOfControlRoom: listOfControlRoom,
+      markerLatitudeController : markerLatitudeController,
+      markerLongitudeController : markerLongitudeController,
+      currentLatitudeController : currentLatitudeController,
+      currentLongitudeController : currentLongitudeController,
       addressController : addressController,
       landmarkController : landmarkController,
       searchNumberController : searchNumberController,

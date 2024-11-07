@@ -1,26 +1,28 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/AddIncidentModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAreaModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAssetModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetChargeAreaModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetControlRoomModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetCustomerLocationModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentIndicationModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetLocationSourceModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetModuleTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetPriorityTypeModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetViewIncidentModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
+import '../domain/model/AddIncidentModel.dart';
+import '../domain/model/GetAreaModel.dart';
+import '../domain/model/GetAssetModel.dart';
+import '../domain/model/GetChargeAreaModel.dart';
+import '../domain/model/GetControlRoomModel.dart';
+import '../domain/model/GetCustomerLocationModel.dart';
+import '../domain/model/GetIncidentIndicationModel.dart';
+import '../domain/model/GetViewIncidentModel.dart';
 
-class MaintenanceAlertHelper{
+class CreateAlertFormHelper{
 
   static Future<GetModuleTypeModel?> getOutageModuleApi({required BuildContext context}) async {
     String schema = await SharedPref.getString(key: PrefsValue.schema,);
@@ -342,8 +344,10 @@ class MaintenanceAlertHelper{
     required String infoOtherName,
     required String address,
     required String landmark,
-    required String latitude,
-    required String longitude,
+    required String currentLat,
+    required String currentLong,
+    required String markerLat,
+    required String markerLong,
     required GetIncidentIndicationData incidentIndication,
     required GetChargeAreaModel chargeArea,
     required GetAreaModel area,
@@ -370,8 +374,10 @@ class MaintenanceAlertHelper{
       "address": address.isEmpty ? "" : address.toString(),
       "landmark": landmark.isEmpty ? "" :landmark.toString(),
       "description": description.isEmpty ? "" : description.toString(),
-      "latitude": latitude.isEmpty ? "" : latitude.toString(),
-      "longitude": longitude.isEmpty ? "" : longitude.toString(),
+      "latitude": currentLat.isEmpty ? "" : currentLat.toString(),
+      "longitude": currentLong.isEmpty ? "" : currentLong.toString(),
+      "instance_latitude": markerLat.isEmpty ? "" : markerLat.toString(),
+      "instance_longitude": markerLong.isEmpty ? "" : markerLong.toString(),
       "remarks": remarks.isEmpty ? "" : remarks.toString(),
       "asset_type_id": customerAsset.id == null ? "": customerAsset.id!.toString(),
       "asset_internal_id": assetInternalId.id == null ? "": customerAsset.id!.toString(),

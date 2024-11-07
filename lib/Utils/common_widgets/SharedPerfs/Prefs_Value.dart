@@ -17,4 +17,6 @@ class PrefsValue {
   static String appVersion = "appVersion";
   static String bpNumber = "bpNumber";
   static String areaId = "areaId";
+  static String markerLat = "markerLat";
+  static String markerLong = "markerLong";
 }
