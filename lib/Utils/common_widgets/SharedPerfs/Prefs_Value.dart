@@ -19,4 +19,6 @@ class PrefsValue {
   static String areaId = "areaId";
   static String markerLat = "markerLat";
   static String markerLong = "markerLong";
+  static String tfGisId = "tfGisId";
+  static String gasValveGISId = "gasValveGISId";
 }

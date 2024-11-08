@@ -107,49 +107,16 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
                     widget2: _currentLongController(dataState: dataState)
                 ),
                 CommonStyle.vertical(context: context),
-               /* RowWidget(
-                    widget1: _markerLatController(dataState: dataState),
-                    widget2: _markerLongController(dataState: dataState)
-                ),
-                CommonStyle.vertical(context: context),
-                _moduleDropdown(dataState: dataState),
-                CommonStyle.vertical(context: context),
                 _incidentTypeDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
-                _incidentPriorityDropdown(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _locationSourceDropdown(dataState: dataState),
-                _customerTypeDropdown(dataState: dataState),
-                _searchNumberController(dataState: dataState),
-                _assetsDropdown(dataState: dataState),
-                _assetTypeIdDropdown(dataState: dataState),
-                _locationController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _informationSourceDropdown(dataState: dataState),
-                _infoSecurityNameController(dataState: dataState),
-                _infoSecurityNumberController(dataState: dataState),
-                _infoSecurityMobileController(dataState: dataState),
-                _infoCustomerNameController(dataState: dataState),
-                _infoCustomerNumberController(dataState: dataState),
-                _infoCustomerMobileController(dataState: dataState),
-                _infoOtherNameController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _addressController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _landmarkController(dataState: dataState),
-                CommonStyle.vertical(context: context),*/
                 _incidentIndicationDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
+                _assetTypeIdController(dataState: dataState),
+                CommonStyle.vertical(context: context),
+                _landmarkController(dataState: dataState),
+                CommonStyle.vertical(context: context),
                 _addressController(dataState: dataState),
                 CommonStyle.vertical(context: context),
-                /*_chargeAreaDropdown(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _areaDropdown(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _controlRoomDropdown(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _descriptionController(dataState: dataState),
-                CommonStyle.vertical(context: context),*/
                 _remarksController(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _image(dataState: dataState),
@@ -163,6 +130,15 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
           ),
         ),
       ),
+    );
+  }
+  Widget _assetTypeIdController({required FetchCreateAlertFormDataState dataState}){
+    return TextFieldWidget(
+        star: AppString.star,
+        label: dataState.tfGisIdController.text == ""? AppString.gasValveGisId:AppString.gasTfGisId,
+        hintText: dataState.tfGisIdController.text == "" ? AppString.gasValveGisId: AppString.gasTfGisId,
+        enabled: false,
+        controller:dataState.tfGisIdController.text == "" ? dataState.valveGisIdController : dataState.tfGisIdController
     );
   }
   Widget _currentLatController({required FetchCreateAlertFormDataState dataState}){

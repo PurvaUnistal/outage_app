@@ -26,7 +26,6 @@ class CreateAlertFormPageLoadState extends CreateAlertFormState {
   List<Object> get props => [];
 }
 
-
 class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final File photo;
   final bool isLoader;
@@ -59,7 +58,8 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final List<GetIncidentIndicationData> listOfIncidentIndication;
   final GetChargeAreaModel chargeAreaValue;
   final List<GetChargeAreaModel> listOfChargeArea;
-  final GetAreaModel areaValue ;
+  final GetAreaModel areaValue;
+
   final List<GetAreaModel> listOfArea;
   final GetLocationSourceModel customerTypeValue;
   final List<GetLocationSourceModel> listOfCustomerType;
@@ -72,6 +72,8 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final GetControlRoomModel controlRoomModel;
   final GetControlRoomData controlRoomValue;
   final List<GetControlRoomData> listOfControlRoom;
+  final TextEditingController valveGisIdController;
+  final TextEditingController tfGisIdController;
   final TextEditingController markerLatitudeController;
   final TextEditingController markerLongitudeController;
   final TextEditingController currentLatitudeController;
@@ -89,7 +91,6 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final TextEditingController infoCustomerBpNumberController;
   final TextEditingController infoCustomerMobileController;
   final TextEditingController infoOtherNameController;
-
 
   FetchCreateAlertFormDataState({
     required this.photo,
@@ -136,6 +137,8 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
     required this.controlRoomModel,
     required this.controlRoomValue,
     required this.listOfControlRoom,
+    required this.valveGisIdController,
+    required this.tfGisIdController,
     required this.markerLatitudeController,
     required this.markerLongitudeController,
     required this.currentLatitudeController,
@@ -154,68 +157,71 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
     required this.infoCustomerMobileController,
     required this.infoOtherNameController,
   });
+
   @override
   List<Object?> get props => [
-    photo,
-    isLoader,
-    isBtnLoader,
-    isModuleLoader,
-    isChargeAreaLoader,
-    isAreaLoader,
-    isCustomerTypeLoader,
-    scheme,
-    userName,
-    role,
-    baseUrl,
-    moduleTypeModel,
-    moduleTypeValue,
-    listOfModuleType,
-    incidentTypeModel,
-    incidentTypeValue,
-    listOfIncidentType,
-    priorityTypeModel,
-    priorityTypeValue,
-    listOfPriorityType,
-    locationSourceModel,
-    locationSourceValue,
-    listOfLocationSource,
-    informationSourceModel,
-    informationSourceValue,
-    listOfInformationSource,
-    incidentIndicationModel,
-    incidentIndicationValue,
-    listOfIncidentIndication,
-    chargeAreaValue,
-    listOfChargeArea,
-    areaValue,
-    listOfArea,
-    customerTypeValue,
-    listOfCustomerType,
-    assetModel,
-    assetDataValue,
-    listOfAssetData,
-    assetTypeIdValue,
-    listOfAssetTypeId,
-    listOfSearchNumber,
-    controlRoomModel,
-    controlRoomValue,
-    listOfControlRoom,
-    markerLatitudeController,
-   markerLongitudeController,
-    currentLatitudeController,
-    currentLongitudeController,
-    addressController,
-    landmarkController,
-    descriptionController,
-    remarksController,
-    searchNumberController,
-    locationController,
-    infoSecurityNameController,
-    infoSecurityIdController,
-    infoSecurityMobileController,
-    infoCustomerNameController,
-    infoCustomerBpNumberController,
-    infoCustomerMobileController,
-    infoOtherNameController,
-  ];
+        photo,
+        isLoader,
+        isBtnLoader,
+        isModuleLoader,
+        isChargeAreaLoader,
+        isAreaLoader,
+        isCustomerTypeLoader,
+        scheme,
+        userName,
+        role,
+        baseUrl,
+        moduleTypeModel,
+        moduleTypeValue,
+        listOfModuleType,
+        incidentTypeModel,
+        incidentTypeValue,
+        listOfIncidentType,
+        priorityTypeModel,
+        priorityTypeValue,
+        listOfPriorityType,
+        locationSourceModel,
+        locationSourceValue,
+        listOfLocationSource,
+        informationSourceModel,
+        informationSourceValue,
+        listOfInformationSource,
+        incidentIndicationModel,
+        incidentIndicationValue,
+        listOfIncidentIndication,
+        chargeAreaValue,
+        listOfChargeArea,
+        areaValue,
+        listOfArea,
+        customerTypeValue,
+        listOfCustomerType,
+        assetModel,
+        assetDataValue,
+        listOfAssetData,
+        assetTypeIdValue,
+        listOfAssetTypeId,
+        listOfSearchNumber,
+        controlRoomModel,
+        controlRoomValue,
+        listOfControlRoom,
+        tfGisIdController,
+    valveGisIdController,
+        markerLatitudeController,
+        markerLongitudeController,
+        currentLatitudeController,
+        currentLongitudeController,
+        addressController,
+        landmarkController,
+        descriptionController,
+        remarksController,
+        searchNumberController,
+        locationController,
+        infoSecurityNameController,
+        infoSecurityIdController,
+        infoSecurityMobileController,
+        infoCustomerNameController,
+        infoCustomerBpNumberController,
+        infoCustomerMobileController,
+        infoOtherNameController,
+      ];
 }

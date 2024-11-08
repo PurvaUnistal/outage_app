@@ -29,7 +29,8 @@ import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/re
 import '../../../../../Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/preference_utils.dart';
 
-class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormState> {
+class CreateAlertFormBloc
+    extends Bloc<CreateAlertFormEvent, CreateAlertFormState> {
   CreateAlertFormBloc() : super(CreateAlertFormInitialState()) {
     on<CreateAlertFormLoadEvent>(_pageLoad);
     on<SelectModuleValueEvent>(_selectModuleValue);
@@ -51,18 +52,20 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
   }
 
   File photo = File('');
-  bool isLoader =  false;
-  bool isBtnLoader =  false;
-  bool isModuleLoader =  false;
-  bool isChargeAreaLoader =  false;
-  bool isAreaLoader =  false;
-  bool isCustomerTypeLoader =  false;
+  bool isLoader = false;
+  bool isBtnLoader = false;
+  bool isModuleLoader = false;
+  bool isChargeAreaLoader = false;
+  bool isAreaLoader = false;
+  bool isCustomerTypeLoader = false;
   String scheme = '';
   String role = '';
   String userName = '';
   String baseUrl = '';
   String accessRightData = '';
 
+  TextEditingController tfGisIdController = TextEditingController();
+  TextEditingController valveGisIdController = TextEditingController();
   TextEditingController markerLatitudeController = TextEditingController();
   TextEditingController markerLongitudeController = TextEditingController();
   TextEditingController currentLatitudeController = TextEditingController();
@@ -75,7 +78,8 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
   TextEditingController infoSecurityIdController = TextEditingController();
   TextEditingController infoSecurityMobileController = TextEditingController();
   TextEditingController infoCustomerNameController = TextEditingController();
-  TextEditingController infoCustomerBpNumberController = TextEditingController();
+  TextEditingController infoCustomerBpNumberController =
+      TextEditingController();
   TextEditingController infoCustomerMobileController = TextEditingController();
   TextEditingController infoOtherNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -101,8 +105,10 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
   GetPriorityTypeData informationSourceValue = GetPriorityTypeData();
   List<GetPriorityTypeData> listOfInformationSource = [];
 
-  GetIncidentIndicationModel incidentIndicationModel = GetIncidentIndicationModel();
-  GetIncidentIndicationData incidentIndicationValue = GetIncidentIndicationData();
+  GetIncidentIndicationModel incidentIndicationModel =
+      GetIncidentIndicationModel();
+  GetIncidentIndicationData incidentIndicationValue =
+      GetIncidentIndicationData();
   List<GetIncidentIndicationData> listOfIncidentIndication = [];
 
   GetChargeAreaModel chargeAreaValue = GetChargeAreaModel();
@@ -131,17 +137,15 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
   GetControlRoomData controlRoomValue = GetControlRoomData();
   List<GetControlRoomData> listOfControlRoom = [];
 
-
-
   _pageLoad(CreateAlertFormLoadEvent event, emit) async {
     emit(CreateAlertFormInitialState());
     photo = File('');
-    isLoader =  false;
-    isBtnLoader =  false;
-    isModuleLoader =  false;
-    isChargeAreaLoader =  false;
-    isAreaLoader =  false;
-    isCustomerTypeLoader =  false;
+    isLoader = false;
+    isBtnLoader = false;
+    isModuleLoader = false;
+    isChargeAreaLoader = false;
+    isAreaLoader = false;
+    isCustomerTypeLoader = false;
     moduleTypeModel = GetModuleTypeModel();
     moduleTypeValue = GetModuleTypeData();
     listOfModuleType = [];
@@ -170,9 +174,9 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
     assetDataValue = GetAssetData();
     listOfAssetData = [];
 
-     gasValueGISModel = GetTfGisModel();
-     assetTypeIdValue = TfGisData();
-     listOfAssetTypeId = [];
+    gasValueGISModel = GetTfGisModel();
+    assetTypeIdValue = TfGisData();
+    listOfAssetTypeId = [];
 
     customerLocationModel = GetCustomerLocationModel();
     getCustomerLocationData = GetCustomerLocationData();
@@ -196,169 +200,217 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
     infoOtherNameController.text = "";
     descriptionController.text = "";
     remarksController.text = "";
-    markerLatitudeController.text = await SharedPref.getString(key: PrefsValue.markerLat);
-    markerLongitudeController.text = await SharedPref.getString(key: PrefsValue.markerLong);
+    markerLatitudeController.text =
+        await SharedPref.getString(key: PrefsValue.markerLat);
+    tfGisIdController.text = await SharedPref.getString(key: PrefsValue.tfGisId);
+    valveGisIdController.text = await SharedPref.getString(key: PrefsValue.gasValveGISId);
+    markerLongitudeController.text =
+        await SharedPref.getString(key: PrefsValue.markerLong);
     scheme = await SharedPref.getString(key: PrefsValue.schema);
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
     await _getCurrentPosition();
-   /* await fetchOutageModuleApi(context: event.context);
-    await fetchLocationSourceApi(context: event.context);
-    await fetchCustomerLocationSourceApi(context: event.context);
-    await fetchInformationSourceApi(context: event.context);*/
-    await fetchIncidentIndicationApi(context: event.context);
-   /* await fetchChargeAreaListApi(context: event.context);
-    await fetchAssetLocationSourceApi(context: event.context);
-    await fetchGasValueGisApi(context: event.context);*/
+    await _fetchIncidentIndicationApi(context: event.context);
+    await _fetchIncidentTypeApi(context: event.context, moduleId: "");
     _eventCompleted(emit);
   }
+
   _getCurrentPosition() async {
     Position? currentPoint = await CurrentLocation.getCurrentLocation();
-  currentLatitudeController.text = currentPoint!.latitude.toString();
-  currentLongitudeController.text= currentPoint.longitude.toString();
+    currentLatitudeController.text = currentPoint!.latitude.toString();
+    currentLongitudeController.text = currentPoint.longitude.toString();
   }
-  fetchOutageModuleApi({required BuildContext context}) async {
+
+  _fetchOutageModuleApi({required BuildContext context}) async {
     var res = await CreateAlertFormHelper.getOutageModuleApi(context: context);
     if (res != null) {
       moduleTypeModel = res;
-      if(moduleTypeModel.data != null){
+      if (moduleTypeModel.data != null) {
         listOfModuleType = moduleTypeModel.data!;
       }
       return res;
     }
   }
-  fetchIncidentTypeApi({required BuildContext context, required String moduleId}) async {
-    var res = await CreateAlertFormHelper.getIncidentTypeApi(context: context,moduleId: moduleId);
+
+  _fetchIncidentTypeApi(
+      {required BuildContext context, required String moduleId}) async {
+    var res = await CreateAlertFormHelper.getIncidentTypeApi(
+        context: context, moduleId: moduleId);
     if (res != null) {
       incidentTypeModel = res;
-      if(incidentTypeModel.data != null){
+      if (incidentTypeModel.data != null) {
         listOfIncidentType = incidentTypeModel.data!;
       }
       return res;
     }
   }
 
-  fetchIncidentPriorityApi({required BuildContext context, required String moduleId}) async {
-    var res = await CreateAlertFormHelper.getIncidentPriorityApi(context: context,moduleId: moduleId);
+  _fetchIncidentPriorityApi(
+      {required BuildContext context, required String moduleId}) async {
+    var res = await CreateAlertFormHelper.getIncidentPriorityApi(
+        context: context, moduleId: moduleId);
     if (res != null) {
       priorityTypeModel = res;
-      if(priorityTypeModel.data != null){
+      if (priorityTypeModel.data != null) {
         listOfPriorityType = priorityTypeModel.data!;
       }
       return res;
     }
   }
-  fetchLocationSourceApi({required BuildContext context,}) async {
-    var res = await CreateAlertFormHelper.getLocationSourceApi(context: context,);
-    if(res != null){
+
+  _fetchLocationSourceApi({
+    required BuildContext context,
+  }) async {
+    var res = await CreateAlertFormHelper.getLocationSourceApi(
+      context: context,
+    );
+    if (res != null) {
       listOfLocationSource = res;
     }
     return res;
   }
-  fetchCustomerLocationSourceApi({required BuildContext context,}) async {
-    var res = await CreateAlertFormHelper.getCustomerLocationSourceApi(context: context,);
-    if(res != null){
+
+  _fetchCustomerLocationSourceApi({
+    required BuildContext context,
+  }) async {
+    var res = await CreateAlertFormHelper.getCustomerLocationSourceApi(
+      context: context,
+    );
+    if (res != null) {
       listOfCustomerType = res;
     }
     return res;
   }
 
-  fetchInformationSourceApi({required BuildContext context,}) async {
-    var res = await CreateAlertFormHelper.getInformationSourceApi(context: context,);
+  _fetchInformationSourceApi({
+    required BuildContext context,
+  }) async {
+    var res = await CreateAlertFormHelper.getInformationSourceApi(
+      context: context,
+    );
     if (res != null) {
       informationSourceModel = res;
-      if(informationSourceModel.data != null){
+      if (informationSourceModel.data != null) {
         listOfInformationSource = informationSourceModel.data!;
       }
       return res;
     }
   }
 
-  fetchIncidentIndicationApi({required BuildContext context,}) async {
-    var res = await CreateAlertFormHelper.getIncidentIndicationApi(context: context,);
+  _fetchIncidentIndicationApi({
+    required BuildContext context,
+  }) async {
+    var res = await CreateAlertFormHelper.getIncidentIndicationApi(
+      context: context,
+    );
     if (res != null) {
       incidentIndicationModel = res;
-      if(incidentIndicationModel.data != null){
+      if (incidentIndicationModel.data != null) {
         listOfIncidentIndication = incidentIndicationModel.data!;
       }
       return res;
     }
   }
 
-  fetchChargeAreaListApi({required BuildContext context,}) async {
-    var res = await CreateAlertFormHttpHelper.getChargeAreaListApi(context: context,);
-    if(res != null){
+  _fetchChargeAreaListApi({
+    required BuildContext context,
+  }) async {
+    var res = await CreateAlertFormHttpHelper.getChargeAreaListApi(
+      context: context,
+    );
+    if (res != null) {
       listOfChargeArea = res;
     }
     return res;
   }
 
-  fetchAllAreaApi({required BuildContext context,required String gid}) async {
-    var res = await CreateAlertFormHttpHelper.getAllAreaApi(context: context,gid: gid);
-    if(res != null){
+  _fetchAllAreaApi({required BuildContext context, required String gid}) async {
+    var res = await CreateAlertFormHttpHelper.getAllAreaApi(
+        context: context, gid: gid);
+    if (res != null) {
       listOfArea = res;
     }
     return res;
   }
 
-  fetchAssetLocationSourceApi({required BuildContext context,}) async {
-    var res = await CreateAlertFormHelper.getAssetLocationSourceApi(context: context,);
+  _fetchAssetLocationSourceApi({
+    required BuildContext context,
+  }) async {
+    var res = await CreateAlertFormHelper.getAssetLocationSourceApi(
+      context: context,
+    );
     if (res != null) {
       assetModel = res;
-      if(assetModel.data != null){
+      if (assetModel.data != null) {
         listOfAssetData = assetModel.data!;
       }
       return res;
     }
   }
 
-  fetchGasValueGisApi({required BuildContext context,}) async {
-    var res = await ReportAlertHelper.getGasValueGisApi(context: context,);
+  _fetchGasValueGisApi({
+    required BuildContext context,
+  }) async {
+    var res = await ReportAlertHelper.getGasValueGisApi(
+      context: context,
+    );
     if (res != null) {
       gasValueGISModel = res;
-      if(gasValueGISModel.data != null){
+      if (gasValueGISModel.data != null) {
         listOfAssetTypeId = gasValueGISModel.data!;
         return res;
       }
     }
   }
 
-  fetchCustomerDetailByLocationApi({required BuildContext context, required String locationSource, required String search}) async {
+  _fetchCustomerDetailByLocationApi(
+      {required BuildContext context,
+      required String locationSource,
+      required String search}) async {
     listOfCustomerLocationData = [];
     var res = await CreateAlertFormHelper.getCustomerDetailByLocationApi(
         context: context, locationSource: locationSource, search: search);
     if (res != null) {
       customerLocationModel = res;
-      if(customerLocationModel.data != null){
+      if (customerLocationModel.data != null) {
         listOfCustomerLocationData = customerLocationModel.data!;
-        if(customerTypeValue.key == "1"){
-          listOfSearchNumber = listOfCustomerLocationData.map((e) => e.bpNumber!).toList();
-        }else if(customerTypeValue.key == "2"){
-          listOfSearchNumber = listOfCustomerLocationData.map((e) => e.mobileNumber!).toList();
-        }else if(customerTypeValue.key == "3"){
-          listOfSearchNumber = listOfCustomerLocationData.map((e) => e.serialNumber!).toList();
-        }else{
-          listOfSearchNumber = listOfCustomerLocationData.map((e) => e.bpNumber!).toList();
+        if (customerTypeValue.key == "1") {
+          listOfSearchNumber =
+              listOfCustomerLocationData.map((e) => e.bpNumber!).toList();
+        } else if (customerTypeValue.key == "2") {
+          listOfSearchNumber =
+              listOfCustomerLocationData.map((e) => e.mobileNumber!).toList();
+        } else if (customerTypeValue.key == "3") {
+          listOfSearchNumber =
+              listOfCustomerLocationData.map((e) => e.serialNumber!).toList();
+        } else {
+          listOfSearchNumber =
+              listOfCustomerLocationData.map((e) => e.bpNumber!).toList();
         }
       }
       return res;
     }
   }
 
-  fetchControlRoomApi({required BuildContext context, required String areaId}) async {
+  _fetchControlRoomApi(
+      {required BuildContext context, required String areaId}) async {
     listOfCustomerLocationData = [];
-    var res = await CreateAlertFormHelper.getControlRoomApi(context: context, areaId: areaId,);
+    var res = await CreateAlertFormHelper.getControlRoomApi(
+      context: context,
+      areaId: areaId,
+    );
     if (res != null) {
       controlRoomModel = res;
-      if(controlRoomModel.data != null){
+      if (controlRoomModel.data != null) {
         listOfControlRoom = controlRoomModel.data!;
       }
       return res;
     }
   }
 
-  _selectModuleValue(SelectModuleValueEvent event, Emitter<CreateAlertFormState> emit) async {
+  _selectModuleValue(
+      SelectModuleValueEvent event, Emitter<CreateAlertFormState> emit) async {
     incidentTypeModel = GetIncidentTypeModel();
     incidentTypeValue = GetIncidentTypeData();
     listOfIncidentType = [];
@@ -366,11 +418,13 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
     priorityTypeValue = GetPriorityTypeData();
     listOfPriorityType = [];
     moduleTypeValue = event.moduleTypeValue;
-    if(event.moduleTypeValue.id != null){
+    if (event.moduleTypeValue.id != null) {
       isModuleLoader = true;
       _eventCompleted(emit);
-      await fetchIncidentTypeApi(context: event.context, moduleId: event.moduleTypeValue.id!);
-      await fetchIncidentPriorityApi(context: event.context, moduleId: event.moduleTypeValue.id!);
+      await _fetchIncidentTypeApi(
+          context: event.context, moduleId: event.moduleTypeValue.id!);
+      await _fetchIncidentPriorityApi(
+          context: event.context, moduleId: event.moduleTypeValue.id!);
       isModuleLoader = false;
       _eventCompleted(emit);
     }
@@ -400,7 +454,9 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
     informationSourceValue = event.informationSourceValue;
     _eventCompleted(emit);
   }
-  _selectIncidentIndicationValue(SelectIncidentIndicationValueEvent event, emit) {
+
+  _selectIncidentIndicationValue(
+      SelectIncidentIndicationValueEvent event, emit) {
     incidentIndicationValue = event.incidentIndicationValue;
     _eventCompleted(emit);
   }
@@ -409,10 +465,11 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
     areaValue = GetAreaModel();
     listOfArea = [];
     chargeAreaValue = event.chargeAreaValue;
-    if(chargeAreaValue.gid != null){
+    if (chargeAreaValue.gid != null) {
       isChargeAreaLoader = true;
       _eventCompleted(emit);
-      await fetchAllAreaApi(context: event.context, gid: event.chargeAreaValue.gid!);
+      await _fetchAllAreaApi(
+          context: event.context, gid: event.chargeAreaValue.gid!);
       isChargeAreaLoader = false;
       _eventCompleted(emit);
     }
@@ -422,10 +479,11 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
     controlRoomValue = GetControlRoomData();
     listOfControlRoom = [];
     areaValue = event.areaValue;
-    if(areaValue.gid != null){
+    if (areaValue.gid != null) {
       isAreaLoader = true;
       _eventCompleted(emit);
-      await fetchControlRoomApi(context: event.context, areaId: areaValue.gid ?? "");
+      await _fetchControlRoomApi(
+          context: event.context, areaId: areaValue.gid ?? "");
       isAreaLoader = false;
       _eventCompleted(emit);
     }
@@ -440,11 +498,11 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
     searchNumberController.text = '';
     listOfSearchNumber = [];
     customerTypeValue = event.customerTypeValue;
-    if(customerTypeValue.key != null){
+    if (customerTypeValue.key != null) {
       isCustomerTypeLoader = true;
       _eventCompleted(emit);
 
-      await fetchCustomerDetailByLocationApi(
+      await _fetchCustomerDetailByLocationApi(
         context: event.context,
         search: searchNumberController.text.trim().toString(),
         locationSource: customerTypeValue.key!,
@@ -456,18 +514,30 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
 
   _selectSearchNumberController(SelectSearchNumberControllerEvent event, emit) {
     searchNumberController.text = event.searchNumberValue;
-    if(customerTypeValue.key == "1"){
-      searchNumberController.text = listOfCustomerLocationData.firstWhereOrNull((element) =>
-      element.bpNumber == event.searchNumberValue)?.bpNumber ??"";
-    }else if(customerTypeValue.key == "2"){
-      searchNumberController.text = listOfCustomerLocationData.firstWhereOrNull((element) =>
-      element.mobileNumber == event.searchNumberValue)?.mobileNumber ??"";
-    }else if(customerTypeValue.key == "3"){
-      searchNumberController.text = listOfCustomerLocationData.firstWhereOrNull((element) =>
-      element.serialNumber == event.searchNumberValue)?.serialNumber ??"";
-    }else{
-      searchNumberController.text = listOfCustomerLocationData.firstWhereOrNull((element) =>
-      element.bpNumber == event.searchNumberValue)?.bpNumber ??"";
+    if (customerTypeValue.key == "1") {
+      searchNumberController.text = listOfCustomerLocationData
+              .firstWhereOrNull(
+                  (element) => element.bpNumber == event.searchNumberValue)
+              ?.bpNumber ??
+          "";
+    } else if (customerTypeValue.key == "2") {
+      searchNumberController.text = listOfCustomerLocationData
+              .firstWhereOrNull(
+                  (element) => element.mobileNumber == event.searchNumberValue)
+              ?.mobileNumber ??
+          "";
+    } else if (customerTypeValue.key == "3") {
+      searchNumberController.text = listOfCustomerLocationData
+              .firstWhereOrNull(
+                  (element) => element.serialNumber == event.searchNumberValue)
+              ?.serialNumber ??
+          "";
+    } else {
+      searchNumberController.text = listOfCustomerLocationData
+              .firstWhereOrNull(
+                  (element) => element.bpNumber == event.searchNumberValue)
+              ?.bpNumber ??
+          "";
     }
     _eventCompleted(emit);
   }
@@ -489,7 +559,6 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
       photo = photoPath!;
     }
     _eventCompleted(emit);
-
   }
 
   _captureGalleryPhoto(CaptureGalleryPhotoEvent event, emit) async {
@@ -502,83 +571,82 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
   }
 
   _submitBtn(SubmitAddIncidentBtnEvent event, emit) async {
-  //  try{
-      var validationCheck = await CreateAlertFormHelper.validationSubmit(
-          context: event.context,
-          moduleType: moduleTypeValue,
-          incidentType: incidentTypeValue,
-          incidentPriority: priorityTypeValue,
-          locationSource: locationSourceValue,
-          customerType: customerTypeValue,
-          customerSearchNumber: searchNumberController.text.trim().toString(),
-          customerAsset: assetDataValue,
-          assetInternalId: assetTypeIdValue,
-          customerLocation: locationController.text.trim().toString(),
-          infoSource: informationSourceValue,
-          infoSecurityName: infoSecurityNameController.text.trim().toString(),
-          infoSecurityId: infoSecurityIdController.text.trim().toString(),
-          infoSecurityMobile: infoSecurityMobileController.text.trim().toString(),
-          infoCustName: infoCustomerNameController.text.trim().toString(),
-          infoCustBpNumber: infoCustomerBpNumberController.text.trim().toString(),
-          infoCustMobile: infoCustomerMobileController.text.trim().toString(),
-          infoOtherName: infoOtherNameController.text.trim().toString(),
-          address: addressController.text.trim().toString(),
-          landmark: landmarkController.text.trim().toString(),
-          incidentIndication: incidentIndicationValue,
-          chargeArea: chargeAreaValue,
-          area: areaValue,
-          controlRoom: controlRoomValue,
-          photo: photo
+    //  try{
+    var validationCheck = await CreateAlertFormHelper.validationSubmit(
+        context: event.context,
+        moduleType: moduleTypeValue,
+        incidentType: incidentTypeValue,
+        incidentPriority: priorityTypeValue,
+        locationSource: locationSourceValue,
+        customerType: customerTypeValue,
+        customerSearchNumber: searchNumberController.text.trim().toString(),
+        customerAsset: assetDataValue,
+        assetInternalId: assetTypeIdValue,
+        customerLocation: locationController.text.trim().toString(),
+        infoSource: informationSourceValue,
+        infoSecurityName: infoSecurityNameController.text.trim().toString(),
+        infoSecurityId: infoSecurityIdController.text.trim().toString(),
+        infoSecurityMobile: infoSecurityMobileController.text.trim().toString(),
+        infoCustName: infoCustomerNameController.text.trim().toString(),
+        infoCustBpNumber: infoCustomerBpNumberController.text.trim().toString(),
+        infoCustMobile: infoCustomerMobileController.text.trim().toString(),
+        infoOtherName: infoOtherNameController.text.trim().toString(),
+        address: addressController.text.trim().toString(),
+        landmark: landmarkController.text.trim().toString(),
+        incidentIndication: incidentIndicationValue,
+        chargeArea: chargeAreaValue,
+        area: areaValue,
+        controlRoom: controlRoomValue,
+        photo: photo);
+    if (await validationCheck == true) {
+      isBtnLoader = false;
+      _eventCompleted(emit);
+      var res = await CreateAlertFormHelper.addIncidentData(
+        context: event.context,
+        moduleType: moduleTypeValue,
+        incidentType: incidentTypeValue,
+        incidentPriority: priorityTypeValue,
+        locationSource: locationSourceValue,
+        customerType: customerTypeValue,
+        customerSearchNumber: searchNumberController.text.trim().toString(),
+        customerAsset: assetDataValue,
+        assetInternalId: assetTypeIdValue,
+        customerLocation: locationController.text.trim().toString(),
+        infoSource: informationSourceValue,
+        infoSecurityName: infoSecurityNameController.text.trim().toString(),
+        infoSecurityId: infoSecurityIdController.text.trim().toString(),
+        infoSecurityMobile: infoSecurityMobileController.text.trim().toString(),
+        infoCustName: infoCustomerNameController.text.trim().toString(),
+        infoCustBpNumber: infoCustomerBpNumberController.text.trim().toString(),
+        infoCustMobile: infoCustomerMobileController.text.trim().toString(),
+        infoOtherName: infoOtherNameController.text.trim().toString(),
+        address: addressController.text.trim().toString(),
+        landmark: landmarkController.text.trim().toString(),
+        incidentIndication: incidentIndicationValue,
+        chargeArea: chargeAreaValue,
+        area: areaValue,
+        controlRoom: controlRoomValue,
+        photo: photo,
+        currentLat: currentLatitudeController.text.trim().toString(),
+        currentLong: currentLongitudeController.text.trim().toString(),
+        markerLat: markerLatitudeController.text.trim().toString(),
+        markerLong: markerLongitudeController.text.trim().toString(),
+        remarks: remarksController.text.trim().toString(),
+        description: descriptionController.text.trim().toString(),
       );
-      if(await validationCheck == true){
+      if (res != null) {
         isBtnLoader = false;
         _eventCompleted(emit);
-        var res = await CreateAlertFormHelper.addIncidentData(
-          context: event.context,
-          moduleType: moduleTypeValue,
-          incidentType: incidentTypeValue,
-          incidentPriority: priorityTypeValue,
-          locationSource: locationSourceValue,
-          customerType: customerTypeValue,
-          customerSearchNumber: searchNumberController.text.trim().toString(),
-          customerAsset: assetDataValue,
-          assetInternalId: assetTypeIdValue,
-          customerLocation: locationController.text.trim().toString(),
-          infoSource: informationSourceValue,
-          infoSecurityName: infoSecurityNameController.text.trim().toString(),
-          infoSecurityId: infoSecurityIdController.text.trim().toString(),
-          infoSecurityMobile: infoSecurityMobileController.text.trim().toString(),
-          infoCustName: infoCustomerNameController.text.trim().toString(),
-          infoCustBpNumber: infoCustomerBpNumberController.text.trim().toString(),
-          infoCustMobile: infoCustomerMobileController.text.trim().toString(),
-          infoOtherName: infoOtherNameController.text.trim().toString(),
-          address: addressController.text.trim().toString(),
-          landmark: landmarkController.text.trim().toString(),
-          incidentIndication: incidentIndicationValue,
-          chargeArea: chargeAreaValue,
-          area: areaValue,
-          controlRoom: controlRoomValue,
-          photo: photo,
-          currentLat: currentLatitudeController.text.trim().toString(),
-          currentLong: currentLongitudeController.text.trim().toString(),
-          markerLat: markerLatitudeController.text.trim().toString(),
-          markerLong: markerLongitudeController.text.trim().toString(),
-          remarks: remarksController.text.trim().toString(),
-          description: descriptionController.text.trim().toString(),
+        Utils.successSnackBar(msg: res.data!, context: event.context);
+        Navigator.pushReplacementNamed(
+          event.context,
+          RoutesName.home,
         );
-        if (res != null) {
-          isBtnLoader = false;
-          _eventCompleted(emit);
-          Utils.successSnackBar(msg: res.data!, context: event.context);
-          Navigator.pushReplacementNamed(
-            event.context,
-            RoutesName.home,
-          );
-        } else {
-          isBtnLoader = false;
-          _eventCompleted(emit);
-        }
+      } else {
+        isBtnLoader = false;
+        _eventCompleted(emit);
       }
+    }
     /*}catch(e){
       isBtnLoader = false;
       log("submit--->${e.toString()}");
@@ -602,51 +670,53 @@ class CreateAlertFormBloc extends Bloc<CreateAlertFormEvent, CreateAlertFormStat
       moduleTypeModel: moduleTypeModel,
       moduleTypeValue: moduleTypeValue,
       listOfModuleType: listOfModuleType,
-      incidentTypeModel : incidentTypeModel,
-      incidentTypeValue : incidentTypeValue,
-      listOfIncidentType : listOfIncidentType,
-      priorityTypeModel : priorityTypeModel,
-      priorityTypeValue : priorityTypeValue,
-      listOfPriorityType : listOfPriorityType,
-      locationSourceModel : locationSourceModel,
-      locationSourceValue : locationSourceValue,
-      listOfLocationSource : listOfLocationSource,
-      informationSourceModel : informationSourceModel,
-      informationSourceValue : informationSourceValue,
-      listOfInformationSource : listOfInformationSource,
-      incidentIndicationModel : incidentIndicationModel,
-      incidentIndicationValue : incidentIndicationValue,
-      listOfIncidentIndication : listOfIncidentIndication,
-      listOfSearchNumber : listOfSearchNumber,
-      chargeAreaValue : chargeAreaValue,
-      listOfChargeArea : listOfChargeArea,
-      areaValue  : areaValue,
-      listOfArea : listOfArea,
+      incidentTypeModel: incidentTypeModel,
+      incidentTypeValue: incidentTypeValue,
+      listOfIncidentType: listOfIncidentType,
+      priorityTypeModel: priorityTypeModel,
+      priorityTypeValue: priorityTypeValue,
+      listOfPriorityType: listOfPriorityType,
+      locationSourceModel: locationSourceModel,
+      locationSourceValue: locationSourceValue,
+      listOfLocationSource: listOfLocationSource,
+      informationSourceModel: informationSourceModel,
+      informationSourceValue: informationSourceValue,
+      listOfInformationSource: listOfInformationSource,
+      incidentIndicationModel: incidentIndicationModel,
+      incidentIndicationValue: incidentIndicationValue,
+      listOfIncidentIndication: listOfIncidentIndication,
+      listOfSearchNumber: listOfSearchNumber,
+      chargeAreaValue: chargeAreaValue,
+      listOfChargeArea: listOfChargeArea,
+      areaValue: areaValue,
+      listOfArea: listOfArea,
       customerTypeValue: customerTypeValue,
       listOfCustomerType: listOfCustomerType,
-      assetModel : assetModel,
-      assetDataValue : assetDataValue,
-      listOfAssetData : listOfAssetData,
-      assetTypeIdValue : assetTypeIdValue,
-      listOfAssetTypeId : listOfAssetTypeId,
+      assetModel: assetModel,
+      assetDataValue: assetDataValue,
+      listOfAssetData: listOfAssetData,
+      assetTypeIdValue: assetTypeIdValue,
+      listOfAssetTypeId: listOfAssetTypeId,
       controlRoomModel: controlRoomModel,
       controlRoomValue: controlRoomValue,
       listOfControlRoom: listOfControlRoom,
-      markerLatitudeController : markerLatitudeController,
-      markerLongitudeController : markerLongitudeController,
-      currentLatitudeController : currentLatitudeController,
-      currentLongitudeController : currentLongitudeController,
-      addressController : addressController,
-      landmarkController : landmarkController,
-      searchNumberController : searchNumberController,
-      locationController : locationController,
-      infoSecurityNameController : infoSecurityNameController,
-      infoSecurityIdController : infoSecurityIdController,
-      infoSecurityMobileController : infoSecurityMobileController,
-      infoCustomerNameController : infoCustomerNameController,
-      infoCustomerBpNumberController : infoCustomerBpNumberController,
-      infoCustomerMobileController : infoCustomerMobileController,
-      infoOtherNameController :infoOtherNameController,
+      tfGisIdController: tfGisIdController,
+      valveGisIdController: valveGisIdController,
+      markerLatitudeController: markerLatitudeController,
+      markerLongitudeController: markerLongitudeController,
+      currentLatitudeController: currentLatitudeController,
+      currentLongitudeController: currentLongitudeController,
+      addressController: addressController,
+      landmarkController: landmarkController,
+      searchNumberController: searchNumberController,
+      locationController: locationController,
+      infoSecurityNameController: infoSecurityNameController,
+      infoSecurityIdController: infoSecurityIdController,
+      infoSecurityMobileController: infoSecurityMobileController,
+      infoCustomerNameController: infoCustomerNameController,
+      infoCustomerBpNumberController: infoCustomerBpNumberController,
+      infoCustomerMobileController: infoCustomerMobileController,
+      infoOtherNameController: infoOtherNameController,
       descriptionController: descriptionController,
       remarksController: remarksController,
     ));

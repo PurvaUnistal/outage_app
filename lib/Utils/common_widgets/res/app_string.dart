@@ -54,6 +54,8 @@ class AppString {
   static const String meterNumber = 'Meter Number';
   static const String assets = 'Assets';
   static const String assetTypeId = 'Assets Type Id';
+  static const String gasTfGisId = 'Gas TF GIS Id';
+  static const String gasValveGisId = 'Gas Valve GIS Id';
   static const String location = 'Location';
   static const String securityGuardName = 'Security Guard Name';
   static const String securityGuardId = 'Security Guard ID';
