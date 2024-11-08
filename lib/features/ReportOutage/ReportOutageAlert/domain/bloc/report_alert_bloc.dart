@@ -25,11 +25,17 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     on<SelectCurrentMarkerButtonEvent>(_selectCurrentMarkerButton);
     on<SelectCameraPositionButtonEvent>(_selectCameraPositionButton);
     on<SelectTFGisEvent>(_selectTFGisValue);
+    on<SelectCheckBoxTFGisEvent>(_selectCheckBoxTFGis);
     on<SelectValveGISValueEvent>(_selectValveGISValue);
+    on<SelectCheckBoxValveGisEvent>(_selectCheckBoxValveGis);
   }
 
   bool isLoader = false;
   bool isPipelineLoader = false;
+  bool checkBoxTf = false;
+  bool checkBoxValve = false;
+  bool isGasTfLoader = false;
+  bool isGasValveLoader = false;
   String scheme = '';
   String role = '';
   String userName = '';
@@ -102,6 +108,10 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     emit(ReportAlertInitialState());
     isLoader = false;
     isPipelineLoader = false;
+    checkBoxTf = false;
+    checkBoxValve = false;
+    isGasTfLoader = false;
+    isGasValveLoader = false;
     role = '';
     nameofLocation = '';
     tfGisController.text = '';
@@ -142,8 +152,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     await ReportAlertHelper.clearCache();
     await _currentAdd();
     await _addLoginMarkerGISPoint();
-    await _fetchTFGisApi(context: event.context);
-    await _fetchGasValueGisApi(context: event.context);
     _eventCompleted(emit);
   }
 
@@ -344,6 +352,27 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
 
   _selectCameraPositionButton(SelectCameraPositionButtonEvent event, emit) {}
 
+  _selectCheckBoxTFGis(SelectCheckBoxTFGisEvent event,emit) async {
+    checkBoxTf = event.checkBoxTf;
+    isGasTfLoader = true;
+    _eventCompleted(emit);
+      await _fetchTFGisApi(context: event.context);
+      await SharedPref.setString(key: PrefsValue.tfAssetId,value: tfGisModel.assetId!);
+    isGasTfLoader = false;
+    _eventCompleted(emit);
+  }
+
+  _selectCheckBoxValveGis(SelectCheckBoxValveGisEvent event,emit) async {
+    checkBoxTf = false;
+    checkBoxValve = event.checkBoxValve;
+    isGasValveLoader = true;
+    _eventCompleted(emit);
+    await _fetchGasValueGisApi(context: event.context);
+  //  await SharedPref.setString(key: PrefsValue.tfAssetId,value: tfGisModel.assetId!);
+    isGasValveLoader = false;
+    _eventCompleted(emit);
+  }
+
   _selectTFGisValue(SelectTFGisEvent event, emit) async {
     polylineList = {};
     markersPointList = {};
@@ -413,6 +442,10 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     emit(FetchReportAlertDataState(
       isLoader: isLoader,
       isPipelineLoader: isPipelineLoader,
+      checkBoxTf: checkBoxTf,
+      checkBoxValve: checkBoxValve,
+      isGasTfLoader: isGasTfLoader,
+      isGasValveLoader: isGasValveLoader,
       scheme: scheme,
       baseUrl: baseUrl,
       userName: userName,

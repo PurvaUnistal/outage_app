@@ -6,6 +6,7 @@ import 'package:igl_outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:igl_outage_app/features/Login/domain/bloc/login_bloc.dart';
 import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/presentation/create_alert_form_page.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
 import 'Utils/common_widgets/Routes/routes.dart';
@@ -57,6 +58,7 @@ class _MyAppState extends State<MyApp> {
               seedColor: AppColor.primer,
             ),
           ),
+      //  home: CreateAlertFormView(),
           initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,
         ));

@@ -35,6 +35,14 @@ class SelectCameraPositionButtonEvent extends ReportAlertEvent {
   List<Object> get props => [cameraPosition];
 }
 
+class SelectCheckBoxTFGisEvent extends ReportAlertEvent {
+  final BuildContext context;
+  final bool checkBoxTf;
+  SelectCheckBoxTFGisEvent({required this.context, required this.checkBoxTf});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, checkBoxTf];
+}
 
 class SelectTFGisEvent extends ReportAlertEvent {
   final BuildContext context;
@@ -45,7 +53,6 @@ class SelectTFGisEvent extends ReportAlertEvent {
   List<Object> get props => [context, tfGisId];
 }
 
-
 class SelectValveGISValueEvent extends ReportAlertEvent {
   final BuildContext context;
   final String gasValveGISId;
@@ -53,4 +60,13 @@ class SelectValveGISValueEvent extends ReportAlertEvent {
   @override
   // TODO: implement props
   List<Object> get props => [context, gasValveGISId];
+}
+
+class SelectCheckBoxValveGisEvent extends ReportAlertEvent {
+  final BuildContext context;
+  final bool checkBoxValve;
+  SelectCheckBoxValveGisEvent({required this.context, required this.checkBoxValve});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, checkBoxValve];
 }

@@ -1,16 +1,17 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as ui;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
+import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/presentation/create_alert_form_page.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/presentation/widget/alert_dialog_widget.dart';
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
 
@@ -119,14 +120,21 @@ class ReportAlertHelper{
            markerId: MarkerId(i.toString()),
            infoWindow: InfoWindow(
                title: "${latLngData.latitude.toString()}, " "${latLngData.longitude.toString()}",
-               onTap: () async {
-                var latLngList =  LatLng(latLngData.latitude, latLngData.longitude);
-                 print("tfLatLngData-->${latLngList.latitude}");
-                 print("tfLatLngData-->${latLngList.longitude}");
-                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreateAlertFormView()));
-               }
            ),
            position: LatLng(latLngData.latitude, latLngData.longitude),
+           onTap: () async {
+             await SharedPref.setString(key: PrefsValue.markerLat,value: latLngData.latitude.toString());
+             await SharedPref.setString(key: PrefsValue.markerLong,value: latLngData.longitude.toString());
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(builder: (context) => const CreateAlertFormView()),
+               );
+               /* showBottomSheet(context: context, builder: (BuildContext context){
+               return AlertDialogTwoBtnWidget();
+             });*/
+          //   }
+
+           },
            icon: markerIcon,
          ));
        }

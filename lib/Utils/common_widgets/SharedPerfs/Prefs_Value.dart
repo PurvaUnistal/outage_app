@@ -20,5 +20,6 @@ class PrefsValue {
   static String markerLat = "markerLat";
   static String markerLong = "markerLong";
   static String tfGisId = "tfGisId";
+  static String tfAssetId = "tfAssetId";
   static String gasValveGISId = "gasValveGISId";
 }

@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/background_widget.dart';
@@ -10,9 +10,11 @@ import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.d
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/presentation/create_alert_form_page.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_state.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/presentation/widget/sateful_dialog.dart';
 import '../../../../Utils/common_widgets/res/app_string.dart';
 
 class ReportAlertView extends StatefulWidget {
@@ -148,7 +150,12 @@ class _ReportAlertViewState extends State<ReportAlertView> {
   _currentLocationButtonWidget({required FetchReportAlertDataState dataState}){
     return  FloatingActionButton(
       heroTag: UniqueKey(),
-      onPressed: (){},
+      onPressed: (){
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CreateAlertFormView()),
+        );
+      },
       backgroundColor: AppColor.primer,
       child: Icon(Icons.my_location_rounded, size: 21.0, color: AppColor.white,),
     );
@@ -164,55 +171,10 @@ class _ReportAlertViewState extends State<ReportAlertView> {
         dataState.gasValveGISController.text = '';
         showDialog(
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(dataState.nameofLocation),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: 16.0),
-                    _tfGisTextFieldWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                    _gasValveGISTextFieldWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                  ],
-                ),
-              ),
-            );
+          builder: (BuildContext mContext) {
+            return ReportPopWidget(mContext: context,);
           },
         );
-      },
-    );
-  }
-
-  Widget _tfGisTextFieldWidget({required FetchReportAlertDataState dataState}) {
-    return AutoCompleteTextFieldWidget(
-      star: AppString.star,
-      label: AppString.tfGis,
-      hintText: AppString.tfGis,
-      keyboardType: TextInputType.number,
-      controller: dataState.tfGisController,
-      suggestions: dataState.listOfTfGisId,
-      onSelected: (val) {
-        BlocProvider.of<ReportAlertBloc>(context)
-            .add(SelectTFGisEvent(tfGisId: val,context: context));
-        Navigator.pop(context);
-      },
-    );
-  }
-
-  Widget _gasValveGISTextFieldWidget({required FetchReportAlertDataState dataState}) {
-    return  AutoCompleteTextFieldWidget(
-      star: AppString.star,
-      label: AppString.gasValveGIS,
-      hintText: AppString.gasValveGIS,
-      keyboardType: TextInputType.number,
-      controller: dataState.gasValveGISController,
-      suggestions: dataState.listOfGasValveGISId,
-      onSelected: (val) {
-        BlocProvider.of<ReportAlertBloc>(context)
-            .add(SelectValveGISValueEvent(gasValveGISId: val,context: context));
-        Navigator.pop(context);
       },
     );
   }

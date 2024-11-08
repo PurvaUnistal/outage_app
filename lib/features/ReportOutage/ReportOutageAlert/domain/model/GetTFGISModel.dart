@@ -11,23 +11,27 @@ String getTfGisModelToJson(GetTfGisModel data) => json.encode(data.toJson());
 class GetTfGisModel {
   int? success;
   bool? error;
+  String? assetId;
   List<TfGisData>? data;
 
   GetTfGisModel({
     this.success,
     this.error,
+    this.assetId,
     this.data,
   });
 
   factory GetTfGisModel.fromJson(Map<String, dynamic> json) => GetTfGisModel(
     success: json["success"] ?? "",
     error: json["error"] ?? "",
+    assetId: json["assetid"] ?? "",
     data: json["data"] == null ? null : List<TfGisData>.from(json["data"].map((x) => TfGisData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
     "success": success,
     "error": error,
+    "assetid": assetId,
     "data": List<dynamic>.from(data!.map((x) => x.toJson())),
   };
 }

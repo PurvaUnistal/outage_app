@@ -52,6 +52,9 @@ dependencies:
   substring_highlight: ^1.0.33
   image_picker: ^1.0.0
   geocoding: ^2.0.0
+  path_provider: ^2.1.4
+  record: ^5.1.2
+  audioplayers: ^6.0.0
 
 
 dev_dependencies:

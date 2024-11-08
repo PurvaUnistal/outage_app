@@ -1,10 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/common_style.dart';
-import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/background_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/dropdown_widget.dart';
@@ -12,6 +11,7 @@ import 'package:igl_outage_app/Utils/common_widgets/image_pop_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/image_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:igl_outage_app/Utils/common_widgets/row_widget.dart';
@@ -19,17 +19,11 @@ import 'package:igl_outage_app/Utils/common_widgets/text_form_widget.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAreaModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAssetModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetChargeAreaModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetControlRoomModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentIndicationModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetLocationSourceModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetModuleTypeModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetPriorityTypeModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+
+import 'widget/voice_record_widget.dart';
 
 class CreateAlertFormView extends StatefulWidget {
   const CreateAlertFormView({super.key});
@@ -107,15 +101,21 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
                     widget2: _currentLongController(dataState: dataState)
                 ),
                 CommonStyle.vertical(context: context),
+              /*  _tfValveIdController(dataState: dataState),
+                CommonStyle.vertical(context: context),*/
                 _incidentTypeDropdown(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _incidentIndicationDropdown(dataState: dataState),
+                CommonStyle.vertical(context: context),
+                _assetIdController(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _assetTypeIdController(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _landmarkController(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _addressController(dataState: dataState),
+                CommonStyle.vertical(context: context),
+                _descriptionController(dataState: dataState),
                 CommonStyle.vertical(context: context),
                 _remarksController(dataState: dataState),
                 CommonStyle.vertical(context: context),
@@ -132,7 +132,7 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
       ),
     );
   }
-  Widget _assetTypeIdController({required FetchCreateAlertFormDataState dataState}){
+  Widget _tfValveIdController({required FetchCreateAlertFormDataState dataState}){
     return TextFieldWidget(
         star: AppString.star,
         label: dataState.tfGisIdController.text == ""? AppString.gasValveGisId:AppString.gasTfGisId,
@@ -159,40 +159,9 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
         controller:dataState.currentLongitudeController
     );
   }
-  Widget _markerLatController({required FetchCreateAlertFormDataState dataState}){
-    return TextFieldWidget(
-        star: AppString.star,
-        label: AppString.markerLat,
-        hintText: AppString.markerLat,
-        enabled: true,
-        controller:dataState.markerLatitudeController
-    );
-  }
-  Widget _markerLongController({required FetchCreateAlertFormDataState dataState}){
-    return TextFieldWidget(
-        star: AppString.star,
-        label: AppString.markerLong,
-        hintText: AppString.markerLong,
-        enabled: true,
-        controller:dataState.markerLongitudeController
-    );
-  }
 
-  Widget _moduleDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return DropdownWidget<GetModuleTypeData>(
-      star: AppString.star,
-      label: AppString.module,
-      hint: AppString.module,
-      dropdownValue: dataState.moduleTypeValue.id == null ? null : dataState.moduleTypeValue,
-      items: dataState.listOfModuleType,
-      onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectModuleValueEvent(moduleTypeValue: val!,context: context));
-      },
-    );
-  }
   Widget _incidentTypeDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.isModuleLoader == false ?  DropdownWidget<GetIncidentTypeData>(
+    return DropdownWidget<GetIncidentTypeData>(
       star: AppString.star,
       label: AppString.incidentType,
       hint: AppString.incidentType,
@@ -202,254 +171,8 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
         BlocProvider.of<CreateAlertFormBloc>(context)
             .add(SelectIncidentTypeValueEvent(incidentTypeValue: val!,context: context));
       },
-    ) : DottedLoaderWidget();
-  }
-  Widget _incidentPriorityDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.isModuleLoader == false ?  DropdownWidget<GetPriorityTypeData>(
-      star: AppString.star,
-      label: AppString.incidentPriority,
-      hint: AppString.incidentPriority,
-      dropdownValue: dataState.priorityTypeValue.id == null ? null : dataState.priorityTypeValue,
-      items: dataState.listOfPriorityType,
-      onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectPriorityTypeValueEvent(priorityTypeValue: val!,context: context));
-      },
-    ) : DottedLoaderWidget();
-  }
-  Widget _locationSourceDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return DropdownWidget<GetLocationSourceModel>(
-      star: AppString.star,
-      label: AppString.locationSource,
-      hint: AppString.locationSource,
-      dropdownValue: dataState.locationSourceValue.key == null ? null : dataState.locationSourceValue,
-      items: dataState.listOfLocationSource,
-      onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectLocationSourceValueEvent(locationSourceValue: val!,context: context));
-      },
     );
   }
-  Widget _customerTypeDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.locationSourceValue.key == "1" ? CommonStyle.col(
-      context: context,
-      child: DropdownWidget<GetLocationSourceModel>(
-        star: AppString.star,
-        label: AppString.customerType,
-        hint: AppString.customerType,
-        dropdownValue: dataState.customerTypeValue.key == null ? null : dataState.customerTypeValue,
-        items: dataState.listOfCustomerType,
-        onChanged: (val) {
-          BlocProvider.of<CreateAlertFormBloc>(context)
-              .add(SelectCustomerTypeValueEvent(customerTypeValue: val!,context: context));
-        },
-      ),
-    ) : Container();
-  }
-
-  Widget _searchNumberController({required FetchCreateAlertFormDataState dataState}) {
-    if(dataState.isCustomerTypeLoader == false){
-      if(dataState.locationSourceValue.key == "1"){
-        if(dataState.customerTypeValue.key == "1" || dataState.customerTypeValue.key == "2" || dataState.customerTypeValue.key == "3"){
-          return CommonStyle.col(
-            context: context,
-            child: AutoCompleteTextFieldWidget(
-              star: AppString.star,
-              label:dataState.customerTypeValue.key == "1" ? AppString.bpNumber
-                  : dataState.customerTypeValue.key == "2" ? AppString.mobileNumber
-                  : dataState.customerTypeValue.key == "3" ? AppString.meterNumber : AppString.bpNumber,
-              hintText:dataState.customerTypeValue.key == "1" ? AppString.bpNumber
-                  : dataState.customerTypeValue.key == "2" ? AppString.mobileNumber
-                  : dataState.customerTypeValue.key == "3" ? AppString.meterNumber : AppString.bpNumber,
-              controller:dataState.searchNumberController,
-              suggestions: dataState.listOfSearchNumber,
-              onSelected: (val) {
-                BlocProvider.of<CreateAlertFormBloc>(context).add(SelectSearchNumberControllerEvent(context: context, searchNumberValue: val));
-              },
-              onChanged: (val) {
-                BlocProvider.of<CreateAlertFormBloc>(context).add(SelectSearchNumberControllerEvent(context: context, searchNumberValue: val));
-              },
-            ),
-          );
-        }else{
-          return Container();
-        }
-      }
-      else {
-        return Container();
-      }
-    }else {
-      return DottedLoaderWidget();
-    }
-  }
-
-  Widget _assetsDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.locationSourceValue.key == "2" ? CommonStyle.col(
-      context: context,
-      child: DropdownWidget<GetAssetData>(
-        star: AppString.star,
-        label: AppString.assets,
-        hint: AppString.assets,
-        dropdownValue: dataState.assetDataValue.assetId == null ? null : dataState.assetDataValue,
-        items: dataState.listOfAssetData,
-        onChanged: (val) {
-          BlocProvider.of<CreateAlertFormBloc>(context)
-              .add(SelectAssetValueEvent(assetDataValue: val!,context: context));
-        },
-      ),
-    ) : Container();
-  }
-  Widget _assetTypeIdDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.locationSourceValue.key == "2" ? CommonStyle.col(
-      context: context,
-      child: DropdownWidget<TfGisData>(
-        star: AppString.star,
-        label: AppString.assetTypeId,
-        hint: AppString.assetTypeId,
-        dropdownValue: dataState.assetTypeIdValue.id == null ? null : dataState.assetTypeIdValue,
-        items: dataState.listOfAssetTypeId,
-        onChanged: (val) {
-          BlocProvider.of<CreateAlertFormBloc>(context)
-              .add(SelectAssetTypeIdValueEvent(assetTypeIdValue: val!,context: context));
-        },
-      ),
-    ) : Container();
-  }
-
-  Widget _locationController({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.locationSourceValue.key  == "3" ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.location,
-          hintText: AppString.location,
-          controller:dataState.locationController
-      ),
-    ) : Container();
-  }
-
-  Widget _addressController({required FetchCreateAlertFormDataState dataState}) {
-    return TextFieldWidget(
-        star: AppString.star,
-        label: AppString.address,
-        hintText: AppString.address,
-        controller:dataState.addressController
-    );
-  }
-
-  Widget _informationSourceDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return DropdownWidget<GetPriorityTypeData>(
-      star: AppString.star,
-      label: AppString.informationSource,
-      hint: AppString.informationSource,
-      dropdownValue: dataState.informationSourceValue.id == null ? null : dataState.informationSourceValue,
-      items: dataState.listOfInformationSource,
-      onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectInformationSourceValueEvent(informationSourceValue: val!,context: context));
-      },
-    );
-  }
-
-  Widget _infoSecurityNameController({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.informationSourceValue.id == "1"
-        ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.securityGuardName,
-          hintText: AppString.securityGuardName,
-          controller:dataState.infoSecurityNameController
-      ),
-    ) : Container();
-  }
-
-  Widget _infoSecurityNumberController({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.informationSourceValue.id == "1"
-        ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.securityGuardId,
-          hintText: AppString.securityGuardId,
-          controller:dataState.infoSecurityIdController
-      ),
-    ) : Container();
-  }
-
-  Widget _infoSecurityMobileController({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.informationSourceValue.id == "1"
-        ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.securityGuardMobile,
-          hintText:AppString.securityGuardMobile,
-          controller:dataState.infoSecurityMobileController
-      ),
-    ) : Container();
-  }
-  Widget _infoCustomerNameController({required FetchCreateAlertFormDataState dataState}) {
-    return  dataState.informationSourceValue.id == "2"
-        ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.customerName,
-          hintText: AppString.customerName,
-          controller:dataState.infoCustomerNameController
-      ),
-    ) : Container();
-  }
-
-  Widget _infoCustomerNumberController({required FetchCreateAlertFormDataState dataState}) {
-    return  dataState.informationSourceValue.id == "2"
-        ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.customerBpNumber,
-          hintText:AppString.customerBpNumber,
-          controller:dataState.infoCustomerBpNumberController
-      ),
-    ) : Container();
-  }
-
-  Widget _infoCustomerMobileController({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.informationSourceValue.id == "2"
-        ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.customerMobile,
-          hintText:  AppString.customerMobile,
-          controller:dataState.infoCustomerMobileController
-      ),
-    ) : Container();
-  }
-
-  Widget _infoOtherNameController({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.informationSourceValue.id == "4"
-        ? CommonStyle.col(
-      context: context,
-      child: TextFieldWidget(
-          star: AppString.star,
-          label: AppString.otherName,
-          hintText:AppString.otherName,
-          controller:dataState.infoOtherNameController
-      ),
-    ) : Container();
-  }
-
-  Widget _landmarkController({required FetchCreateAlertFormDataState dataState}) {
-    return TextFieldWidget(
-        star: AppString.star,
-        label: AppString.landmark,
-        hintText: AppString.landmark,
-        controller:dataState.landmarkController
-    );
-  }
-
   Widget _incidentIndicationDropdown({required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetIncidentIndicationData>(
       star: AppString.star,
@@ -464,47 +187,59 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
     );
   }
 
-  Widget _chargeAreaDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return DropdownWidget<GetChargeAreaModel>(
+  Widget _assetsDropdown({required FetchCreateAlertFormDataState dataState}) {
+    return  DropdownWidget<GetAssetData>(
       star: AppString.star,
-      label: AppString.chargeArea,
-      hint: AppString.chargeArea,
-      dropdownValue: dataState.chargeAreaValue.gid == null ? null : dataState.chargeAreaValue,
-      items: dataState.listOfChargeArea,
+      label: AppString.assets,
+      hint: AppString.assets,
+      dropdownValue: dataState.assetValue.assetId!.isEmpty ? null : dataState.assetValue,
+      items: dataState.listOfAsset,
       onChanged: (val) {
         BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectChargeAreaValueEvent(chargeAreaValue: val!,context: context));
+            .add(SelectAssetValueEvent(assetValue: val!,context: context));
       },
     );
   }
 
-  Widget _areaDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.isChargeAreaLoader == false ?  DropdownWidget<GetAreaModel>(
-      star: AppString.star,
-      label: AppString.area,
-      hint: AppString.area,
-      dropdownValue: dataState.areaValue.gid == null ? null : dataState.areaValue,
-      items: dataState.listOfArea,
-      onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectAreaValueEvent(areaValue: val!,context: context));
-      },
-    ) : DottedLoaderWidget();
+  Widget _assetIdController({required FetchCreateAlertFormDataState dataState}) {
+    return  TextFieldWidget(
+        star: AppString.star,
+        label: AppString.assets,
+        hintText: AppString.assets,
+        controller:dataState.assetIdController
+    );
   }
 
-  Widget _controlRoomDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return dataState.isAreaLoader == false ?  DropdownWidget<GetControlRoomData>(
-      star: AppString.star,
-      label: AppString.controlRoom,
-      hint: AppString.controlRoom,
-      dropdownValue: dataState.controlRoomValue.areaId == null ? null : dataState.controlRoomValue,
-      items: dataState.listOfControlRoom,
-      onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectControlRoomValueEvent(controlRoomValue: val!,context: context));
-      },
-    ) : DottedLoaderWidget();
+  Widget _assetTypeIdController({required FetchCreateAlertFormDataState dataState}){
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.assetTypeId,
+        hintText: AppString.assetTypeId,
+        controller:dataState.tfGisIdController
+    );
   }
+
+  Widget _addressController({required FetchCreateAlertFormDataState dataState}) {
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.address,
+        hintText: AppString.address,
+        controller:dataState.addressController
+    );
+  }
+
+
+
+  Widget _landmarkController({required FetchCreateAlertFormDataState dataState}) {
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.landmark,
+        hintText: AppString.landmark,
+        controller:dataState.landmarkController
+    );
+  }
+
+
 
 
   Widget _descriptionController({required FetchCreateAlertFormDataState dataState}) {
@@ -526,28 +261,66 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
   }
 
   Widget _image({required FetchCreateAlertFormDataState dataState}){
-    return ImageWidget(
-      star: AppString.star,
-      title: AppString.photo,
-      imgFile: dataState.photo,
-      onPressed: () {
-        showModalBottomSheet(
-            enableDrag: true,
-            isScrollControlled: true,
-            context: context,
-            builder: (BuildContext context) {
-              return ImagePopWidget(
-                onTapCamera: () async {
-                  Navigator.of(context).pop();
-                  BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureCameraPhotoEvent());
-                },
-                onTapGallery: () async {
-                  Navigator.of(context).pop();
-                  BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureGalleryPhotoEvent());
-                },
-              );
-            });
-      },
+    return Row(
+
+      children: [
+        ImageWidget(
+          star: AppString.star,
+          title: AppString.photo,
+          imgFile: dataState.photo,
+          onPressed: () {
+            showModalBottomSheet(
+                enableDrag: true,
+                isScrollControlled: true,
+                context: context,
+                builder: (BuildContext context) {
+                  return ImagePopWidget(
+                    onTapCamera: () async {
+                      Navigator.of(context).pop();
+                      BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureCameraPhotoEvent());
+                    },
+                    onTapGallery: () async {
+                      Navigator.of(context).pop();
+                      BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureGalleryPhotoEvent());
+                    },
+                  );
+                });
+          },
+        ),
+        SizedBox(width: 12,),
+        IconButton(
+          onPressed: () async {
+            double size =  MediaQuery.of(!context.mounted ? context : context).size.height
+                - MediaQuery.of(!context.mounted ? context : context).size.width;
+            var res = await showCupertinoModalPopup<dynamic>(
+              context: !context.mounted ? context : context,
+              builder: (BuildContext context) => Container(
+                height: size * 0.70,
+                padding: const EdgeInsets.only(top: 6.0),
+                margin: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                child: const SafeArea(
+                  top: false,
+                  child: VoiceRecordWidget(),
+                ),
+              ),
+            );
+            if(res != null){
+              BlocProvider.of<CreateAlertFormBloc>(!context.mounted ? context : context,)
+                  .add(SelectAudioEvent(audioPath: res.toString()));
+            }
+          }, icon: Icon(Icons.mic, color: dataState.audioRecordFile.path.isNotEmpty ? AppColor.primer :AppColor.grey,),
+          style: IconButton.styleFrom(backgroundColor: AppColor.primer),
+        ),
+      /*  CircleAvatar(
+            backgroundColor: AppColor.primer,
+            child: Center(child: IconButton(onPressed: (){}, icon: Icon(Icons.mic,color: AppColor.white,size: 18,))))*/
+      ],
     );
   }
 

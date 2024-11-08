@@ -20,6 +20,10 @@ class ReportAlertPageLoadState extends ReportAlertState {
 class FetchReportAlertDataState extends ReportAlertState {
   final bool isLoader;
   final bool isPipelineLoader;
+  final bool checkBoxTf;
+  final bool checkBoxValve;
+  final bool isGasTfLoader;
+  final bool isGasValveLoader;
   final String scheme;
   final String userName;
   final String nameofLocation;
@@ -46,6 +50,10 @@ class FetchReportAlertDataState extends ReportAlertState {
   FetchReportAlertDataState({
     required this.isLoader,
     required this.isPipelineLoader,
+    required this.checkBoxTf,
+    required this.checkBoxValve,
+    required this.isGasTfLoader,
+    required this.isGasValveLoader,
     required this.scheme,
     required this.baseUrl,
     required this.userName,
@@ -72,6 +80,10 @@ class FetchReportAlertDataState extends ReportAlertState {
   List<Object?> get props => [
     isLoader,
     isPipelineLoader,
+    checkBoxTf,
+    checkBoxValve,
+    isGasTfLoader,
+    isGasValveLoader,
     scheme,
     userName,
     nameofLocation,

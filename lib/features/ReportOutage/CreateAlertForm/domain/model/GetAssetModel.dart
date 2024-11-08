@@ -6,8 +6,8 @@ class GetAssetModel {
   GetAssetModel({this.success, this.error, this.data});
 
   GetAssetModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    error = json['error'];
+    success = json['success'] ?? "";
+    error = json['error'] ?? "";
     if (json['data'] != null) {
       data = <GetAssetData>[];
       json['data'].forEach((v) {
@@ -36,6 +36,16 @@ class GetAssetData {
   String? createdAt;
   dynamic updatedAt;
   String? assetId;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GetAssetData &&
+          runtimeType == other.runtimeType &&
+          assetId == other.assetId;
+
+  @override
+  int get hashCode => assetId.hashCode;
   String? status;
 
   GetAssetData(
