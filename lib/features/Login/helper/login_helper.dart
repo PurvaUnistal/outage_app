@@ -11,6 +11,7 @@ import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
 
 class LoginHelper {
+
   static Future<dynamic> textFieldValidation({required String email, required String password, required BuildContext context}) async {
     try {
       if (email.isEmpty) {
@@ -45,7 +46,7 @@ class LoginHelper {
     Map<String, String> para = {
       "email": emailId,
       "password": password,
-      "device": deviceId,
+      "deviceId" : deviceId,
     };
     try {
       var res = await ApiHelper.postData(

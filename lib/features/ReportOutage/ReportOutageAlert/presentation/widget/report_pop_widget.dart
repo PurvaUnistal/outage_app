@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
@@ -74,6 +75,7 @@ class _ReportPopWidgetState extends State<ReportPopWidget> {
         prefixIcon: Icon(Icons.location_on, color: Colors.cyanAccent,),
         label: AppString.tfGis,
         hintText: AppString.tfGis,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         keyboardType: TextInputType.number,
         controller: dataState.tfGisController,
         suggestions: dataState.listOfTfGisId,
@@ -100,6 +102,7 @@ class _ReportPopWidgetState extends State<ReportPopWidget> {
         prefixIcon: Icon(Icons.location_on, color: Colors.green,),
         label: AppString.gasValveGIS,
         hintText: AppString.gasValveGIS,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         keyboardType: TextInputType.number,
         controller: dataState.gasValveGISController,
         suggestions: dataState.listOfGasValveGISId,

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 import '../model/GetAssetModel.dart';
 import '../model/GetIncidentIndicationModel.dart';
 
@@ -39,6 +40,11 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final GetAssetData assetValue;
   final List<GetAssetData> listOfAsset;
 
+  final TfGisData tfGisValue;
+  final List<TfGisData> listOfTfGis;
+  final List<String> listOfAssetTypeId;
+
+  final TextEditingController assetTypeIdController;
   final TextEditingController assetIdController;
   final TextEditingController valveGisIdController;
   final TextEditingController tfGisIdController;
@@ -46,7 +52,6 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final TextEditingController markerLongitudeController;
   final TextEditingController currentLatitudeController;
   final TextEditingController currentLongitudeController;
-  final TextEditingController assetTypeIdController;
   final TextEditingController addressController;
   final TextEditingController landmarkController;
   final TextEditingController descriptionController;
@@ -67,12 +72,15 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
     required this.assetModel,
     required this.assetValue,
     required this.listOfAsset,
+    required this.tfGisValue,
+    required this.listOfTfGis,
+    required this.listOfAssetTypeId,
     required this.incidentIndicationModel,
     required this.incidentIndicationValue,
     required this.listOfIncidentIndication,
-    required this.assetTypeIdController,
     required this.valveGisIdController,
     required this.assetIdController,
+    required this.assetTypeIdController,
     required this.tfGisIdController,
     required this.markerLatitudeController,
     required this.markerLongitudeController,
@@ -100,13 +108,16 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
         assetModel,
         assetValue,
         listOfAsset,
+        tfGisValue,
+        listOfTfGis,
+    listOfAssetTypeId,
         incidentIndicationModel,
         incidentIndicationValue,
         listOfIncidentIndication,
-        assetTypeIdController,
         tfGisIdController,
         valveGisIdController,
         assetIdController,
+    assetTypeIdController,
         markerLatitudeController,
         markerLongitudeController,
         currentLatitudeController,

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:igl_outage_app/Background/wavy_background.dart';
+import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/common_style.dart';
-import 'package:igl_outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/icon_button.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
@@ -102,7 +102,7 @@ class _LoginViewState extends State<LoginView> {
     var h = MediaQuery.of(context).size.height;
     var w = MediaQuery.of(context).size.width;
     return Image.asset(
-      AssetPath.iglLogo,
+      AssetPath.agclIcon,
       width: w * 0.9,
       height: h * 0.19,
     );

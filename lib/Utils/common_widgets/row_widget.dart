@@ -12,9 +12,8 @@ class RowWidget extends StatelessWidget {
     return  Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Flexible(flex:1,child: widget1),
-        CommonStyle.widthSpace(context: context),
-        Flexible(flex: 1,child: widget2),
+        Flexible(child: widget1),
+        Flexible(child: widget2),
       ],
     );
   }

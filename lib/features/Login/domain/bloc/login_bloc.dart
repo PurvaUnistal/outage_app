@@ -63,7 +63,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           _eventCompleted(emit);
           if (res.user != null) {
             loginModel = res;
-            if(res.status == 200 && res.user!.role!.toLowerCase().contains('outage engineer')){
+            if(res.status == 200 && res.user!.role!.toLowerCase().contains('complain management')){
               await SharedPref.setString(key: PrefsValue.passwordVal,value: emailController.text);
               await SharedPref.setString(key: PrefsValue.emailVal,value: passwordController.text);
               await SharedPref.setString(key: PrefsValue.userId,value: res.user!.id!);

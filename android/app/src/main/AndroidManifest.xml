@@ -22,7 +22,7 @@
         android:label="IGL Outage"
         android:name="${applicationName}"
         android:largeHeap="true"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/agcl_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

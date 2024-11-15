@@ -35,6 +35,16 @@ class SelectCameraPositionButtonEvent extends ReportAlertEvent {
   List<Object> get props => [cameraPosition];
 }
 
+class SelectGoogleMapButtonEvent extends ReportAlertEvent {
+  final LatLng latLngOnTap;
+  final BuildContext context;
+  SelectGoogleMapButtonEvent({required this.latLngOnTap, required this.context});
+  @override
+  // TODO: implement props
+  List<Object> get props => [latLngOnTap,context];
+}
+
+
 class SelectCheckBoxTFGisEvent extends ReportAlertEvent {
   final BuildContext context;
   final bool checkBoxTf;

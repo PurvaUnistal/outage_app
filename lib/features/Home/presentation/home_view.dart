@@ -9,7 +9,7 @@ import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_event.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_state.dart';
-import 'package:igl_outage_app/features/MagageOutage/ManageAlert/presentation/manage_alert_page.dart';
+import 'package:igl_outage_app/features/ManageOutage/ManageAlert/presentation/manage_alert_page.dart';
 import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/presentation/maintenance_alert_page.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/presentation/navigate_alert_page.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/presentation/report_alert_page.dart';

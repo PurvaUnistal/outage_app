@@ -19,7 +19,10 @@ class PrefsValue {
   static String areaId = "areaId";
   static String markerLat = "markerLat";
   static String markerLong = "markerLong";
-  static String tfGisId = "tfGisId";
-  static String tfAssetId = "tfAssetId";
+  static String assetId = "assetId";
+  static String gasTfGisId = "tfGisId";
   static String gasValveGISId = "gasValveGISId";
+  static String incidentTypeId = "incidentTypeId";
+  static String incidentId = "incidentId";
+
 }

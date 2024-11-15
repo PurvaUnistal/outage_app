@@ -20,4 +20,10 @@ class Styles {
   static TextStyle count = const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black);
   static TextStyle countW = const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white);
   static TextStyle texts = const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black);
+  static TextStyle titleGreen = TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColor.primer);
+  static TextStyle titleNormalBlack = TextStyle(fontWeight: FontWeight.normal, fontSize: 12, color: AppColor.black);
+  static TextStyle titleBoldWhite = TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColor.white);
+  static TextStyle titleBlack({required Color color}){
+   return TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color,);
+  }
 }

@@ -15,7 +15,6 @@ import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/mode
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetLocationSourceModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetModuleTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetPriorityTypeModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetViewIncidentModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
@@ -114,21 +113,6 @@ class MaintenanceAlertHelper{
     return null;
   }
 
-  static Future<ViewIncidentModel?> getViewIncidentApi({required BuildContext context}) async {
-    String schema = await SharedPref.getString(key: PrefsValue.schema,);
-    Map<String, String> para = {
-      "schema": schema,
-    };
-    String json = Uri(queryParameters: para).query;
-    try {
-      var res = await ApiHelper.getData(urlEndPoint: Apis.getViewIncident +json, context: context);
-      ViewIncidentModel response = ViewIncidentModel.fromJson(res);
-      return response;
-    } catch (e) {
-      log("getViewIncident-->${e.toString()}");
-    }
-    return null;
-  }
 
   static Future<List<GetLocationSourceModel>?>getCustomerLocationSourceApi({required BuildContext context}) async {
     try {

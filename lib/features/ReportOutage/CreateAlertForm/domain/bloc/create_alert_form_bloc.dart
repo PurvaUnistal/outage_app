@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:igl_outage_app/Utils/common_widgets/GetImage/get_image_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Routes/routes_name.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
@@ -14,6 +15,8 @@ import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/mode
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentIndicationModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/helper/create_alert_form_helper.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/preference_utils.dart';
 
@@ -24,14 +27,16 @@ class CreateAlertFormBloc
     on<SelectIncidentTypeValueEvent>(_selectIncidentTypeValue);
     on<SelectIncidentIndicationValueEvent>(_selectIncidentIndicationValue);
     on<SelectAssetValueEvent>(_selectAssetValue);
+    on<SelectAssetTypeIdValueEvent>(_selectAssetTypeIdValueEvent);
+    on<SelectTfGisValueEvent>(_selectTfGisValue);
     on<CaptureCameraPhotoEvent>(_captureCameraPhoto);
     on<CaptureGalleryPhotoEvent>(_captureGalleryPhoto);
-    on<SelectAudioEvent>(_selectAudio);
+    //   on<SelectAudioEvent>(_selectAudio);
     on<SubmitAddIncidentBtnEvent>(_submitBtn);
   }
 
   File photo = File('');
-  File audioRecordFile =  File("");
+  File audioRecordFile = File("");
   bool isLoader = false;
   bool isBtnLoader = false;
 
@@ -39,6 +44,7 @@ class CreateAlertFormBloc
   String role = '';
   String userName = '';
   String baseUrl = '';
+  String assetId = '';
 
   TextEditingController assetIdController = TextEditingController();
   TextEditingController assetTypeIdController = TextEditingController();
@@ -58,8 +64,10 @@ class CreateAlertFormBloc
   GetIncidentTypeData incidentTypeValue = GetIncidentTypeData();
   List<GetIncidentTypeData> listOfIncidentType = [];
 
-  GetIncidentIndicationModel incidentIndicationModel = GetIncidentIndicationModel();
-  GetIncidentIndicationData incidentIndicationValue = GetIncidentIndicationData();
+  GetIncidentIndicationModel incidentIndicationModel =
+      GetIncidentIndicationModel();
+  GetIncidentIndicationData incidentIndicationValue =
+      GetIncidentIndicationData();
   List<GetIncidentIndicationData> listOfIncidentIndication = [];
 
   GetAssetModel assetModel = GetAssetModel();
@@ -67,54 +75,77 @@ class CreateAlertFormBloc
   List<GetAssetData> listOfAsset = [];
   List<GetAssetData> listOfFilterAsset = [];
 
+  TfGisData tfGisValue = TfGisData();
+  List<TfGisData> listOfTfGis = [];
+
+  List<String> listOfAssetTypeId = [];
+
+  TfGisData valveGisValue = TfGisData();
+  List<TfGisData> listOfValveGis = [];
 
   _pageLoad(CreateAlertFormLoadEvent event, emit) async {
     emit(CreateAlertFormInitialState());
     photo = File('');
-    audioRecordFile =  File("");
+    audioRecordFile = File("");
     isLoader = false;
     isBtnLoader = false;
 
-
-     incidentTypeModel = GetIncidentTypeModel();
-     incidentTypeValue = GetIncidentTypeData();
+    incidentTypeModel = GetIncidentTypeModel();
+    incidentTypeValue = GetIncidentTypeData();
     listOfIncidentType = [];
 
-     incidentIndicationModel = GetIncidentIndicationModel();
-     incidentIndicationValue = GetIncidentIndicationData();
-     listOfIncidentIndication = [];
+    incidentIndicationModel = GetIncidentIndicationModel();
+    incidentIndicationValue = GetIncidentIndicationData();
+    listOfIncidentIndication = [];
 
-     assetModel = GetAssetModel();
-     assetValue = GetAssetData();
-     listOfAsset = [];
-     listOfFilterAsset = [];
+    assetModel = GetAssetModel();
+    assetValue = GetAssetData();
+    listOfAsset = [];
+    listOfFilterAsset = [];
 
+    tfGisValue = TfGisData();
+    listOfTfGis = [];
 
+    valveGisValue = TfGisData();
+    listOfValveGis = [];
+
+    assetTypeIdController.text = "";
     currentLatitudeController.text = "";
     currentLongitudeController.text = "";
     addressController.text = "";
     landmarkController.text = "";
-
     descriptionController.text = "";
     remarksController.text = "";
-    assetIdController.text =  await SharedPref.getString(key: PrefsValue.tfAssetId);
+
+    await ReportAlertHelper.clearCache();
+    assetId =
+        await SharedPref.getString(key: PrefsValue.assetId);
     markerLatitudeController.text =
-    await SharedPref.getString(key: PrefsValue.markerLat);
-    tfGisIdController.text =
-    await SharedPref.getString(key: PrefsValue.tfGisId);
-    valveGisIdController.text =
-    await SharedPref.getString(key: PrefsValue.gasValveGISId);
+        await SharedPref.getString(key: PrefsValue.markerLat);
     markerLongitudeController.text =
-    await SharedPref.getString(key: PrefsValue.markerLong);
+        await SharedPref.getString(key: PrefsValue.markerLong);
     scheme = await SharedPref.getString(key: PrefsValue.schema);
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
     await _getCurrentPosition();
+    await _filterAssetType();
     await _fetchIncidentIndicationApi(context: event.context);
     await _fetchIncidentTypeApi(context: event.context, moduleId: "");
-   // await _fetchAssetLocationSourceApi(context: event.context,);
+    await _fetchAssetLocationSourceApi(context: event.context,);
     _eventCompleted(emit);
+  }
+
+  _filterAssetType() async {
+    if (assetId == "2") {
+      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.gasValveGISId);
+      listOfValveGis = await HiveDataBase.allValveGisDataBox!.values.toList();
+      listOfAssetTypeId = await listOfValveGis.map((e) => e.id!).toSet().toList();
+    } else if (assetId == "7") {
+      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.gasTfGisId);
+      listOfTfGis = await HiveDataBase.allTfGisDataBox!.values.toList();
+      listOfAssetTypeId = await listOfTfGis.map((e) => e.id!).toSet().toList();
+    }
   }
 
   _getCurrentPosition() async {
@@ -122,7 +153,6 @@ class CreateAlertFormBloc
     currentLatitudeController.text = currentPoint!.latitude.toString();
     currentLongitudeController.text = currentPoint.longitude.toString();
   }
-
 
   _fetchIncidentTypeApi(
       {required BuildContext context, required String moduleId}) async {
@@ -137,9 +167,7 @@ class CreateAlertFormBloc
     }
   }
 
-  _fetchIncidentIndicationApi({
-    required BuildContext context,
-  }) async {
+  _fetchIncidentIndicationApi({required BuildContext context,}) async {
     var res = await CreateAlertFormHelper.getIncidentIndicationApi(
       context: context,
     );
@@ -162,23 +190,23 @@ class CreateAlertFormBloc
       assetModel = res;
       if (assetModel.data != null) {
         listOfAsset = assetModel.data!;
-        for(var assetIdData in listOfAsset)
-          if(assetValue.assetId == assetIdData.assetId){
+        for (var assetIdData in listOfAsset)
+          if (assetId == assetIdData.id) {
             listOfFilterAsset.add(assetIdData);
+            assetIdController.text = listOfFilterAsset[0].assetName!;
           }
         return res;
       }
     }
   }
 
-
   _selectIncidentTypeValue(SelectIncidentTypeValueEvent event, emit) {
     incidentTypeValue = event.incidentTypeValue;
     _eventCompleted(emit);
   }
 
-
-  _selectIncidentIndicationValue(SelectIncidentIndicationValueEvent event, emit) {
+  _selectIncidentIndicationValue(
+      SelectIncidentIndicationValueEvent event, emit) {
     incidentIndicationValue = event.incidentIndicationValue;
     _eventCompleted(emit);
   }
@@ -188,6 +216,15 @@ class CreateAlertFormBloc
     _eventCompleted(emit);
   }
 
+  _selectAssetTypeIdValueEvent(SelectAssetTypeIdValueEvent event, emit) {
+    assetTypeIdController.text = event.assetTypeId;
+    _eventCompleted(emit);
+  }
+
+  _selectTfGisValue(SelectTfGisValueEvent event, emit) {
+    tfGisValue = event.tfGisValue;
+    _eventCompleted(emit);
+  }
 
   _captureCameraPhoto(CaptureCameraPhotoEvent event, emit) async {
     var photoPath = await GetImageWidget.cameraCapture();
@@ -207,11 +244,11 @@ class CreateAlertFormBloc
     _eventCompleted(emit);
   }
 
-  _selectAudio(SelectAudioEvent event, emit) {
+  /*_selectAudio(SelectAudioEvent event, emit) {
     audioRecordFile =  File(event.audioPath);
     _eventCompleted(emit);
   }
-
+*/
   _submitBtn(SubmitAddIncidentBtnEvent event, emit) async {
     //  try{
     var validationCheck = await CreateAlertFormHelper.validationSubmit(
@@ -219,11 +256,10 @@ class CreateAlertFormBloc
         incidentType: incidentTypeValue,
         incidentIndication: incidentIndicationValue,
         asset: assetIdController.text.trim().toString(),
-        assetId: assetIdController.text,
+        assetId: assetId.toString(),
         address: addressController.text.trim().toString(),
         landmark: landmarkController.text.trim().toString(),
-        photo: photo
-    );
+        photo: photo);
     if (await validationCheck == true) {
       isBtnLoader = false;
       _eventCompleted(emit);
@@ -232,7 +268,7 @@ class CreateAlertFormBloc
         incidentType: incidentTypeValue,
         incidentIndication: incidentIndicationValue,
         assetId: assetIdController.text.trim().toString(),
-        assetInternalId: "",
+        assetInternalId: assetId.toString(),
         address: addressController.text.trim().toString(),
         landmark: landmarkController.text.trim().toString(),
         photo: photo,
@@ -268,37 +304,34 @@ class CreateAlertFormBloc
       audioRecordFile: audioRecordFile,
       isLoader: isLoader,
       isBtnLoader: isBtnLoader,
-
       scheme: scheme,
       baseUrl: baseUrl,
       userName: userName,
       role: role,
-
       incidentTypeModel: incidentTypeModel,
       incidentTypeValue: incidentTypeValue,
       listOfIncidentType: listOfIncidentType,
-
       incidentIndicationModel: incidentIndicationModel,
       incidentIndicationValue: incidentIndicationValue,
       listOfIncidentIndication: listOfIncidentIndication,
-
-      assetModel :assetModel,
-      assetValue : assetValue,
-      listOfAsset : listOfAsset,
+      assetModel: assetModel,
+      assetValue: assetValue,
+      listOfAsset: listOfAsset,
+      listOfAssetTypeId: listOfAssetTypeId,
+      listOfTfGis: listOfTfGis,
+      tfGisValue: tfGisValue,
       assetTypeIdController: assetTypeIdController,
-
-
-      assetIdController : assetIdController,
-      tfGisIdController : tfGisIdController,
-      valveGisIdController : valveGisIdController,
-      markerLatitudeController : markerLatitudeController,
-      markerLongitudeController : markerLongitudeController,
-      currentLatitudeController : currentLatitudeController,
-      currentLongitudeController : currentLongitudeController,
-      addressController : addressController,
-      landmarkController : landmarkController,
-      descriptionController : descriptionController,
-      remarksController : remarksController,
+      assetIdController: assetIdController,
+      tfGisIdController: tfGisIdController,
+      valveGisIdController: valveGisIdController,
+      markerLatitudeController: markerLatitudeController,
+      markerLongitudeController: markerLongitudeController,
+      currentLatitudeController: currentLatitudeController,
+      currentLongitudeController: currentLongitudeController,
+      addressController: addressController,
+      landmarkController: landmarkController,
+      descriptionController: descriptionController,
+      remarksController: remarksController,
     ));
   }
 }

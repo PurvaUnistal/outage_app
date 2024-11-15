@@ -2,20 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
-import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/background_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/presentation/create_alert_form_page.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_state.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/presentation/widget/sateful_dialog.dart';
 import '../../../../Utils/common_widgets/res/app_string.dart';
+import 'widget/report_pop_widget.dart';
 
 class ReportAlertView extends StatefulWidget {
   const ReportAlertView({super.key});
@@ -119,7 +116,15 @@ class _ReportAlertViewState extends State<ReportAlertView> {
     );
   }
   _googleMapWidget({required FetchReportAlertDataState dataState}){
-    return  dataState.isPipelineLoader == false ? GoogleMap(
+    return dataState.isPipelineLoader == false ?  GoogleMap(
+         onTap:(latLng){
+           dataState.polylineList.isNotEmpty ? BlocProvider.of<ReportAlertBloc>(context).add(
+               SelectGoogleMapButtonEvent(
+                 context: context,
+                 latLngOnTap:latLng
+               ))
+           :(latLng){};
+         },
       mapType: dataState.currentMapType,
       compassEnabled: true,
       zoomGesturesEnabled: true,
@@ -151,10 +156,7 @@ class _ReportAlertViewState extends State<ReportAlertView> {
     return  FloatingActionButton(
       heroTag: UniqueKey(),
       onPressed: (){
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CreateAlertFormView()),
-        );
+
       },
       backgroundColor: AppColor.primer,
       child: Icon(Icons.my_location_rounded, size: 21.0, color: AppColor.white,),

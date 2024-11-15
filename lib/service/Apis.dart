@@ -27,5 +27,8 @@ class Apis {
    static String getFittingGis = baseUrl + "get-noncontrolable-fitting-gis";
    static String getTFGis = baseUrl + "get-tf-gis";
    static String getPipelineNetwork = baseUrl + "get-pipeline-network?";
+   static String getIncidentAction = baseUrl + "outage/get-incident-action?";
+   static String getIncidentTypeAction = baseUrl + "outage/get-incident-type-action-api?";
+   static String incidentActionProgress = baseUrl + "outage/get-incident-action-progress";
 
 }

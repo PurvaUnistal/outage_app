@@ -4,6 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/presentation/create_alert_form_page.dart';
@@ -11,9 +13,10 @@ import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/mo
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/presentation/widget/alert_dialog_widget.dart';
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
+
+import '../presentation/widget/alert_dialog_widget.dart';
 
 class ReportAlertHelper{
   static Future<void> clearCache() async {
@@ -54,8 +57,17 @@ class ReportAlertHelper{
   static Future<GetTfGisModel?> getGasValueGisApi({required BuildContext context}) async {
     try {
       var res = await ApiHelper.getData(urlEndPoint: Apis.getGasValueGis, context: context);
-      GetTfGisModel response = GetTfGisModel.fromJson(res);
-      return response;
+      if(res != null){
+        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        if (response.data!.isNotEmpty) {
+          if (await HiveDataBase.allValveGisDataBox!.isOpen) {
+            await HiveDataBase.allTfGisDataBox!.clear();
+            await HiveDataBase.allValveGisDataBox!.clear();
+            HiveDataBase.allValveGisDataBox!.addAll(response.data!);
+          }
+        }
+        return response;
+      }
     } catch (e) {
       log("getGasValueGis-->${e.toString()}");
     }
@@ -65,8 +77,10 @@ class ReportAlertHelper{
   static Future<GetGasValueGISModel?> getFittingGisApi({required BuildContext context}) async {
     try {
       var res = await ApiHelper.getData(urlEndPoint: Apis.getFittingGis, context: context);
-      GetGasValueGISModel response = GetGasValueGISModel.fromJson(res);
-      return response;
+      if(res != null){
+        GetGasValueGISModel response = GetGasValueGISModel.fromJson(res);
+        return response;
+      }
     } catch (e) {
       log("getFittingGis-->${e.toString()}");
     }
@@ -76,8 +90,15 @@ class ReportAlertHelper{
   static Future<GetTfGisModel?> getTFGisApi({required BuildContext context}) async {
     try {
       var res = await ApiHelper.getData(urlEndPoint: Apis.getTFGis, context: context);
-      GetTfGisModel response = GetTfGisModel.fromJson(res);
-      if(response.data != null){
+      if(res != null){
+        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        if (response.data!.isNotEmpty) {
+          if (await HiveDataBase.allTfGisDataBox!.isOpen) {
+            await HiveDataBase.allTfGisDataBox!.clear();
+            await HiveDataBase.allValveGisDataBox!.clear();
+            HiveDataBase.allTfGisDataBox!.addAll(response.data!);
+          }
+        }
         return response;
       }
     } catch (e) {
@@ -116,6 +137,7 @@ class ReportAlertHelper{
      try{
        int i = 0;
        for(var latLngData in latlngList){
+         markersPointList.clear();
          markersPointList .add(Marker(
            markerId: MarkerId(i.toString()),
            infoWindow: InfoWindow(
@@ -125,18 +147,19 @@ class ReportAlertHelper{
            onTap: () async {
              await SharedPref.setString(key: PrefsValue.markerLat,value: latLngData.latitude.toString());
              await SharedPref.setString(key: PrefsValue.markerLong,value: latLngData.longitude.toString());
-               Navigator.push(
-                 context,
-                 MaterialPageRoute(builder: (context) => const CreateAlertFormView()),
-               );
-               /* showBottomSheet(context: context, builder: (BuildContext context){
-               return AlertDialogTwoBtnWidget();
-             });*/
-          //   }
-
+             showModalBottomSheet(
+               isScrollControlled: true,
+               showDragHandle: true,
+               backgroundColor: Colors.green.shade100,
+               elevation: 0,
+               context: context,
+               builder: (context) {
+                 return AlertDialogTwoBtnWidget();
+                 },
+             );
            },
-           icon: markerIcon,
-         ));
+         )
+         );
        }
      }catch(_) {};
     return markersPointList;
@@ -149,19 +172,17 @@ class ReportAlertHelper{
     Set<Polyline> polylineList = {};
     try{
       if(latlngList.isNotEmpty){
-        polylineList.add(Polyline(
+        polylineList.clear();
+        polylineList.add(
+            Polyline(
             polylineId: PolylineId(latlngList.toString()),
             visible: true,
-            width: 6,
+            width: 8,
             points: latlngList,
             color: color,
-            jointType: JointType. mitered,
-            geodesic: false,
-            startCap: Cap.roundCap,
-            endCap: Cap.roundCap,
-            onTap: (){
-              print("Hello Polyline");
-            }
+            jointType: JointType.bevel,
+          onTap: () async {
+          },
         ));
       }
     }catch(_){}

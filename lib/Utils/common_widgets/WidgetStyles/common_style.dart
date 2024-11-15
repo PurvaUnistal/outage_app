@@ -91,4 +91,11 @@ class CommonStyle {
       child: Text(label, style: Styles.rowR12,),
     ));
   }
+
+  static DataCell dataCellAction({required Widget child}) {
+    return DataCell(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: child,
+    ));
+  }
 }

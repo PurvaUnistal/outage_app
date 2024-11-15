@@ -48,6 +48,7 @@ class ApiHelper {
         required BuildContext context,
         required String urlEndPoint,
         Map<String, dynamic>? param,
+    Map<String, String>? headers,
         String? contentType,
         formData,
       }) async {
@@ -55,7 +56,8 @@ class ApiHelper {
       if(await ConnectivityHelper.allConnectivityCheck(context: context) == false){
         return null;
       }
-      var response = await Dio().post(urlEndPoint, data: param ?? FormData.fromMap(formData));
+      var response = await Dio().post(urlEndPoint,options: Options(
+          headers: headers), data: param ?? FormData.fromMap(formData));
       log("url-->${urlEndPoint}");
       log("resData-->${response.data}");
       if (response.statusCode == 200) {

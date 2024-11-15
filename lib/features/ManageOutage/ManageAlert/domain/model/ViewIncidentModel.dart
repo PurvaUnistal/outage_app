@@ -6,8 +6,8 @@ class ViewIncidentModel {
   ViewIncidentModel({this.success, this.error, this.data});
 
   ViewIncidentModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    error = json['error'];
+    success = json['success'] ?? "";
+    error = json['error'] ?? "";
     if (json['data'] != null) {
       data = <ViewIncidentData>[];
       json['data'].forEach((v) {
@@ -34,7 +34,6 @@ class ViewIncidentData {
   String? indicationname;
   String? incidenttype;
   String? informationsource;
-  String? modulename;
   String? priority;
   String? id;
   String? moduleId;
@@ -60,21 +59,24 @@ class ViewIncidentData {
   String? latitude;
   String? longitude;
   String? source;
-  dynamic attachFile;
+  String? attachFile;
   dynamic customerType;
   String? customerId;
   String? assetTypeId;
   String? assetInternalId;
   dynamic locationGeom;
-  String? securityGuardId;
-  String? securityGuardName;
-  String? securityGuardMobile;
+  dynamic securityGuardId;
+  dynamic securityGuardName;
+  dynamic securityGuardMobile;
   String? infoCustomerId;
   dynamic infoCustomerName;
   dynamic infoCustomerMobile;
   dynamic infoCustomerBpnumber;
   dynamic otherName;
   dynamic customerTypeData;
+  String? controlRoomId;
+  String? incidentLatitude;
+  String? incidentLongitude;
   String? incedentId;
 
   ViewIncidentData(
@@ -84,7 +86,6 @@ class ViewIncidentData {
         this.indicationname,
         this.incidenttype,
         this.informationsource,
-        this.modulename,
         this.priority,
         this.id,
         this.moduleId,
@@ -125,57 +126,62 @@ class ViewIncidentData {
         this.infoCustomerBpnumber,
         this.otherName,
         this.customerTypeData,
+        this.controlRoomId,
+        this.incidentLatitude,
+        this.incidentLongitude,
         this.incedentId});
 
   ViewIncidentData.fromJson(Map<String, dynamic> json) {
-    incid = json['incid'];
-    areaName = json['area_name'];
-    incidentpriority = json['incidentpriority'];
-    indicationname = json['indicationname'];
-    incidenttype = json['incidenttype'];
-    informationsource = json['informationsource'];
-    modulename = json['modulename'];
-    priority = json['priority'];
-    id = json['id'];
-    moduleId = json['module_id'];
-    incidentTypeId = json['incident_type_id'];
-    priorityId = json['priority_id'];
-    informationSourceId = json['information_source_id'];
-    chargeAreaId = json['charge_area_id'];
-    areaId = json['area_id'];
-    indicationId = json['indication_id'];
-    locationSource = json['location_source'];
-    address = json['address'];
-    landmark = json['landmark'];
-    description = json['description'];
-    remarks = json['remarks'];
-    createdBy = json['created_by'];
-    updatedBy = json['updated_by'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    status = json['status'];
-    actionStatus = json['action_status'];
-    actionStatusStartDate = json['action_status_start_date'];
-    actionStatusEndDate = json['action_status_end_date'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
-    source = json['source'];
-    attachFile = json['attach_file'];
-    customerType = json['customer_type'];
-    customerId = json['customer_id'];
-    assetTypeId = json['asset_type_id'];
-    assetInternalId = json['asset_internal_id'];
-    locationGeom = json['location_geom'];
-    securityGuardId = json['security_guard_id'];
-    securityGuardName = json['security_guard_name'];
-    securityGuardMobile = json['security_guard_mobile'];
-    infoCustomerId = json['info_customer_id'];
-    infoCustomerName = json['info_customer_name'];
-    infoCustomerMobile = json['info_customer_mobile'];
-    infoCustomerBpnumber = json['info_customer_bpnumber'];
-    otherName = json['other_name'];
-    customerTypeData = json['customer_type_data'];
-    incedentId = json['incedent_id'];
+    incid = json['incid'] ?? "";
+    areaName = json['area_name'] ?? "";
+    incidentpriority = json['incidentpriority'] ?? "";
+    indicationname = json['indicationname'] ?? "";
+    incidenttype = json['incidenttype'] ?? "";
+    informationsource = json['informationsource'] ?? "";
+    priority = json['priority'] ?? "";
+    id = json['id'] ?? "";
+    moduleId = json['module_id'] ?? "";
+    incidentTypeId = json['incident_type_id'] ?? "";
+    priorityId = json['priority_id'] ?? "";
+    informationSourceId = json['information_source_id'] ?? "";
+    chargeAreaId = json['charge_area_id'] ?? "";
+    areaId = json['area_id'] ?? "";
+    indicationId = json['indication_id'] ?? "";
+    locationSource = json['location_source'] ?? "";
+    address = json['address'] ?? "";
+    landmark = json['landmark'] ?? "";
+    description = json['description'] ?? "";
+    remarks = json['remarks'] ?? "";
+    createdBy = json['created_by'] ?? "";
+    updatedBy = json['updated_by'] ?? "";
+    createdAt = json['created_at'] ?? "";
+    updatedAt = json['updated_at'] ?? "";
+    status = json['status'] ?? "";
+    actionStatus = json['action_status'] ?? "";
+    actionStatusStartDate = json['action_status_start_date'] ?? "";
+    actionStatusEndDate = json['action_status_end_date'] ?? "";
+    latitude = json['latitude'] ?? "0.0";
+    longitude = json['longitude'] ?? "0.0";
+    source = json['source'] ?? "";
+    attachFile = json['attach_file'] ?? "";
+    customerType = json['customer_type'] ?? "";
+    customerId = json['customer_id'] ?? "";
+    assetTypeId = json['asset_type_id'] ?? "";
+    assetInternalId = json['asset_internal_id'] ?? "";
+    locationGeom = json['location_geom'] ?? "";
+    securityGuardId = json['security_guard_id'] ?? "";
+    securityGuardName = json['security_guard_name'] ?? "";
+    securityGuardMobile = json['security_guard_mobile'] ?? "";
+    infoCustomerId = json['info_customer_id'] ?? "";
+    infoCustomerName = json['info_customer_name'] ?? "";
+    infoCustomerMobile = json['info_customer_mobile'] ?? "";
+    infoCustomerBpnumber = json['info_customer_bpnumber'] ?? "";
+    otherName = json['other_name'] ?? "";
+    customerTypeData = json['customer_type_data'] ?? "";
+    controlRoomId = json['control_room_id'] ?? "";
+    incidentLatitude = json['incident_latitude'] ?? "0.0";
+    incidentLongitude = json['incident_longitude'] ??"0.0";
+    incedentId = json['incedent_id'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -186,7 +192,6 @@ class ViewIncidentData {
     data['indicationname'] = this.indicationname;
     data['incidenttype'] = this.incidenttype;
     data['informationsource'] = this.informationsource;
-    data['modulename'] = this.modulename;
     data['priority'] = this.priority;
     data['id'] = this.id;
     data['module_id'] = this.moduleId;
@@ -227,6 +232,9 @@ class ViewIncidentData {
     data['info_customer_bpnumber'] = this.infoCustomerBpnumber;
     data['other_name'] = this.otherName;
     data['customer_type_data'] = this.customerTypeData;
+    data['control_room_id'] = this.controlRoomId;
+    data['incident_latitude'] = this.incidentLatitude;
+    data['incident_longitude'] = this.incidentLongitude;
     data['incedent_id'] = this.incedentId;
     return data;
   }

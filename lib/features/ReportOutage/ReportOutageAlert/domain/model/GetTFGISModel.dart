@@ -3,6 +3,10 @@
 //     final getTfgisModel = getTfgisModelFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:hive/hive.dart';
+import 'package:igl_outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
+
+part 'GetTFGISModel.g.dart';
 
 GetTfGisModel getTfGisModelFromJson(String str) => GetTfGisModel.fromJson(json.decode(str));
 
@@ -36,9 +40,13 @@ class GetTfGisModel {
   };
 }
 
+@HiveType(typeId: HiveTypeId.tfGisData)
 class TfGisData {
+  @HiveField(0)
   String? id;
+  @HiveField(1)
   String? latitude;
+  @HiveField(2)
   String? longitude;
 
   TfGisData({

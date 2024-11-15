@@ -1,4 +1,6 @@
 class AssetPath {
+  static String agclLogo = 'assets/icons/agcl_logo.png';
+  static String agclIcon = 'assets/icons/agcl_icon.png';
   static String pbgLogo = 'assets/icons/pbg_logo.png';
   static String iglLogo = 'assets/icons/igl_logo.png';
   static String meter = 'assets/icons/meter.jpg';

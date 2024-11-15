@@ -1,17 +1,17 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
+import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/common_style.dart';
-import 'package:igl_outage_app/Utils/common_widgets/background_widget.dart';
-import 'package:igl_outage_app/Utils/common_widgets/button_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/dropdown_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/image_pop_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/image_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
-import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:igl_outage_app/Utils/common_widgets/row_widget.dart';
@@ -19,11 +19,10 @@ import 'package:igl_outage_app/Utils/common_widgets/text_form_widget.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
-import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAssetModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentIndicationModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 
-import 'widget/voice_record_widget.dart';
 
 class CreateAlertFormView extends StatefulWidget {
   const CreateAlertFormView({super.key});
@@ -42,17 +41,15 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
-          builder: (context, state) {
-            if (state is FetchCreateAlertFormDataState) {
-              return  _itemBuilder(dataState: state);
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
-        ),
+    return BackgroundInfoWidget(
+      child: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
+        builder: (context, state) {
+          if (state is FetchCreateAlertFormDataState) {
+            return  _itemBuilder(dataState: state);
+          } else {
+            return const Center(child: SpinLoader());
+          }
+        },
       ),
     );
   }
@@ -90,43 +87,41 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
             ),
           ],
         ),
-        body: BackgroundWidget(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 15),
-            child: ListView(
-              children: [
-                CommonStyle.vertical(context: context),
-                RowWidget(
-                    widget1: _currentLatController(dataState: dataState),
-                    widget2: _currentLongController(dataState: dataState)
-                ),
-                CommonStyle.vertical(context: context),
-              /*  _tfValveIdController(dataState: dataState),
-                CommonStyle.vertical(context: context),*/
-                _incidentTypeDropdown(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _incidentIndicationDropdown(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _assetIdController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _assetTypeIdController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _landmarkController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _addressController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _descriptionController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _remarksController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _image(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                CommonStyle.vertical(context: context),
-                _button(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                CommonStyle.vertical(context: context),
-              ],
-            ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 15),
+          child: ListView(
+            children: [
+              CommonStyle.vertical(context: context),
+              RowWidget(
+                  widget1: _currentLatController(dataState: dataState),
+                  widget2: _currentLongController(dataState: dataState)
+              ),
+              CommonStyle.vertical(context: context),
+            /*  _tfValveIdController(dataState: dataState),
+              CommonStyle.vertical(context: context),*/
+              _incidentTypeDropdown(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _incidentIndicationDropdown(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _assetIdController(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _assetTypeIdController(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _landmarkController(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _addressController(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _descriptionController(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _remarksController(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              _image(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              CommonStyle.vertical(context: context),
+              _button(dataState: dataState),
+              CommonStyle.vertical(context: context),
+              CommonStyle.vertical(context: context),
+            ],
           ),
         ),
       ),
@@ -187,35 +182,42 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
     );
   }
 
-  Widget _assetsDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return  DropdownWidget<GetAssetData>(
-      star: AppString.star,
-      label: AppString.assets,
-      hint: AppString.assets,
-      dropdownValue: dataState.assetValue.assetId!.isEmpty ? null : dataState.assetValue,
-      items: dataState.listOfAsset,
-      onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectAssetValueEvent(assetValue: val!,context: context));
-      },
-    );
-  }
-
   Widget _assetIdController({required FetchCreateAlertFormDataState dataState}) {
     return  TextFieldWidget(
         star: AppString.star,
         label: AppString.assets,
         hintText: AppString.assets,
+        enabled: false,
         controller:dataState.assetIdController
     );
   }
 
-  Widget _assetTypeIdController({required FetchCreateAlertFormDataState dataState}){
-    return TextFieldWidget(
-        star: AppString.star,
-        label: AppString.assetTypeId,
-        hintText: AppString.assetTypeId,
-        controller:dataState.tfGisIdController
+  Widget _assetTypeIdController({required FetchCreateAlertFormDataState dataState}) {
+    return AutoCompleteTextFieldWidget(
+      prefixIcon: Icon(Icons.location_on, color: Colors.cyanAccent,),
+      label: AppString.assetTypeId,
+      hintText: AppString.assetTypeId,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      controller: dataState.assetTypeIdController,
+      suggestions: dataState.listOfAssetTypeId,
+      onSelected: (val) {
+        BlocProvider.of<CreateAlertFormBloc>(context)
+            .add(SelectAssetTypeIdValueEvent(assetTypeId: val,context: context));
+      },
+    );
+  }
+  Widget _assetTypeIdDropdown({required FetchCreateAlertFormDataState dataState}) {
+    return DropdownWidget<TfGisData>(
+      star: AppString.star,
+      label: AppString.assetTypeId,
+      hint: AppString.assetTypeId,
+      dropdownValue: dataState.tfGisValue.id == null ? null : dataState.tfGisValue,
+      items: dataState.listOfTfGis,
+      onChanged: (val) {
+        BlocProvider.of<CreateAlertFormBloc>(context)
+            .add(SelectTfGisValueEvent(tfGisValue: val!,context: context));
+      },
     );
   }
 
@@ -288,7 +290,7 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
           },
         ),
         SizedBox(width: 12,),
-        IconButton(
+       /* IconButton(
           onPressed: () async {
             double size =  MediaQuery.of(!context.mounted ? context : context).size.height
                 - MediaQuery.of(!context.mounted ? context : context).size.width;
@@ -316,7 +318,7 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
             }
           }, icon: Icon(Icons.mic, color: dataState.audioRecordFile.path.isNotEmpty ? AppColor.primer :AppColor.grey,),
           style: IconButton.styleFrom(backgroundColor: AppColor.primer),
-        ),
+        ),*/
       /*  CircleAvatar(
             backgroundColor: AppColor.primer,
             child: Center(child: IconButton(onPressed: (){}, icon: Icon(Icons.mic,color: AppColor.white,size: 18,))))*/

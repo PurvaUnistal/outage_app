@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'WidgetStyles/common_style.dart';
 import 'res/app_color.dart';
 import 'res/app_styles.dart';
@@ -16,7 +17,8 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
   final Function(String)? onSelected;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
-  TextEditingController? controller;
+  final TextEditingController? controller;
+  final List<TextInputFormatter>? inputFormatters;
 
   AutoCompleteTextFieldWidget({
     super.key,
@@ -32,6 +34,7 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.controller,
+    this.inputFormatters,
   });
 
   @override
@@ -86,6 +89,7 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
           validator: validator,
           style: Styles.texts,
           onChanged: onChanged,
+          inputFormatters: inputFormatters,
           textInputAction: TextInputAction.done,
           decoration: InputDecoration(
             counterText: "",
