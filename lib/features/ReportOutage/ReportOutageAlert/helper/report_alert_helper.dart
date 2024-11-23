@@ -328,7 +328,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<dynamic> createMarker({
+  static dynamic createMarker({
     required List<LatLng> latlngList,
     required BuildContext context,
     required BitmapDescriptor markerIcon,

@@ -114,7 +114,6 @@ class _ReportAlertViewState extends State<ReportAlertView> {
   _googleMapWidget({required FetchReportAlertDataState dataState}) {
     if (controller != null && dataState.markersPointList.isNotEmpty) {
       print("dataState.markersPointList-->${dataState.markersPointList.length}");
-      print("dataState.markersPointList-->${dataState.markersPointList.length}");
      /* controller!.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
           zoom: 12,
         //  target: LatLng(dataState.markersPointList.last.position.latitude, dataState.markersPointList.last.position.longitude)

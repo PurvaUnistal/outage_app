@@ -163,7 +163,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
 
   MapType currentMapType = MapType.normal;
   CameraPosition cameraPosition =
-      CameraPosition(target: LatLng(0, 0), zoom: 12);
+  CameraPosition(target: LatLng(0, 0), zoom: 12);
 
   _pageLoad(ReportAlertLoadEvent event, emit) async {
     emit(ReportAlertInitialState());
@@ -425,10 +425,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     }
   }
 
-  _fetchPipelineNetworkApi(
-      {required BuildContext context,
-      required String latitude,
-      required String longitude}) async {
+  _fetchPipelineNetworkApi({required BuildContext context,
+    required String latitude,
+    required String longitude}) async {
     latLngGis = [];
     tfMarkersPointList = {};
     valveMarkersPointList = {};
@@ -439,6 +438,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       latitude: latitude,
       longitude: longitude,
     );
+    tfMarkersPointList.clear();
+    tfPolylineList.clear();
     if (res != null) {
       pipelineNetworkModel = res;
       if (pipelineNetworkModel.data?.length != 0 &&
@@ -468,6 +469,10 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
                 color: Colors.green, latlngList: latLngGis, context: context));
           }
         }
+        markersPointList.addAll(tfMarkersPointList);
+        markersPointList = Set.of(markersPointList);
+        polylineList.addAll(tfPolylineList);
+        polylineList = Set.of(polylineList);
       } else if (pipelineNetworkModel.data?.length == 0) {
         //  return Utils.errorSnackBar(msg: "No data Found", context: context);
       }
@@ -476,7 +481,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
 
   _selectMapTypeButton(SelectMapTypeButtonEvent event, emit) {
     currentMapType =
-        currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
+    currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
     _eventCompleted(emit);
   }
 
@@ -528,15 +533,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             latitude: listOfFilterTfGis[0].latitude!,
             longitude: listOfFilterTfGis[0].longitude!);
       }
-      markersPointList.addAll(tfMarkersPointList);
-      polylineList.addAll(tfPolylineList);
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
   }
 
   _selectCheckBoxValveGis(SelectCheckBoxValveGisEvent event, emit) async {
-    await  _clearTextField();
+    await _clearTextField();
     checkBoxValve = event.checkBoxValve;
     isGasValveLoader = true;
     _eventCompleted(emit);
@@ -574,8 +577,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     }
   }
 
-  _selectCheckBoxRegulatorGis(SelectCheckBoxRegulatorGisEvent event, emit) async {
-    await  _clearTextField();
+  _selectCheckBoxRegulatorGis(SelectCheckBoxRegulatorGisEvent event,
+      emit) async {
+    await _clearTextField();
     checkBoxRegulator = event.checkBoxRegulator;
     isGasRegulatorLoader = true;
     _eventCompleted(emit);
@@ -825,7 +829,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
                 await SharedPref.setString(
                     key: PrefsValue.markerLong,
                     value: event.latLngOnTap.longitude.toString());
-                showBottomSheet(context: event.context, builder: (BuildContext context){
+                showBottomSheet(
+                    context: event.context, builder: (BuildContext context) {
                   return AlertDialogTwoBtnWidget();
                 });
               },
@@ -841,15 +846,18 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
 
   _selectFilterButton(SelectFilterButtonEvent event, emit) async {
     await _clearPopTextField();
-    showDialog(
+    await showDialog(
         context: event.context,
         builder: (BuildContext context) {
-          return ReportPopWidget(mContext: event.context,);
+          return BlocProvider.value(
+            value: BlocProvider.of<ReportAlertBloc>(context) ,
+            child: ReportPopWidget(mContext: event.context,),
+          );
         });
     _eventCompleted(emit);
   }
 
-  _clearTextField(){
+  _clearTextField() {
     checkBoxTf = false;
     isGasTfLoader = false;
     checkBoxValve = false;
@@ -875,7 +883,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     gasReducerGISController.text = "";
     gasEndCapGISController.text = "";
   }
-  _clearPopTextField(){
+
+  _clearPopTextField() {
     tfGisController.text = "";
     gasValveGISController.text = "";
     gasRegulatorGISController.text = "";
@@ -885,6 +894,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     gasReducerGISController.text = "";
     gasEndCapGISController.text = "";
   }
+
   _eventCompleted(Emitter<ReportAlertState> emit) {
     emit(FetchReportAlertDataState(
       isLoader: isLoader,
