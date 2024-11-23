@@ -470,9 +470,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           }
         }
         markersPointList.addAll(tfMarkersPointList);
-        markersPointList = Set.of(markersPointList);
         polylineList.addAll(tfPolylineList);
-        polylineList = Set.of(polylineList);
       } else if (pipelineNetworkModel.data?.length == 0) {
         //  return Utils.errorSnackBar(msg: "No data Found", context: context);
       }
@@ -922,10 +920,10 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       role: role,
       cameraPosition: cameraPosition,
       currentMapType: currentMapType,
-      markersPointList: markersPointList,
+      markersPointList: Set.of(markersPointList),
       currentPosition: currentPosition,
       loginPosition: loginPosition,
-      polylineList: polylineList,
+      polylineList: Set.of(polylineList),
       pipelineNetworkModel: pipelineNetworkModel,
       pipelineNetworkData: pipelineNetworkData,
       listOfPipelineNetwork: listOfPipelineNetwork,
