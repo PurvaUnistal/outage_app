@@ -138,12 +138,12 @@ class CreateAlertFormBloc
 
   _filterAssetType() async {
     if (assetId == "2") {
-      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.gasValveGISId);
-      listOfValveGis = await HiveDataBase.allValveGisDataBox!.values.toList();
+      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.assetTypeId);
+      listOfValveGis = await HiveDataBase.allGisDataBox!.values.toList();
       listOfAssetTypeId = await listOfValveGis.map((e) => e.id!).toSet().toList();
     } else if (assetId == "7") {
-      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.gasTfGisId);
-      listOfTfGis = await HiveDataBase.allTfGisDataBox!.values.toList();
+      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.assetTypeId);
+      listOfTfGis = await HiveDataBase.allGisDataBox!.values.toList();
       listOfAssetTypeId = await listOfTfGis.map((e) => e.id!).toSet().toList();
     }
   }
@@ -284,7 +284,7 @@ class CreateAlertFormBloc
         Utils.successSnackBar(msg: res.data!, context: event.context);
         Navigator.pushReplacementNamed(
           event.context,
-          RoutesName.home,
+          RoutesName.outageApp,
         );
       } else {
         isBtnLoader = false;

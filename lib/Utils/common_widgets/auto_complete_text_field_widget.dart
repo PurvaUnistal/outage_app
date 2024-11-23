@@ -111,6 +111,7 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
             filled: true,
             fillColor: AppColor.white,
             isDense: true,
+            enabled: enabled ?? false,
             contentPadding: EdgeInsets.symmetric(horizontal: 5.0, vertical: prefixIcon != null || suffixIcon != null ? 10 : 10),
             border: enabled == false ? CommonStyle.borderGrey : CommonStyle.border,
             focusedBorder: enabled == false ? CommonStyle.borderGrey : CommonStyle.border,

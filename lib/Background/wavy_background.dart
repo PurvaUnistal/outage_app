@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
 
@@ -65,13 +66,13 @@ class WavyBackground extends StatelessWidget {
 }
 
 List<Color> orangeGradients = [
-  Colors.green.shade800,
-  Colors.green.shade400,
+  AppColor.primer,
+  AppColor.primer40,
 ];
 
 List<Color> aquaGradients = [
-  Colors.yellow.shade800,
-  Colors.yellow.shade400,
+  AppColor.primer1,
+  AppColor.primer1_40,
 ];
 
 class WavyHeader extends StatelessWidget {
@@ -153,9 +154,9 @@ class CircleGreen extends StatelessWidget {
     return Transform.translate(
       offset: Offset(-70.0, 90.0),
       child: Material(
-        color: Colors.green.shade800,
+        color: AppColor.primer,
         child: Padding(padding: EdgeInsets.all(120)),
-        shape: CircleBorder(side: BorderSide(color: Colors.white, width: 15.0)),
+        shape: CircleBorder(side: BorderSide(color:  AppColor.white, width: 15.0)),
       ),
     );
   }
@@ -167,9 +168,9 @@ class CircleYellow extends StatelessWidget {
     return Transform.translate(
       offset: Offset(0.0, 210.0),
       child: Material(
-        color: Colors.yellow.shade800,
+        color: AppColor.primer1,
         child: Padding(padding: EdgeInsets.all(140)),
-        shape: CircleBorder(side: BorderSide(color: Colors.white, width: 15.0)),
+        shape: CircleBorder(side: BorderSide(color: AppColor.white, width: 15.0)),
       ),
     );
   }

@@ -1,6 +1,5 @@
 class HiveBoxName {
-  static get tfGisDataBox => "tfGisDataBox";
-  static get allValveGisDataBox => "allValveGisDataBox";
+  static get allGisDataBox => "allGisDataBox";
 }
 
 class HiveTypeId {

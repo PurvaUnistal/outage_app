@@ -5,19 +5,19 @@ import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.d
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_event.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_state.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 
-class ReportPopWidget extends StatelessWidget {
+class NavigatePopWidget extends StatelessWidget {
   final BuildContext mContext;
-  const ReportPopWidget({super.key, required this.mContext});
+  const NavigatePopWidget({super.key, required this.mContext});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ReportAlertBloc, ReportAlertState>(
+    return BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
       builder: (context, state) {
-        if (state is FetchReportAlertDataState) {
+        if(state is FetchNavigateAlertDataState ){
           return SingleChildScrollView(
             child: Dialog(
               backgroundColor: Colors.white,
@@ -60,13 +60,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _tfWidget({required FetchReportAlertDataState dataState}){
+  Widget _tfWidget({required FetchNavigateAlertDataState dataState}){
     return  ListTile(
       leading: Checkbox(
         value: dataState.checkBoxTf,
         activeColor: Colors.cyanAccent,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxTFGisEvent(
                   checkBoxTf: val!, context: mContext));
         },
@@ -85,7 +85,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.tfGisController,
         suggestions: dataState.listOfTfGisId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext)
+          BlocProvider.of<NavigateAlertBloc>(mContext)
               .add(SelectTFGisEvent(
               tfGisId: val, context: mContext));
           Navigator.pop(mContext);
@@ -95,13 +95,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _valveWidget({required FetchReportAlertDataState dataState}){
+  Widget _valveWidget({required FetchNavigateAlertDataState dataState}){
     return   ListTile(
       leading: Checkbox(
         value: dataState.checkBoxValve,
         activeColor: Colors.green,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxValveGisEvent(
                   checkBoxValve: val!, context: mContext));
         },
@@ -120,7 +120,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.gasValveGISController,
         suggestions: dataState.listOfGasValveGISId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectValveGISValueEvent(
                   gasValveGISId: val, context: mContext));
           Navigator.pop(mContext);
@@ -130,13 +130,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _regulatorWidget({required FetchReportAlertDataState dataState}){
+  Widget _regulatorWidget({required FetchNavigateAlertDataState dataState}){
     return   ListTile(
       leading: Checkbox(
         value: dataState.checkBoxRegulator,
         activeColor: Colors.green,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxRegulatorGisEvent(
                   checkBoxRegulator: val!, context: mContext));
         },
@@ -155,7 +155,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.gasRegulatorGISController,
         suggestions: dataState.listOfGasRegulatorGISId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectRegulatorGISValueEvent(
                   gasRegulatorGISId: val, context: mContext));
           Navigator.pop(mContext);
@@ -165,13 +165,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _teeWidget({required FetchReportAlertDataState dataState}){
+  Widget _teeWidget({required FetchNavigateAlertDataState dataState}){
     return   ListTile(
       leading: Checkbox(
         value: dataState.checkBoxTee,
         activeColor: Colors.green,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxTeeGisEvent(
                   checkBoxTee: val!, context: mContext));
         },
@@ -190,7 +190,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.gasTeeGISController,
         suggestions: dataState.listOfGasTeeGISId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectTeeGISValueEvent(
                   gasTeeGISId: val, context: mContext));
           Navigator.pop(mContext);
@@ -200,13 +200,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _elbowWidget({required FetchReportAlertDataState dataState}){
+  Widget _elbowWidget({required FetchNavigateAlertDataState dataState}){
     return   ListTile(
       leading: Checkbox(
         value: dataState.checkBoxElbow,
         activeColor: Colors.green,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxElbowGisEvent(
                   checkBoxElbow: val!, context: mContext));
         },
@@ -225,7 +225,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.gasElbowGISController,
         suggestions: dataState.listOfGasElbowGISId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectElbowGISValueEvent(
                   gasElbowGISId: val, context: mContext));
           Navigator.pop(mContext);
@@ -235,13 +235,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _couplerWidget({required FetchReportAlertDataState dataState}){
+  Widget _couplerWidget({required FetchNavigateAlertDataState dataState}){
     return   ListTile(
       leading: Checkbox(
         value: dataState.checkBoxCoupler,
         activeColor: Colors.green,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxCouplerGisEvent(
                   checkBoxCoupler: val!, context: mContext));
         },
@@ -260,7 +260,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.gasCouplerGISController,
         suggestions: dataState.listOfGasCouplerGISId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCouplerGISValueEvent(
                   gasCouplerGISId: val, context: mContext));
           Navigator.pop(mContext);
@@ -270,13 +270,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _reducerWidget({required FetchReportAlertDataState dataState}){
+  Widget _reducerWidget({required FetchNavigateAlertDataState dataState}){
     return   ListTile(
       leading: Checkbox(
         value: dataState.checkBoxReducer,
         activeColor: Colors.green,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxReducerGisEvent(
                   checkBoxReducer: val!, context: mContext));
         },
@@ -295,7 +295,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.gasReducerGISController,
         suggestions: dataState.listOfGasReducerGISId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectReducerGISValueEvent(
                   gasReducerGISId: val, context: mContext));
           Navigator.pop(mContext);
@@ -305,13 +305,13 @@ class ReportPopWidget extends StatelessWidget {
     );
   }
 
-  Widget _endCapWidget({required FetchReportAlertDataState dataState}){
+  Widget _endCapWidget({required FetchNavigateAlertDataState dataState}){
     return   ListTile(
       leading: Checkbox(
         value: dataState.checkBoxEndCap,
         activeColor: Colors.green,
         onChanged: (bool? val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxEndCapGisEvent(
                   checkBoxEndCap: val!, context: mContext));
         },
@@ -330,7 +330,7 @@ class ReportPopWidget extends StatelessWidget {
         controller: dataState.gasEndCapGISController,
         suggestions: dataState.listOfGasEndCapGISId,
         onSelected: (val) {
-          BlocProvider.of<ReportAlertBloc>(mContext).add(
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectEndCapGISValueEvent(
                   gasEndCapGISId: val, context: mContext));
           Navigator.pop(mContext);

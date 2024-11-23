@@ -56,7 +56,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWidget(
-        title: RoutesName.home,
+        title: RoutesName.outageApp,
         boolLeading: false,
         actions: [
           IconButton(

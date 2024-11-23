@@ -50,6 +50,8 @@ class User {
   dynamic accessright;
   String? gaLatitude;
   String? gaLongitude;
+  String? gaId;
+  String? areas;
   String? spreadId;
   String? sectionId;
 
@@ -66,6 +68,8 @@ class User {
         this.accessright,
         this.gaLatitude,
         this.gaLongitude,
+        this.areas,
+        this.gaId,
         this.spreadId,
         this.sectionId});
 
@@ -82,6 +86,8 @@ class User {
     accessright = json['accessright'] ?? "";
     gaLatitude = json['ga_latitude'] ?? "";
     gaLongitude = json['ga_longitude'] ?? "";
+    areas = json['areas'] ?? "";
+    gaId = json['ga_id'] ?? "";
     spreadId = json['spread_id'] ?? "";
     sectionId = json['section_id'] ?? "";
   }
@@ -100,6 +106,8 @@ class User {
     data['accessright'] = this.accessright;
     data['ga_latitude'] = this.gaLatitude;
     data['ga_longitude'] = this.gaLongitude;
+    data['ga_id'] = this.gaId;
+    data['areas'] = this.areas;
     data['spread_id'] = this.spreadId;
     data['section_id'] = this.sectionId;
     return data;

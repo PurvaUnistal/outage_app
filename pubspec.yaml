@@ -66,11 +66,10 @@ dev_dependencies:
     sdk: flutter
 
 flutter_icons:
-  android: "agcl_icon"
+  android: "unistal_logo"
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/icons/agcl_icon.png"
-  min_sdk_android: 21
+  image_path: "assets/icons/unistal_logo.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

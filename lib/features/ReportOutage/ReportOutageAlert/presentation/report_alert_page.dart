@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
+import 'package:igl_outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/background_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
@@ -12,7 +13,6 @@ import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bl
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_state.dart';
 import '../../../../Utils/common_widgets/res/app_string.dart';
-import 'widget/report_pop_widget.dart';
 
 class ReportAlertView extends StatefulWidget {
   const ReportAlertView({super.key});
@@ -22,46 +22,43 @@ class ReportAlertView extends StatefulWidget {
 }
 
 class _ReportAlertViewState extends State<ReportAlertView> {
-  Completer<GoogleMapController> mapController = Completer();
+  GoogleMapController? controller;
+
   @override
   void initState() {
-    BlocProvider.of<ReportAlertBloc>(context).add(ReportAlertLoadEvent(context: context));
+    BlocProvider.of<ReportAlertBloc>(context)
+        .add(ReportAlertLoadEvent(context: context));
     super.initState();
   }
-
   @override
   void dispose() {
     // TODO: implement dispose
-
-    _disposeController();
+    controller!.dispose();
     super.dispose();
   }
 
-  Future<void> _disposeController() async {
-    final GoogleMapController controller = await mapController.future;
-    controller.dispose();
-  }
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BackgroundWidget(
-        child: BlocBuilder<ReportAlertBloc, ReportAlertState>(
-          builder: (context, state) {
-            if (state is FetchReportAlertDataState) {
-              return  BackgroundWidget(child: _itemBuilder(dataState: state));
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
-        ),
+    return BackgroundWidget(
+      child: BlocBuilder<ReportAlertBloc, ReportAlertState>(
+        builder: (context, state) {
+          if (state is FetchReportAlertDataState) {
+            return _itemBuilder(dataState: state);
+          } else {
+            return const Center(child: SpinLoader());
+          }
+        },
       ),
     );
   }
+
   Future<bool> _onWillPop() async {
     return (await showDialog(
-        context: context,
-        builder: (BuildContext mContext) =>
-            MessageBoxTwoButtonPopWidget(message: "Do you want to Report Alert?", okButtonText: "Exit", onPressed: () => Navigator.of(context).pop(true)))) ??
+            context: context,
+            builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
+                message: "Do you want to Report Alert?",
+                okButtonText: "Exit",
+                onPressed: () => Navigator.of(context).pop(true)))) ??
         false;
   }
 
@@ -91,93 +88,100 @@ class _ReportAlertViewState extends State<ReportAlertView> {
               ),
             ],
           ),
-          body:Stack(
-              children: <Widget>[
-                _googleMapWidget(dataState:dataState),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Column(
-                      children: [
-                        _mapTypeButtonWidget(dataState: dataState),
-                        SizedBox(height: 16.0),
-                        _currentLocationButtonWidget(dataState: dataState),
-                        SizedBox(height: 16.0),
-                        _filterButtonWidget(dataState: dataState),
-                      ],
-                    ),
-
-                  ),
+          body: Stack(children: <Widget>[
+            _googleMapWidget(dataState: dataState),
+            dataState.isPipelineLoader == false ?
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Column(
+                  children: [
+                    _mapTypeButtonWidget(dataState: dataState),
+                    SizedBox(height: 16.0),
+                    _currentLocationButtonWidget(dataState: dataState),
+                    SizedBox(height: 16.0),
+                    _filterButtonWidget(dataState: dataState),
+                  ],
                 ),
-              ]
-          )
+              ),
+            )
+                : WaveLoaderWidget(),
+          ])),
+    );
+  }
+
+  _googleMapWidget({required FetchReportAlertDataState dataState}) {
+    if (controller != null && dataState.markersPointList.isNotEmpty) {
+      print("dataState.markersPointList-->${dataState.markersPointList.length}");
+      print("dataState.markersPointList-->${dataState.markersPointList.length}");
+     /* controller!.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          zoom: 12,
+        //  target: LatLng(dataState.markersPointList.last.position.latitude, dataState.markersPointList.last.position.longitude)
+          target: LatLng(dataState.currentPosition.latitude, dataState.currentPosition.longitude)
+      )
+      )
+      );*/
+    }
+   return GoogleMap(
+            mapType: dataState.currentMapType,
+            compassEnabled: true,
+            myLocationButtonEnabled: true,
+            markers: dataState.markersPointList,
+            polylines: dataState.polylineList,
+            initialCameraPosition: dataState.cameraPosition,
+            onMapCreated: (GoogleMapController mController) {
+              controller = mController;
+              },
+            onTap: (latLng) {
+              dataState.polylineList.isNotEmpty
+                  ? BlocProvider.of<ReportAlertBloc>(context).add(
+                      SelectGoogleMapButtonEvent(
+                          context: context, latLngOnTap: latLng))
+                  : (latLng) {};
+            },
+          );
+  }
+
+  _mapTypeButtonWidget({required FetchReportAlertDataState dataState}) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      onPressed: () => BlocProvider.of<ReportAlertBloc>(context)
+          .add(SelectMapTypeButtonEvent()),
+      backgroundColor: AppColor.primer,
+      child: Icon(
+        Icons.layers,
+        size: 21.0,
+        color: AppColor.white,
       ),
     );
   }
-  _googleMapWidget({required FetchReportAlertDataState dataState}){
-    return dataState.isPipelineLoader == false ?  GoogleMap(
-         onTap:(latLng){
-           dataState.polylineList.isNotEmpty ? BlocProvider.of<ReportAlertBloc>(context).add(
-               SelectGoogleMapButtonEvent(
-                 context: context,
-                 latLngOnTap:latLng
-               ))
-           :(latLng){};
-         },
-      mapType: dataState.currentMapType,
-      compassEnabled: true,
-      zoomGesturesEnabled: true,
-      myLocationButtonEnabled: false,
-      zoomControlsEnabled: true,
-      markers: dataState.markersPointList,
-      polylines: dataState.polylineList,
-      initialCameraPosition: CameraPosition(
-        target: dataState.loginPosition,
-        zoom: 12.0,
+
+  _currentLocationButtonWidget({required FetchReportAlertDataState dataState}) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      onPressed: () => BlocProvider.of<ReportAlertBloc>(context)
+          .add(SelectCurrentMarkerButtonEvent()),
+      backgroundColor: AppColor.primer,
+      child: Icon(
+        Icons.my_location_rounded,
+        size: 21.0,
+        color: AppColor.white,
       ),
-      onMapCreated: (GoogleMapController controller){
-        // mapController.complete(controller);
-      },
-    ) : Center(child: SpinLoader());
-  }
-
-  _mapTypeButtonWidget({required FetchReportAlertDataState dataState}){
-    return  FloatingActionButton(
-      heroTag: UniqueKey(),
-      onPressed: ()=>BlocProvider.of<ReportAlertBloc>(context).add(
-          SelectMapTypeButtonEvent()),
-      backgroundColor: AppColor.primer,
-      child: Icon(Icons.layers, size: 21.0, color: AppColor.white,),
     );
   }
 
-  _currentLocationButtonWidget({required FetchReportAlertDataState dataState}){
-    return  FloatingActionButton(
-      heroTag: UniqueKey(),
-      onPressed: (){
-
-      },
-      backgroundColor: AppColor.primer,
-      child: Icon(Icons.my_location_rounded, size: 21.0, color: AppColor.white,),
-    );
-  }
-
-  _filterButtonWidget({required FetchReportAlertDataState dataState}){
-    return  FloatingActionButton(
+  _filterButtonWidget({required FetchReportAlertDataState dataState}) {
+    return FloatingActionButton(
       heroTag: UniqueKey(),
       backgroundColor: AppColor.primer,
-      child: Icon(Icons.filter_alt, size: 21.0, color: AppColor.white,),
-      onPressed: (){
-        dataState.tfGisController.text = '';
-        dataState.gasValveGISController.text = '';
-        showDialog(
-          context: context,
-          builder: (BuildContext mContext) {
-            return ReportPopWidget(mContext: context,);
-          },
-        );
-      },
+      child: Icon(
+        Icons.filter_alt,
+        size: 21.0,
+        color: AppColor.white,
+      ),
+        onPressed: () => BlocProvider.of<ReportAlertBloc>(context)
+            .add(SelectFilterButtonEvent(context: context)),
     );
   }
 

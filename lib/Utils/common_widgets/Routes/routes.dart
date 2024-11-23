@@ -17,7 +17,7 @@ class Routes {
       case RoutesName.login:
         return MaterialPageRoute(
             builder: (BuildContext context) => const LoginView());
-      case RoutesName.home:
+      case RoutesName.outageApp:
         return MaterialPageRoute(
             builder: (BuildContext context) => const HomeView());
       case RoutesName.manageAlertView:

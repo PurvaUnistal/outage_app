@@ -24,17 +24,17 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
 
             children: [
               ButtonWidget(
-                 text : "No",
-                  onPressed: ()=> Navigator.pop(context),),
+                text : "No",
+                onPressed: ()=> Navigator.pop(context),),
               SizedBox(width: 12,),
               ButtonWidget(
-                  text : "Yes",
-                  onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (buildContext) => const CreateAlertFormView()),
-                    );
-                  },),
+                text : "Yes",
+                onPressed: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (buildContext) => const CreateAlertFormView()),
+                  );
+                },),
             ],
           ),
         ],

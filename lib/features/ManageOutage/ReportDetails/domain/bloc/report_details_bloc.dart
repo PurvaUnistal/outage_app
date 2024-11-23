@@ -85,7 +85,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     if (res != null) {
       incidentTypeActionModel = res;
       if (incidentTypeActionModel.data != null) {
-        listOfIncidentTypeAction = incidentTypeActionModel.data!; // ye list or ha isme action status aagr null ho ya pending ho
+        listOfIncidentTypeAction = incidentTypeActionModel.data!;
         for(var data in listOfIncidentTypeAction){
           if(data.actionStatus == "1" ){
             break;

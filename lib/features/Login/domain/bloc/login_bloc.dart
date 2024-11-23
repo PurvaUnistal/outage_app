@@ -74,12 +74,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               await SharedPref.setString(key: PrefsValue.pwdChanged,value: res.user!.pwdChanged!);
               await SharedPref.setString(key: PrefsValue.loginLat,value: res.user!.gaLatitude!);
               await SharedPref.setString(key: PrefsValue.loginLong,value: res.user!.gaLongitude!);
+              await SharedPref.setString(key: PrefsValue.gaId,value: res.user!.gaId!);
+              await SharedPref.setString(key: PrefsValue.areas,value: res.user!.areas!);
               PackageInfo packageInfo = await PackageInfo.fromPlatform();
               String appVersion = packageInfo.version;
               await SharedPref.setString(key: PrefsValue.appVersion,value: appVersion);
                 Navigator.pushReplacementNamed(
                   event.context,
-                  RoutesName.home,
+                  RoutesName.outageApp,
                 );
 
             }

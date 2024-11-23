@@ -8,6 +8,7 @@ class PrefsValue {
   static String userName = "User Name";
   static String userId = "User Id";
   static String gaId = "gaId";
+  static String areas = "areas";
   static String cookies = "cookies";
   static String pwdChanged = "pwdChanged";
   static String loginLat = "loginLat";
@@ -20,8 +21,7 @@ class PrefsValue {
   static String markerLat = "markerLat";
   static String markerLong = "markerLong";
   static String assetId = "assetId";
-  static String gasTfGisId = "tfGisId";
-  static String gasValveGISId = "gasValveGISId";
+  static String assetTypeId = "assetTypeId";
   static String incidentTypeId = "incidentTypeId";
   static String incidentId = "incidentId";
 

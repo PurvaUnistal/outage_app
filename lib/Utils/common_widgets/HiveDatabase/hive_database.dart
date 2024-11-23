@@ -5,8 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'hive_box_name.dart';
 
 class HiveDataBase {
-  static Box<TfGisData>? allTfGisDataBox;
-  static Box<TfGisData>? allValveGisDataBox;
+  static Box<TfGisData>? allGisDataBox;
   Future<void> init() async {
     Directory tempDir = await getApplicationDocumentsDirectory();
     Directory filesDir = Directory(tempDir.path)..createSync(recursive: true);
@@ -14,7 +13,6 @@ class HiveDataBase {
 
     Hive.registerAdapter(TfGisDataAdapter());
 
-    allTfGisDataBox = await Hive.openBox<TfGisData>(HiveBoxName.tfGisDataBox);
-    allValveGisDataBox = await Hive.openBox<TfGisData>(HiveBoxName.allValveGisDataBox);
+    allGisDataBox = await Hive.openBox<TfGisData>(HiveBoxName.allGisDataBox);
   }
 }

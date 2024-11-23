@@ -54,7 +54,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
           if (email.isNotEmpty || password.isNotEmpty) {
             Navigator.pushReplacementNamed(
               context,
-              RoutesName.home,
+              RoutesName.outageApp,
             );
           }
         } else {

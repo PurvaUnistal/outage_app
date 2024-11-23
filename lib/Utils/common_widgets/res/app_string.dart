@@ -45,6 +45,12 @@ class AppString {
   static const String area = 'Area';
   static const String tfGis = 'TF GIS';
   static const String gasValveGIS = 'Gas Valve GIS';
+  static const String gasRegulatorGIS = 'Gas Regulator GIS';
+  static const String gasTeeGIS = 'Gas Tee GIS';
+  static const String gasElbowGIS = 'Gas Elbow GIS';
+  static const String gasCouplerGIS = 'Gas Coupler GIS';
+  static const String gasReducerGIS = 'Gas Reducer GIS';
+  static const String gasEndCapGIS = 'Gas EndCap GIS';
   static const String controlRoom = 'Control Room';
   static const String description = 'Description';
   static const String remarks = 'Remarks';

@@ -2,9 +2,9 @@
 class Apis {
 
 
-   static String baseUrl = 'http://142.79.231.30:9097/api/';
+   static String baseUrl = 'http://agcl.smartgasnet.com/api/';
  // static String baseUrl = 'http://pbgpl.smartgasnet.com/api/';
-  static String basePath = 'http://142.79.231.30:9097/';
+  static String basePath = 'http://agcl.smartgasnet.com/';
 
   static String loginUrl = baseUrl + "auth";
   static String areaList = baseUrl + "outage/getAllArea?schema=";
@@ -23,9 +23,11 @@ class Apis {
    static String getControlRoom = baseUrl + "outage/get-control-room?";
    static String addIncident = baseUrl + "outage/add-incident";
    static String getPipelineGis = baseUrl + "get-pipeline-gis";
-   static String getGasValueGis = baseUrl + "get-gasvalve-gis";
+   static String getTFGis = baseUrl + "get-tf-gis?";
+   static String getGasValueGis = baseUrl + "get-gasvalve-gis?";
+   static String getRegulatorGis = baseUrl + "get-regulator-gis?";
+   static String getNonControllableFittingGis = baseUrl + "get-noncontrolable-fitting-gis?";
    static String getFittingGis = baseUrl + "get-noncontrolable-fitting-gis";
-   static String getTFGis = baseUrl + "get-tf-gis";
    static String getPipelineNetwork = baseUrl + "get-pipeline-network?";
    static String getIncidentAction = baseUrl + "outage/get-incident-action?";
    static String getIncidentTypeAction = baseUrl + "outage/get-incident-type-action-api?";

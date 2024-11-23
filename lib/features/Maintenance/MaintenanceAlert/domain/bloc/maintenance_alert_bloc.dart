@@ -555,7 +555,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
           Utils.successSnackBar(msg: res.data!, context: event.context);
           Navigator.pushReplacementNamed(
             event.context,
-            RoutesName.home,
+            RoutesName.outageApp,
           );
         } else {
           isBtnLoader = false;
