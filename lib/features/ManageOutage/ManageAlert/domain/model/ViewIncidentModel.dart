@@ -1,3 +1,5 @@
+import 'package:igl_outage_app/Utils/common_widgets/res/enums.dart';
+
 class ViewIncidentModel {
   int? success;
   bool? error;
@@ -53,7 +55,7 @@ class ViewIncidentData {
   String? createdAt;
   String? updatedAt;
   String? status;
-  String? actionStatus;
+  ActionStatus? actionStatus;
   String? actionStatusStartDate;
   String? actionStatusEndDate;
   String? latitude;
@@ -157,7 +159,10 @@ class ViewIncidentData {
     createdAt = json['created_at'] ?? "";
     updatedAt = json['updated_at'] ?? "";
     status = json['status'] ?? "";
-    actionStatus = json['action_status'] ?? "";
+  //  actionStatus = json['action_status'] ?? "";
+    actionStatus = json['action_status'] != null
+        ? getActionStatus(json['action_status'].toString())
+        : ActionStatus.newAction;
     actionStatusStartDate = json['action_status_start_date'] ?? "";
     actionStatusEndDate = json['action_status_end_date'] ?? "";
     latitude = json['latitude'] ?? "0.0";
@@ -237,5 +242,18 @@ class ViewIncidentData {
     data['incident_longitude'] = this.incidentLongitude;
     data['incedent_id'] = this.incedentId;
     return data;
+  }
+
+  getActionStatus(String status) {
+    switch(status){
+      case "0" :
+        return ActionStatus.newAction;
+      case "1" :
+        return ActionStatus.inProgress;
+      case "4" :
+        return ActionStatus.completed;
+      default:
+        return ActionStatus.newAction;
+    }
   }
 }

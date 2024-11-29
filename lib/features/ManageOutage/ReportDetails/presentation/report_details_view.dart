@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_border_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
@@ -87,7 +86,13 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
             ),
           ],
         ),
-        body: ListView.builder(
+        body: incidentTypeActionSize == 0
+            ? Center(
+            child: Text(
+              "No records found",
+              style: Styles.labels,
+            ))
+            :  ListView.builder(
             shrinkWrap: true,
             itemCount: incidentTypeActionSize,
             itemBuilder: (BuildContext context, int i) {
@@ -96,7 +101,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                 child: Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border.all(color: Colors.green.shade800),
+                        border: Border.all(color: AppColor.primer1),
                         borderRadius: BorderRadius.all(Radius.circular(8))),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -173,7 +178,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                   SizedBox(
                     width: 8,
                   ),
-                  dataState.isBtnLoader == true &&
+                  i != listSize - 1 ?  dataState.isBtnLoader == true &&
                           dataState.currentActionStatus == "2"
                       ? DottedLoaderWidget()
                       : ButtonColorWidget(
@@ -187,7 +192,8 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                               actionStatus: "2",
                               row: i.toString(),
                             ));
-                          }),
+                          })
+                      : Container(),
                 ],
               )
             : dataType.actionStatus == "1"
@@ -261,7 +267,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                 color: AppColor.red, text: "Not Started", onTap: () {})
             : dataType.actionStatus == "1"
                 ? ButtonBorderWidget(
-                    color: AppColor.primer1, text: "In Progress", onTap: () {})
+                    color: AppColor.yellow800, text: "In Progress", onTap: () {})
                 : dataType.actionStatus == "2"
                     ? ButtonBorderWidget(
                         color: AppColor.grey, text: "Skipped", onTap: () {})

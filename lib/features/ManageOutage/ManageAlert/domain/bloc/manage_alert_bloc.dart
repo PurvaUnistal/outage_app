@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:igl_outage_app/features/ManageOutage/ManageAlert/domain/model/ViewIncidentModel.dart';
 import 'package:igl_outage_app/features/ManageOutage/ManageAlert/helper/manage_alert_helper.dart';
-import 'package:igl_outage_app/features/ManageOutage/ReportDetails/presentation/report_details_view.dart';
 import 'manage_alert_event.dart';
 import 'manage_alert_state.dart';
 
@@ -14,7 +12,9 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
   ManageAlertBloc() : super(ManageAlertInitialState()) {
     on<ManageAlertLoadEvent>(_pageLoad);
     on<SelectTabChangedEvent>(_selectTabChanged);
-    on<SelectReportChangedEvent>(_selectReportChanged);
+    on<SelectPageSelectDataEvent>(_selectPageSelectData);
+    on<ManagePageRefreshDataEvent>(_pageRefreshData);
+    on<SelectSearchPriorityEvent>(_selectSearchPriority);
   }
 
   bool isLoader = false;
@@ -24,33 +24,27 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
   String userName = '';
   String baseUrl = '';
   int tabIndex = 0;
+
   ViewIncidentModel viewIncidentModel = ViewIncidentModel();
   ViewIncidentData viewIncidentValue = ViewIncidentData();
   List<ViewIncidentData> listOfViewIncident = [];
-  List<ViewIncidentData> listOfNewViewIncident = [];
-  List<ViewIncidentData> listOfProgressViewIncident = [];
-  List<ViewIncidentData> listOfCompletedViewIncident = [];
+  List<ViewIncidentData> listOfFilterViewIncident = [];
 
-  List<Tab> listOfTab = [
-    Tab(text: "New"),
-    Tab(text: "In Progress"),
-    Tab(text: "Completed"),
-  ];
 
+
+  TextEditingController searchPriorityController = TextEditingController();
 
   _pageLoad(ManageAlertLoadEvent event, emit) async {
     emit(ManageAlertInitialState());
     isLoader = false;
     tabIndexLoader = false;
     tabIndex = 0;
+
     viewIncidentModel = ViewIncidentModel();
     viewIncidentValue = ViewIncidentData();
     listOfViewIncident = [];
-    listOfNewViewIncident = [];
-    listOfProgressViewIncident = [];
-    listOfCompletedViewIncident = [];
-    listOfTab = listOfTab;
-
+    listOfFilterViewIncident = [];
+    searchPriorityController.text = "";
     scheme = await SharedPref.getString(key: PrefsValue.schema);
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
@@ -69,41 +63,65 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
       viewIncidentModel = res;
       if (viewIncidentModel.data != null) {
         listOfViewIncident = viewIncidentModel.data!;
-        listOfNewViewIncident = listOfViewIncident
-            .where((element) => element.actionStatus == "0")
-            .toList();
-        listOfProgressViewIncident = listOfViewIncident
-            .where((element) => element.actionStatus == "1")
-            .toList();
-        listOfCompletedViewIncident = listOfViewIncident
-            .where((element) => element.actionStatus == "4")
-            .toList();
+        listOfFilterViewIncident = listOfViewIncident;
+        await _filterList();
       }
       return res;
     }
   }
 
+  _filterList(){
+    if (tabIndex == 0) {
+      listOfFilterViewIncident = listOfFilterViewIncident
+          .where((e) => e.actionStatus == ActionStatus.newAction)
+          .toList();
+    } else if (tabIndex == 1) {
+      listOfFilterViewIncident = listOfFilterViewIncident
+          .where((e) => e.actionStatus == ActionStatus.inProgress)
+          .toList();
+    } else if (tabIndex == 2) {
+      listOfFilterViewIncident = listOfFilterViewIncident
+          .where((e) => e.actionStatus == ActionStatus.completed)
+          .toList();
+    }
+  }
+
   _selectTabChanged(SelectTabChangedEvent event, emit) async {
+    searchPriorityController.text = "";
     tabIndex = event.tabIndex;
-    tabIndexLoader = true;
+      tabIndexLoader = true;
     _eventCompleted(emit);
-    await _fetchViewIncidentApi(context: event.context);
+      await _fetchViewIncidentApi(context: event.context);
     tabIndexLoader = false;
     _eventCompleted(emit);
   }
 
-  _selectReportChanged(SelectReportChangedEvent event, emit) async {
-    /*if(event.incidentTypeId.isNotEmpty){
-      await SharedPref.setString(key: PrefsValue.incidentTypeId,value: event.incidentTypeId.toString());
-      await SharedPref.setString(key: PrefsValue.incidentId,value: event.incidentId.toString());
-      print("event.incidentTypeId-->${event.incidentTypeId}");
-      print("event.incidentId-->${event.incidentId}");
-      Navigator.push(
-        event.context,
-        MaterialPageRoute(builder: (buildContext) => const ReportDetailsView()),
-      );
+  _selectPageSelectData(SelectPageSelectDataEvent event, emit) async {
+    viewIncidentValue = listOfViewIncident[event.index];
+   await _filterList();
+    _eventCompleted(emit);
+  }
+
+  _pageRefreshData(ManagePageRefreshDataEvent event, emit) async {
+    await _fetchViewIncidentApi(context: event.context);
+    await _filterList();
+    _eventCompleted(emit);
+  }
+
+
+  _selectSearchPriority(SelectSearchPriorityEvent event, emit) async {
+    searchPriorityController.text = event.searchPriority;
+    if (event.searchPriority.isNotEmpty) {
+      listOfFilterViewIncident = listOfFilterViewIncident
+          .where((element) =>
+              element.priority!.toString().contains(event.searchPriority) ||
+              element.priority!.startsWith(event.searchPriority.toString()))
+          .toList();
       _eventCompleted(emit);
-    }*/
+    } else {
+      listOfFilterViewIncident = await listOfViewIncident;
+    }
+    _eventCompleted(emit);
   }
 
   _eventCompleted(Emitter<ManageAlertState> emit) {
@@ -115,13 +133,11 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
       userName: userName,
       role: role,
       tabIndex: tabIndex,
-      listOfTab:listOfTab,
+      searchPriorityController: searchPriorityController,
       viewIncidentModel: viewIncidentModel,
       viewIncidentValue: viewIncidentValue,
       listOfViewIncident: listOfViewIncident,
-      listOfNewViewIncident: listOfNewViewIncident,
-      listOfProgressViewIncident: listOfProgressViewIncident,
-      listOfCompletedViewIncident: listOfCompletedViewIncident,
+      listOfFilterViewIncident: listOfFilterViewIncident,
     ));
   }
 }

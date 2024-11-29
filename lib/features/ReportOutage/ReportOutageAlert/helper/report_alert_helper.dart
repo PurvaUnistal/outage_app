@@ -318,10 +318,11 @@ class ReportAlertHelper {
     String json = Uri(queryParameters: para).query;
     try {
       log(Apis.getPipelineNetwork + json);
-      var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getPipelineNetwork + json, context: context);
-      GetPipelineNetworkModel response = GetPipelineNetworkModel.fromJson(res);
-      return response;
+      var res = await ApiHelper.getData(urlEndPoint: Apis.getPipelineNetwork + json, context: context);
+      if(res != null){
+        GetPipelineNetworkModel response = GetPipelineNetworkModel.fromJson(res);
+        return response;
+      }
     } catch (e) {
       log("getPipelineNetwork-->${e.toString()}");
     }
@@ -338,6 +339,7 @@ class ReportAlertHelper {
       for (var latLngData in latlngList) {
         markersPointList.clear();
         markersPointList.add(Marker(
+          icon: markerIcon,
           markerId: MarkerId("${latLngData.latitude},${latLngData.longitude}"),
           infoWindow: InfoWindow(
             title: "${latLngData.latitude.toString()}, "

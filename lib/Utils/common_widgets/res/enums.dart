@@ -1,0 +1,1 @@
+enum ActionStatus {newAction, inProgress, completed }

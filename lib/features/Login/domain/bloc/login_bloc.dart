@@ -63,7 +63,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           _eventCompleted(emit);
           if (res.user != null) {
             loginModel = res;
-            if(res.status == 200 && res.user!.role!.toLowerCase().contains('complain management')){
+          //  if(res.status == 200 && res.user!.role!.toLowerCase().contains('complain management')){
+            if(res.status == 200 ){
               await SharedPref.setString(key: PrefsValue.passwordVal,value: emailController.text);
               await SharedPref.setString(key: PrefsValue.emailVal,value: passwordController.text);
               await SharedPref.setString(key: PrefsValue.userId,value: res.user!.id!);
@@ -76,6 +77,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               await SharedPref.setString(key: PrefsValue.loginLong,value: res.user!.gaLongitude!);
               await SharedPref.setString(key: PrefsValue.gaId,value: res.user!.gaId!);
               await SharedPref.setString(key: PrefsValue.areas,value: res.user!.areas!);
+              List<Accessright> accessrightList = await res.user!.accessright!;
+              await SharedPref.setString(key: PrefsValue.accessRight,value: Accessright.jsonFromAccessrightList(accessrightList));
               PackageInfo packageInfo = await PackageInfo.fromPlatform();
               String appVersion = packageInfo.version;
               await SharedPref.setString(key: PrefsValue.appVersion,value: appVersion);

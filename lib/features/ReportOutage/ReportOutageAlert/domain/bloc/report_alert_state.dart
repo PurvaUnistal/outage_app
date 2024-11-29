@@ -44,7 +44,8 @@ class FetchReportAlertDataState extends ReportAlertState {
   final String role;
   final String baseUrl;
   final CameraPosition cameraPosition;
-  
+  Completer<GoogleMapController> googleMapController;
+
   final TextEditingController tfGisController;
   final TextEditingController gasValveGISController;
   final TextEditingController gasRegulatorGISController;
@@ -104,6 +105,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.nameofLocation,
     required this.role,
     required this.cameraPosition,
+    required this.googleMapController,
     required this.tfGisController,
     required this.gasValveGISController,
     required this.gasRegulatorGISController,
@@ -157,6 +159,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     nameofLocation,
     role,
     cameraPosition,
+    googleMapController,
     baseUrl,
     tfGisController,
     gasValveGISController,

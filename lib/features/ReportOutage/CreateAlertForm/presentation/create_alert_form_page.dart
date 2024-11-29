@@ -34,7 +34,6 @@ class CreateAlertFormView extends StatefulWidget {
 class _CreateAlertFormViewState extends State<CreateAlertFormView> {
   @override
   void initState() {
-/*    LatLng  _latLngDate =   BlocProvider.of<ReportAlertBloc>(context).latLngData;*/
     BlocProvider.of<CreateAlertFormBloc>(context).add(CreateAlertFormLoadEvent(context: context));
     super.initState();
   }

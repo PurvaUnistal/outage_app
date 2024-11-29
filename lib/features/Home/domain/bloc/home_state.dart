@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:igl_outage_app/features/Login/domain/model/login_model.dart';
 
 abstract class HomeState extends Equatable {}
 
@@ -19,12 +20,14 @@ class FetchHomeDataState extends HomeState {
   final String userName;
   final String role;
   final String baseUrl;
+  final List<Accessright> listOFAccessRight;
 
 
   FetchHomeDataState({
     required this.isLoader,
     required this.scheme,
     required this.baseUrl,
+    required this.listOFAccessRight,
     required this.userName,
     required this.role,
   });
@@ -35,5 +38,6 @@ class FetchHomeDataState extends HomeState {
     userName,
     role,
     baseUrl,
+    listOFAccessRight,
   ];
 }

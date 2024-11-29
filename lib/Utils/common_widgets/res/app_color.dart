@@ -5,9 +5,10 @@ class AppColor {
   static Color primer1 = Colors.green.shade800;
   static Color primer40 = Colors.blue.shade400;
   static Color primer100 = Colors.blue.shade100;
+  static Color primer50 = Colors.blue.shade50;
   static Color primer1_40 = Colors.green.shade400;
 
-  static Color yellow40 = Colors.yellow.shade400;
+  static Color yellow800 = Colors.yellow.shade800;
   static Color green50 = Colors.green.shade50;
   static Color white = Colors.white;
   static Color white70 = Colors.white.withOpacity(0.3);

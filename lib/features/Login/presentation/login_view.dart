@@ -33,10 +33,6 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBarWidget(
-      //   title: AppString.tpaApp,
-      //   boolLeading: false,
-      // ),
       body: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
           if (state is LoginFetchDataState) {

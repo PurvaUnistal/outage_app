@@ -11,7 +11,7 @@ class BackgroundInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     backgroundColor: AppColor.white,
+     backgroundColor: AppColor.primer50,
       body: Stack(
         children: [
           Padding(

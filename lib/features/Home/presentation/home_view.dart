@@ -9,8 +9,7 @@ import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_event.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_state.dart';
-import 'package:igl_outage_app/features/ManageOutage/ManageAlert/presentation/manage_alert_page.dart';
-import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/presentation/maintenance_alert_page.dart';
+import 'package:igl_outage_app/features/ManageOutage/ManageAlert/presentation/page/manage_alert_page.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/presentation/navigate_alert_page.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/presentation/report_alert_page.dart';
 import 'Widgets/card_widget.dart';
@@ -23,27 +22,9 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-List<String> paths = [
-  AssetPath.manage,
-  AssetPath.maintenance,
-  AssetPath.navigate,
-  AssetPath.reportOutage,
-];
-
-List<String> iconText = [
-  "Navigate",
-  "Report",
-  "Manage",
-  "Maintenance",
-];
-
-List<Widget> navigatorView = [
-  NavigateAlertView(),
-  ReportAlertView(),
-  ManageAlertView(),
-  MaintenanceAlertView(),
-
-];
+List<String> paths = [];
+List<String> iconText = [];
+List<Widget> navigatorView = [];
 
 class _HomeViewState extends State<HomeView> {
   @override
@@ -55,34 +36,36 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(
-        title: RoutesName.outageApp,
-        boolLeading: false,
-        actions: [
-          IconButton(
-              onPressed: () async {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) => const LogoutWidget());
-              },
-              icon: Icon(
-                Icons.logout,
-                color: AppColor.white,
-              ))
-        ],
-      ),
+      appBar: _appBarWidget(),
       body: SafeArea(
         child: BackgroundWidget(
           child: BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
               if (state is FetchHomeDataState) {
+                for (var data in state.listOFAccessRight) {
+                  if (data.menuCode == "Outage") {
+                    if (data.navigate == "1") {
+                      paths.add(AssetPath.navigate);
+                      iconText.add("Navigate");
+                      navigatorView.add(NavigateAlertView());
+                    }
+                    if (data.add == "1") {
+                      paths.add(AssetPath.reportOutage);
+                      iconText.add("Report");
+                      navigatorView.add(ReportAlertView());
+                    }
+                    if (data.manage == "1") {
+                      paths.add(AssetPath.manage);
+                      iconText.add("Manage");
+                      navigatorView.add(ManageAlertView());
+                    }
+                  }
+                }
                 return Center(
-                    child:Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child:  _buildLayout(dataState: state),
-                    )
-
-                );
+                    child: Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: _tabWidget(dataState: state),
+                ));
               } else {
                 return const Center(child: SpinLoader());
               }
@@ -92,30 +75,38 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-  _buildLayout({required FetchHomeDataState dataState}){
-    return Container(
-        padding: EdgeInsets.all(12.0),
-        child: GridView.builder(
-          itemCount: paths.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 4.0,
-              mainAxisSpacing: 4.0),
-          itemBuilder: (BuildContext context, int index) {
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => navigatorView[index]));
-              },
-              child: CardWidget(
-                text: iconText[index],
-                path: paths[index],
-              ),
-            );
-          },
-        ));
-  }
+
+  _appBarWidget() {
+    return AppBarWidget(
+      title: RoutesName.outageApp,
+      boolLeading: false,
+      actions: [
+        IconButton(
+            onPressed: () => showModalBottomSheet(
+                context: context, builder: (context) => const LogoutWidget()),
+            icon: Icon(
+              Icons.logout,
+              color: AppColor.white,
+            ))
+      ],
+    );
   }
 
+  Widget _tabWidget({required FetchHomeDataState dataState}) {
+    return GridView.builder(
+      itemCount: paths.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, crossAxisSpacing: 4.0, mainAxisSpacing: 4.0),
+      itemBuilder: (BuildContext context, int index) {
+        return InkWell(
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => navigatorView[index])),
+          child: CardWidget(
+            text: iconText[index],
+            path: paths[index],
+          ),
+        );
+      },
+    );
+  }
+}

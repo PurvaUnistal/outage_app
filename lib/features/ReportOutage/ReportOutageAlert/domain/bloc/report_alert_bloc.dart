@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
@@ -162,37 +167,18 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   Set<Polyline> endCapPolylineList = {};
 
   MapType currentMapType = MapType.normal;
-  CameraPosition cameraPosition =
-  CameraPosition(target: LatLng(0, 0), zoom: 12);
+  Completer<GoogleMapController> googleMapController = Completer();
+  CameraPosition cameraPosition = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: AppString.zoom,
+  );
 
   _pageLoad(ReportAlertLoadEvent event, emit) async {
     emit(ReportAlertInitialState());
     isLoader = false;
     isPipelineLoader = false;
-    checkBoxTf = false;
-    checkBoxValve = false;
-    isGasTfLoader = false;
-    isGasValveLoader = false;
-    checkBoxRegulator = false;
-    isGasRegulatorLoader = false;
-    checkBoxTee = false;
-    isGasTeeLoader = false;
-    checkBoxElbow = false;
-    isGasElbowLoader = false;
-    checkBoxCoupler = false;
-    isGasCouplerLoader = false;
-    checkBoxReducer = false;
-    isGasReducerLoader = false;
-    checkBoxEndCap = false;
-    isGasEndCapLoader = false;
-    tfGisController.text = '';
-    gasValveGISController.text = '';
-    gasRegulatorGISController.text = '';
-    gasTeeGISController.text = '';
-    gasElbowGISController.text = '';
-    gasCouplerGISController.text = '';
-    gasReducerGISController.text = '';
-    gasEndCapGISController.text = '';
+    await _clearMarkerPolylineField();
+    await _clearTextField();
 
     gasPipelineModel = GetPipelineGisModel();
     listOfPipelineGIS = [];
@@ -245,27 +231,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     latLngOnTap = LatLng(0, 0);
     latLngGis = [];
     markersPointList = {};
-    tfMarkersPointList = {};
-    valveMarkersPointList = {};
-    regulatorMarkersPointList = {};
-    teeMarkersPointList = {};
-    elbowMarkersPointList = {};
-    couplerMarkersPointList = {};
-    reducerMarkersPointList = {};
-    endCapMarkersPointList = {};
-
     polylineList = {};
-    tfPolylineList = {};
-    valvePolylineList = {};
-    regulatorPolylineList = {};
-    teePolylineList = {};
-    elbowPolylineList = {};
-    couplerPolylineList = {};
-    reducerPolylineList = {};
-    endCapPolylineList = {};
-
+    googleMapController = Completer();
     currentMapType = MapType.normal;
-    cameraPosition = CameraPosition(target: LatLng(0, 0), zoom: 12);
     scheme = await SharedPref.getString(key: PrefsValue.schema);
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
@@ -282,7 +250,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   _currentLoginLocation() async {
     final Uint8List markerIcon = await ReportAlertHelper.getBytesFromAsset(
         'assets/icons/pipeMarker.png', 100);
-    cameraPosition = CameraPosition(target: loginPosition, zoom: 12);
+    cameraPosition = CameraPosition(target: loginPosition, zoom: AppString.zoom);
     List<Placemark> placemarks = await placemarkFromCoordinates(
         double.parse(loginLat.toString()), double.parse(loginLong.toString()));
     if (placemarks.isNotEmpty) {
@@ -425,21 +393,16 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     }
   }
 
-  _fetchPipelineNetworkApi({required BuildContext context,
-    required String latitude,
-    required String longitude}) async {
-    latLngGis = [];
-    tfMarkersPointList = {};
-    valveMarkersPointList = {};
-    tfPolylineList = {};
-    valvePolylineList = {};
+  _fetchPipelineNetworkApi(
+      {required BuildContext context,
+      required String latitude,
+      required String longitude}) async {
+    await _clearMarkerPolylineField();
     var res = await ReportAlertHelper.getPipelineNetworkApi(
       context: context,
       latitude: latitude,
       longitude: longitude,
     );
-    tfMarkersPointList.clear();
-    tfPolylineList.clear();
     if (res != null) {
       pipelineNetworkModel = res;
       if (pipelineNetworkModel.data?.length != 0 &&
@@ -449,14 +412,18 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           latLngGis = await DecodePolyline.decodePolyline(
               listOfPipelineNetwork[i].geomencode!);
           if (tfGisController.text.isNotEmpty) {
+            final Uint8List tfIcon = await ReportAlertHelper.getBytesFromAsset(AssetPath.tfIcon, 50);
             tfMarkersPointList.addAll(await ReportAlertHelper.createMarker(
               latlngList: latLngGis,
               context: context,
-              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueViolet),
+              markerIcon: BitmapDescriptor.fromBytes(tfIcon),
             ));
+
             tfPolylineList.addAll(await ReportAlertHelper.createPolyLine(
                 color: Colors.pink, latlngList: latLngGis, context: context));
+            markersPointList.addAll(tfMarkersPointList);
+            polylineList.addAll(tfPolylineList);
+
           } else if (gasValveGISController.text.isNotEmpty) {
             valveMarkersPointList.addAll(await ReportAlertHelper.createMarker(
               latlngList: latLngGis,
@@ -464,38 +431,125 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
               markerIcon: BitmapDescriptor.defaultMarkerWithHue(
                   BitmapDescriptor.hueGreen),
             ));
-
             valvePolylineList.addAll(await ReportAlertHelper.createPolyLine(
                 color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(valveMarkersPointList);
+            polylineList.addAll(valvePolylineList);
+          } else if (gasRegulatorGISController.text.isNotEmpty) {
+            regulatorMarkersPointList
+                .addAll(await ReportAlertHelper.createMarker(
+              latlngList: latLngGis,
+              context: context,
+              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+            ));
+            regulatorPolylineList.addAll(await ReportAlertHelper.createPolyLine(
+                color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(regulatorMarkersPointList);
+            polylineList.addAll(regulatorPolylineList);
+          } else if (gasRegulatorGISController.text.isNotEmpty) {
+            regulatorMarkersPointList
+                .addAll(await ReportAlertHelper.createMarker(
+              latlngList: latLngGis,
+              context: context,
+              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+            ));
+            regulatorPolylineList.addAll(await ReportAlertHelper.createPolyLine(
+                color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(regulatorMarkersPointList);
+            polylineList.addAll(regulatorPolylineList);
+          } else if (gasTeeGISController.text.isNotEmpty) {
+            teeMarkersPointList.addAll(await ReportAlertHelper.createMarker(
+              latlngList: latLngGis,
+              context: context,
+              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+            ));
+            teePolylineList.addAll(await ReportAlertHelper.createPolyLine(
+                color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(teeMarkersPointList);
+            polylineList.addAll(teePolylineList);
+          } else if (gasElbowGISController.text.isNotEmpty) {
+            elbowMarkersPointList.addAll(await ReportAlertHelper.createMarker(
+              latlngList: latLngGis,
+              context: context,
+              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+            ));
+            elbowPolylineList.addAll(await ReportAlertHelper.createPolyLine(
+                color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(elbowMarkersPointList);
+            polylineList.addAll(elbowPolylineList);
+          } else if (gasCouplerGISController.text.isNotEmpty) {
+            couplerMarkersPointList.addAll(await ReportAlertHelper.createMarker(
+              latlngList: latLngGis,
+              context: context,
+              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+            ));
+            couplerPolylineList.addAll(await ReportAlertHelper.createPolyLine(
+                color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(couplerMarkersPointList);
+            polylineList.addAll(couplerPolylineList);
+          } else if (gasReducerGISController.text.isNotEmpty) {
+            reducerMarkersPointList.addAll(await ReportAlertHelper.createMarker(
+              latlngList: latLngGis,
+              context: context,
+              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+            ));
+            reducerPolylineList.addAll(await ReportAlertHelper.createPolyLine(
+                color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(reducerMarkersPointList);
+            polylineList.addAll(reducerPolylineList);
+          } else if (gasEndCapGISController.text.isNotEmpty) {
+            endCapMarkersPointList.addAll(await ReportAlertHelper.createMarker(
+              latlngList: latLngGis,
+              context: context,
+              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+            ));
+            endCapPolylineList.addAll(await ReportAlertHelper.createPolyLine(
+                color: Colors.green, latlngList: latLngGis, context: context));
+            markersPointList.addAll(endCapMarkersPointList);
+            polylineList.addAll(endCapPolylineList);
           }
         }
-        markersPointList.addAll(tfMarkersPointList);
-        polylineList.addAll(tfPolylineList);
       } else if (pipelineNetworkModel.data?.length == 0) {
-        //  return Utils.errorSnackBar(msg: "No data Found", context: context);
+        return Utils.errorSnackBar(msg: "No data Found", context: context);
       }
+      GoogleMapController controller = await googleMapController.future;
+      if (markersPointList.isNotEmpty) {
+        currentPosition = LatLng(markersPointList.last.position.latitude, markersPointList.last.position.longitude);
+        controller.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(target: currentPosition, zoom: 14)
+        ));
+    }
     }
   }
 
+
   _selectMapTypeButton(SelectMapTypeButtonEvent event, emit) {
     currentMapType =
-    currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
+        currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
     _eventCompleted(emit);
   }
 
   _selectCurrentMarkerButton(SelectCurrentMarkerButtonEvent event, emit) async {
     Position? currentPoint = await CurrentLocation.getCurrentLocation();
-    if (currentPoint != null) {
-      currentPosition = LatLng(currentPoint.latitude, currentPoint.longitude);
-      /* markersPointList.add(Marker(
-        markerId: MarkerId("${currentPoint.latitude.toString()},${currentPoint.longitude.toString()}"),
-        position: currentPosition,
-        infoWindow: InfoWindow(
-          title: 'You',
-        ),
-        icon: BitmapDescriptor.hueYellow,
-      ));*/
-    }
+    GoogleMapController controller = await googleMapController.future;
+      if (currentPoint != null) {
+        currentPosition = LatLng(currentPoint.latitude, currentPoint.longitude);
+        controller.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(target: currentPosition, zoom: 14)
+        ));
+        markersPointList.add(Marker(
+          markerId: MarkerId(nameofLocation),
+          position: currentPosition,
+          icon: BitmapDescriptor.defaultMarker,
+        ));
+            }
     _eventCompleted(emit);
   }
 
@@ -513,7 +567,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   }
 
   _selectTFGisValue(SelectTFGisEvent event, emit) async {
-    listOfFilterTfGis = [];
     tfGisController.text = event.tfGisId;
     if (tfGisController.text.isNotEmpty && gasValveGISController.text.isEmpty) {
       await SharedPref.setString(
@@ -552,6 +605,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   _selectValveGISValue(SelectValveGISValueEvent event, emit) async {
     listOfFilterGasValueGIS = [];
     gasValveGISController.text = event.gasValveGISId;
+    markersPointList = {};
+    _currentLoginLocation();
     if (gasValveGISController.text.isNotEmpty && tfGisController.text.isEmpty) {
       await SharedPref.setString(
           key: PrefsValue.assetTypeId, value: gasValveGISController.text);
@@ -568,15 +623,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             latitude: listOfFilterGasValueGIS[0].latitude!,
             longitude: listOfFilterGasValueGIS[0].longitude!);
       }
-      markersPointList.addAll(valveMarkersPointList);
-      polylineList.addAll(valvePolylineList);
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
   }
 
-  _selectCheckBoxRegulatorGis(SelectCheckBoxRegulatorGisEvent event,
-      emit) async {
+  _selectCheckBoxRegulatorGis(
+      SelectCheckBoxRegulatorGisEvent event, emit) async {
     await _clearTextField();
     checkBoxRegulator = event.checkBoxRegulator;
     isGasRegulatorLoader = true;
@@ -608,8 +661,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             latitude: listOfFilterGasRegulatorGIS[0].latitude!,
             longitude: listOfFilterGasRegulatorGIS[0].longitude!);
       }
-      markersPointList.addAll(valveMarkersPointList);
-      polylineList.addAll(valvePolylineList);
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
@@ -646,8 +697,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             latitude: listOfFilterGasTeeGIS[0].latitude!,
             longitude: listOfFilterGasTeeGIS[0].longitude!);
       }
-      markersPointList.addAll(teeMarkersPointList);
-      polylineList.addAll(teePolylineList);
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
@@ -827,10 +876,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
                 await SharedPref.setString(
                     key: PrefsValue.markerLong,
                     value: event.latLngOnTap.longitude.toString());
-                showBottomSheet(
-                    context: event.context, builder: (BuildContext context) {
-                  return AlertDialogTwoBtnWidget();
-                });
+                showModalBottomSheet(
+                    context: event.context,
+                    isScrollControlled: true,
+                    showDragHandle: true,
+                    builder: (BuildContext context) {
+                      return AlertDialogTwoBtnWidget();
+                    });
               },
             ),
           );
@@ -844,12 +896,15 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
 
   _selectFilterButton(SelectFilterButtonEvent event, emit) async {
     await _clearPopTextField();
+    await _clearMarkerPolylineField();
     await showDialog(
         context: event.context,
         builder: (BuildContext context) {
           return BlocProvider.value(
-            value: BlocProvider.of<ReportAlertBloc>(context) ,
-            child: ReportPopWidget(mContext: event.context,),
+            value: BlocProvider.of<ReportAlertBloc>(context),
+            child: ReportPopWidget(
+              mContext: event.context,
+            ),
           );
         });
     _eventCompleted(emit);
@@ -883,6 +938,14 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   }
 
   _clearPopTextField() {
+    isGasTfLoader = false;
+    isGasValveLoader = false;
+    isGasRegulatorLoader = false;
+    isGasTeeLoader = false;
+    isGasElbowLoader = false;
+    isGasCouplerLoader = false;
+    isGasReducerLoader = false;
+    isGasEndCapLoader = false;
     tfGisController.text = "";
     gasValveGISController.text = "";
     gasRegulatorGISController.text = "";
@@ -891,6 +954,29 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     gasCouplerGISController.text = "";
     gasReducerGISController.text = "";
     gasEndCapGISController.text = "";
+  }
+
+  _clearMarkerPolylineField() {
+    markersPointList = {};
+    polylineList = {};
+    _currentLoginLocation();
+    latLngGis = [];
+    tfMarkersPointList = {};
+    valveMarkersPointList = {};
+    regulatorMarkersPointList = {};
+    teeMarkersPointList = {};
+    elbowMarkersPointList = {};
+    couplerMarkersPointList = {};
+    reducerMarkersPointList = {};
+    endCapMarkersPointList = {};
+    tfPolylineList = {};
+    valvePolylineList = {};
+    regulatorPolylineList = {};
+    teePolylineList = {};
+    elbowPolylineList = {};
+    couplerPolylineList = {};
+    reducerPolylineList = {};
+    endCapPolylineList = {};
   }
 
   _eventCompleted(Emitter<ReportAlertState> emit) {
@@ -919,6 +1005,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       nameofLocation: nameofLocation,
       role: role,
       cameraPosition: cameraPosition,
+      googleMapController: googleMapController,
       currentMapType: currentMapType,
       markersPointList: Set.of(markersPointList),
       currentPosition: currentPosition,

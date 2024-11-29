@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class LoginModel {
   int? status;
   bool? error;
@@ -40,54 +42,65 @@ class LoginModel {
 class User {
   String? id;
   String? email;
+  String? password;
   String? moduleId;
   String? name;
   String? userStatus;
   String? pwdChanged;
-  dynamic modules;
-  String? schema;
-  String? role;
-  dynamic accessright;
+  String? gaId;
   String? gaLatitude;
   String? gaLongitude;
-  String? gaId;
+  dynamic modules;
   String? areas;
+  String? chargeareas;
+  String? schema;
+  List<Accessright>? accessright;
+  String? role;
   String? spreadId;
   String? sectionId;
 
   User(
       {this.id,
         this.email,
+        this.password,
         this.moduleId,
         this.name,
         this.userStatus,
         this.pwdChanged,
-        this.modules,
-        this.schema,
-        this.role,
-        this.accessright,
+        this.gaId,
         this.gaLatitude,
         this.gaLongitude,
+        this.modules,
         this.areas,
-        this.gaId,
+        this.chargeareas,
+        this.schema,
+        this.accessright,
+        this.role,
         this.spreadId,
         this.sectionId});
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'] ?? "";
     email = json['email'] ?? "";
+    password = json['password'] ?? "";
     moduleId = json['module_id'] ?? "";
     name = json['name'] ?? "";
     userStatus = json['user_status'] ?? "";
     pwdChanged = json['pwd_changed'] ?? "";
-    modules = json['modules'] ?? "";
-    schema = json['schema'] ?? "";
-    role = json['role'] ?? "";
-    accessright = json['accessright'] ?? "";
+    gaId = json['ga_id'] ?? "";
     gaLatitude = json['ga_latitude'] ?? "";
     gaLongitude = json['ga_longitude'] ?? "";
+    modules = json['modules'] ?? "";
     areas = json['areas'] ?? "";
-    gaId = json['ga_id'] ?? "";
+    chargeareas = json['chargeareas'] ?? "";
+    schema = json['schema'] ?? "";
+    if (json['accessright'] != null) {
+      accessright = <Accessright>[];
+      json['accessright'].forEach((v) {
+        accessright!.add(new Accessright.fromJson(v));
+      });
+    }
+    role = json['role'] ?? "";
     spreadId = json['spread_id'] ?? "";
     sectionId = json['section_id'] ?? "";
   }
@@ -96,20 +109,73 @@ class User {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['email'] = this.email;
+    data['password'] = this.password;
     data['module_id'] = this.moduleId;
     data['name'] = this.name;
     data['user_status'] = this.userStatus;
     data['pwd_changed'] = this.pwdChanged;
-    data['modules'] = this.modules;
-    data['schema'] = this.schema;
-    data['role'] = this.role;
-    data['accessright'] = this.accessright;
+    data['ga_id'] = this.gaId;
     data['ga_latitude'] = this.gaLatitude;
     data['ga_longitude'] = this.gaLongitude;
-    data['ga_id'] = this.gaId;
+    data['modules'] = this.modules;
     data['areas'] = this.areas;
+    data['chargeareas'] = this.chargeareas;
+    data['schema'] = this.schema;
+    if (this.accessright != null) {
+      data['accessright'] = this.accessright!.map((v) => v.toJson()).toList();
+    }
+    data['role'] = this.role;
     data['spread_id'] = this.spreadId;
     data['section_id'] = this.sectionId;
+    return data;
+  }
+}
+
+class Accessright {
+  String? menuCode;
+  String? id;
+  String? name;
+  String? submoduleAlias;
+  String? manage;
+  String? add;
+  String? navigate;
+
+  Accessright(
+      {this.menuCode,
+        this.id,
+        this.name,
+        this.submoduleAlias,
+        this.manage,
+        this.add,
+        this.navigate});
+
+  static accessrightListFromJson(String json) {
+    return List<Accessright>.from(jsonDecode(json).map((x) => Accessright.fromJson(x)));
+  }
+
+  static jsonFromAccessrightList(List<Accessright> list) {
+    return jsonEncode(list);
+  }
+
+  Accessright.fromJson(Map<String, dynamic> json) {
+    menuCode = json['menu_code'] ?? "";
+    id = json['id'] ?? "";
+    name = json['name'] ?? "";
+    submoduleAlias = json['submodule_alias'] ?? "";
+    manage = json['manage'] ?? "";
+    add = json['add'] ?? "";
+    navigate = json['navigate'] ?? "";
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['menu_code'] = this.menuCode;
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['submodule_alias'] = this.submoduleAlias;
+    data['manage'] = this.manage;
+    data['add'] = this.add;
+    data['navigate'] = this.navigate;
     return data;
   }
 }

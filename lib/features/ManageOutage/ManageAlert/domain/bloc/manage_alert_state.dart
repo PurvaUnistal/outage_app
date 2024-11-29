@@ -23,13 +23,11 @@ class FetchManageAlertDataState extends ManageAlertState {
   final String role;
   final String baseUrl;
   final int tabIndex;
-  final List<Tab> listOfTab;
+  final TextEditingController searchPriorityController;
   final ViewIncidentModel viewIncidentModel;
   final ViewIncidentData viewIncidentValue;
   final List<ViewIncidentData> listOfViewIncident;
-  final List<ViewIncidentData> listOfNewViewIncident;
-  final List<ViewIncidentData> listOfProgressViewIncident;
-  final List<ViewIncidentData> listOfCompletedViewIncident;
+  final List<ViewIncidentData> listOfFilterViewIncident;
 
 
   FetchManageAlertDataState({
@@ -40,13 +38,11 @@ class FetchManageAlertDataState extends ManageAlertState {
     required this.userName,
     required this.role,
     required this.tabIndex,
-    required this.listOfTab,
+    required this.searchPriorityController,
     required this.viewIncidentModel,
     required this.viewIncidentValue,
     required this.listOfViewIncident,
-    required this.listOfNewViewIncident,
-    required this.listOfProgressViewIncident,
-    required this.listOfCompletedViewIncident,
+    required this.listOfFilterViewIncident,
 
   });
   @override
@@ -58,12 +54,10 @@ class FetchManageAlertDataState extends ManageAlertState {
     role,
     baseUrl,
     tabIndex,
-    listOfTab,
+    searchPriorityController,
     viewIncidentModel,
     viewIncidentValue,
     listOfViewIncident,
-   listOfNewViewIncident,
-    listOfProgressViewIncident,
-    listOfCompletedViewIncident,
+    listOfFilterViewIncident,
   ];
 }

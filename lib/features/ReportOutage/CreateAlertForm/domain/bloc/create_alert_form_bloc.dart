@@ -250,7 +250,7 @@ class CreateAlertFormBloc
   }
 */
   _submitBtn(SubmitAddIncidentBtnEvent event, emit) async {
-    //  try{
+     try{
     var validationCheck = await CreateAlertFormHelper.validationSubmit(
         context: event.context,
         incidentType: incidentTypeValue,
@@ -291,11 +291,11 @@ class CreateAlertFormBloc
         _eventCompleted(emit);
       }
     }
-    /*}catch(e){
+    }catch(e){
       isBtnLoader = false;
       log("submit--->${e.toString()}");
       _eventCompleted(emit);
-    }*/
+    }
   }
 
   _eventCompleted(Emitter<CreateAlertFormState> emit) {

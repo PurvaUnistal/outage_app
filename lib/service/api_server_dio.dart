@@ -23,7 +23,8 @@ class ApiHelper {
     } on DioException catch (error) {
       log(error.message!);
       if(error.response?.statusCode == 400){
-        return error.response!.data;
+        return Utils.errorSnackBar(msg: error.response!.data.toString(), context: context);
+       // return error.response!.data;
       }else if(error.response?.statusCode == 401){
         log("errorStatus(401)-->${error.response!.statusMessage!.toString()}");
         return await Utils.errorSnackBar(msg: error.response!.statusMessage!.toString(), context: context);

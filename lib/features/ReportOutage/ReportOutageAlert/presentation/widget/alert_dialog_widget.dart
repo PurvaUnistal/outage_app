@@ -30,6 +30,7 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
               ButtonWidget(
                 text : "Yes",
                 onPressed: (){
+                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (buildContext) => const CreateAlertFormView()),

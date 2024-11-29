@@ -5,9 +5,9 @@ import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.d
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_event.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_state.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 
 class NavigatePopWidget extends StatelessWidget {
   final BuildContext mContext;

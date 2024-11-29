@@ -19,7 +19,6 @@ import 'features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:math';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var appDir = (await getTemporaryDirectory()).path;
@@ -67,7 +66,7 @@ class _MyAppState extends State<MyApp> {
               seedColor: AppColor.primer,
             ),
           ),
-        //  home: PolylineClickExample(),
+       //   home: PolylineClickExample(),
           initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,
         ));
@@ -158,10 +157,10 @@ class _PolylineClickExampleState extends State<PolylineClickExample> {
     return Scaffold(
       appBar: AppBar(title: Text('Polyline Click Example')),
       body: GoogleMap(
-        onMapCreated: (controller) => _controller = controller,
+      //  onMapCreated: (controller) => _controller = controller,
         initialCameraPosition: CameraPosition(
           target: LatLng(37.42796133580664, -122.085749655962),
-          zoom: 15,
+          zoom: 12,
         ),
         polylines: _polylines,
         onTap: _onMapTapped,
@@ -169,5 +168,3 @@ class _PolylineClickExampleState extends State<PolylineClickExample> {
     );
   }
 }
-
-

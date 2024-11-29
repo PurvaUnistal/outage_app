@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 
 abstract class ReportAlertEvent extends Equatable{}
 
@@ -13,6 +11,8 @@ class ReportAlertLoadEvent extends ReportAlertEvent {
   // TODO: implement props
   List<Object> get props => [context];
 }
+
+
 
 class SelectMapTypeButtonEvent extends ReportAlertEvent {
   @override

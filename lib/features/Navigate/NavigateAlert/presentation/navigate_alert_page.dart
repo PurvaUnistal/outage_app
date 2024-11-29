@@ -4,14 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
-import 'package:igl_outage_app/Utils/common_widgets/background_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/common_style.dart';
 import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:igl_outage_app/Utils/common_widgets/text_form_widget.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_event.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_state.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 import '../../../../Utils/common_widgets/res/app_string.dart';
 
 class NavigateAlertView extends StatefulWidget {
@@ -22,45 +24,35 @@ class NavigateAlertView extends StatefulWidget {
 }
 
 class _NavigateAlertViewState extends State<NavigateAlertView> {
-  GoogleMapController? controller;
-
   @override
   void initState() {
     BlocProvider.of<NavigateAlertBloc>(context)
         .add(NavigateAlertLoadEvent(context: context));
     super.initState();
   }
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    controller!.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BackgroundWidget(
-        child: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
-          builder: (context, state) {
-            if (state is FetchNavigateAlertDataState) {
-              return BackgroundWidget(child: _itemBuilder(dataState: state));
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
-        ),
+    return BackgroundInfoWidget(
+      child: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
+        builder: (context, state) {
+          if (state is FetchNavigateAlertDataState) {
+            return _itemBuilder(dataState: state);
+          } else {
+            return const Center(child: SpinLoader());
+          }
+        },
       ),
     );
   }
 
   Future<bool> _onWillPop() async {
     return (await showDialog(
-        context: context,
-        builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
-            message: "Do you want to Report Alert?",
-            okButtonText: "Exit",
-            onPressed: () => Navigator.of(context).pop(true)))) ??
+            context: context,
+            builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
+                message: "Do you want to Report Alert?",
+                okButtonText: "Exit",
+                onPressed: () => Navigator.of(context).pop(true)))) ??
         false;
   }
 
@@ -68,84 +60,107 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-          appBar: AppBarWidget(
-            title: AppString.navigateAlert,
-            boolLeading: true,
-            actions: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    dataState.userName,
-                    textAlign: TextAlign.start,
-                    style: Styles.rel,
-                  ),
-                  Text(
-                    dataState.scheme,
-                    textAlign: TextAlign.start,
-                    style: Styles.rel,
-                  )
-                ],
-              ),
-            ],
-          ),
+          appBar: _appBarWidget(dataState: dataState),
           body: Stack(children: <Widget>[
             _googleMapWidget(dataState: dataState),
-            dataState.isPipelineLoader == false ?
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Column(
-                  children: [
-                    _mapTypeButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                    _currentLocationButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                    _filterButtonWidget(dataState: dataState),
-                  ],
-                ),
-              ),
-            )
+            dataState.isPipelineLoader == false
+                ? Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [  CommonStyle.vertical(context: context),
+                     /*   _startLocationWidget(dataState: dataState),
+                        CommonStyle.vertical(context: context),
+                        _destinationLocationWidget(dataState: dataState),
+                        CommonStyle.vertical(context: context),*/
+                        _mapTypeButtonWidget(dataState: dataState),
+                        SizedBox(height: 16.0),
+                        _currentLocationButtonWidget(dataState: dataState),
+                        SizedBox(height: 16.0),
+                        _filterButtonWidget(dataState: dataState),
+                      ],
+                    ),
+                  ),
+                )
                 : WaveLoaderWidget(),
           ])),
     );
   }
 
-  _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
-    if (controller != null && dataState.markersPointList.isNotEmpty) {
-      print("dataState.markersPointList-->${dataState.markersPointList.length}");
-      print("dataState.markersPointList-->${dataState.markersPointList.length}");
-      /* controller!.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
-          zoom: 12,
-        //  target: LatLng(dataState.markersPointList.last.position.latitude, dataState.markersPointList.last.position.longitude)
-          target: LatLng(dataState.currentPosition.latitude, dataState.currentPosition.longitude)
-      )
-      )
-      );*/
-    }
+  _appBarWidget({required FetchNavigateAlertDataState dataState}) {
+    return AppBarWidget(
+      title: AppString.navigateAlert,
+      boolLeading: true,
+      actions: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              dataState.userName,
+              textAlign: TextAlign.start,
+              style: Styles.rel,
+            ),
+            Text(
+              dataState.scheme,
+              textAlign: TextAlign.start,
+              style: Styles.rel,
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
     return GoogleMap(
       mapType: dataState.currentMapType,
-   //   compassEnabled: true,
+      compassEnabled: true,
+      myLocationEnabled: true,
       myLocationButtonEnabled: true,
       markers: dataState.markersPointList,
       polylines: dataState.polylineList,
       initialCameraPosition: dataState.cameraPosition,
-      onMapCreated: (GoogleMapController mController) {
-        controller = mController;
+      onMapCreated: (GoogleMapController controller) {
+        dataState.googleMapController.complete(controller);
       },
       onTap: (latLng) {
         dataState.polylineList.isNotEmpty
             ? BlocProvider.of<NavigateAlertBloc>(context).add(
-            SelectGoogleMapButtonEvent(
-                context: context, latLngOnTap: latLng))
+                SelectGoogleMapButtonEvent(
+                    context: context, latLngOnTap: latLng))
             : (latLng) {};
       },
     );
   }
 
-  _mapTypeButtonWidget({required FetchNavigateAlertDataState dataState}) {
+  Widget _startLocationWidget(
+      {required FetchNavigateAlertDataState dataState}) {
+    return TextFieldWidget(
+      label: "Start",
+      hintText: "Start",
+      suffixIcon: IconButton(
+          icon: Icon(Icons.my_location),
+        onPressed: () => BlocProvider.of<NavigateAlertBloc>(context)
+          .add(SelectCurrentMarkerButtonEvent()), ),
+        controller:dataState.startLocationController
+    );
+  }
+
+  Widget _destinationLocationWidget(
+      {required FetchNavigateAlertDataState dataState}) {
+    return TextFieldWidget(
+      label: "Destination",
+      hintText: "Destination",
+      // suffixIcon: IconButton(onPressed: (){}, icon: Icon(Icons.my_location)),
+      //  controller:dataState.addressController
+    );
+  }
+
+  Widget _mapTypeButtonWidget(
+      {required FetchNavigateAlertDataState dataState}) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
       onPressed: () => BlocProvider.of<NavigateAlertBloc>(context)
@@ -159,7 +174,8 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
     );
   }
 
-  _currentLocationButtonWidget({required FetchNavigateAlertDataState dataState}) {
+  Widget _currentLocationButtonWidget(
+      {required FetchNavigateAlertDataState dataState}) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
       onPressed: () => BlocProvider.of<NavigateAlertBloc>(context)
@@ -173,7 +189,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
     );
   }
 
-  _filterButtonWidget({required FetchNavigateAlertDataState dataState}) {
+  Widget _filterButtonWidget({required FetchNavigateAlertDataState dataState}) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
       backgroundColor: AppColor.primer,
@@ -186,5 +202,4 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
           .add(SelectFilterButtonEvent(context: context)),
     );
   }
-
 }

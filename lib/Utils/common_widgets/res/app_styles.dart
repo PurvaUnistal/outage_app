@@ -14,7 +14,7 @@ class Styles {
   static TextStyle labels = TextStyle(fontWeight: FontWeight.w400, fontSize: 12, color: AppColor.primer);
   static TextStyle labelsW = TextStyle(fontWeight: FontWeight.w400, fontSize: 12, color: AppColor.white);
   static TextStyle labelGrey = TextStyle(fontWeight: FontWeight.w400, fontSize: 12, color: AppColor.black54);
-  static TextStyle title = TextStyle(fontSize: 12, color: Colors.green.shade800, fontWeight: FontWeight.bold);
+  static TextStyle title = TextStyle(fontSize: 12, color: AppColor.primer, fontWeight: FontWeight.bold);
   static TextStyle rowR12 = TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold);
   static TextStyle rowY12 = TextStyle(fontSize: 12, color: AppColor.primer1, fontWeight: FontWeight.bold);
   static TextStyle count = const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black);

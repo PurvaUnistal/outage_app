@@ -1,7 +1,8 @@
 
 
 class AppString {
-  static String version = "Version : Outage-1.11.10.24";
+  static double  zoom = 15;
+  static String version = "Version : Outage-1.28.11.24";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";
@@ -19,7 +20,7 @@ class AppString {
   static String star = "* ";
 
 
-  static String searchBPNumber = "Search Mobile/BP Number...";
+  static String searchPriority = "Search Priority...";
 
   static const String tpaApp = 'Outage APP';
   static const String photo = 'Photo';
@@ -70,6 +71,9 @@ class AppString {
   static const String customerBpNumber = 'Customer BP Number';
   static const String customerMobile = 'Customer Mobile';
   static const String otherName = 'Other Name';
+  static const String newData = 'New';
+  static const String inProgress = 'In Progress';
+  static const String completed = 'Completed';
 
 
 

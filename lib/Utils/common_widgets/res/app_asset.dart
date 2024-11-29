@@ -4,6 +4,7 @@ class AssetPath {
   static String pbgLogo = 'assets/icons/pbg_logo.png';
   static String iglLogo = 'assets/icons/igl_logo.png';
   static String meter = 'assets/icons/meter.jpg';
+  static String tfIcon = 'assets/icons/tf_icon.png';
   static String household = 'assets/icons/household-bills.jpg';
   static String lmcBanner = 'assets/icons/lmc-banner1.png';
   static String pipeback = 'assets/icons/pipeback.jpg';

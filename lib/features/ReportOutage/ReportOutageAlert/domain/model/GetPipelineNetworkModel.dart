@@ -11,7 +11,7 @@ String getPipelineNetworkModelToJson(GetPipelineNetworkModel data) => json.encod
 class GetPipelineNetworkModel {
   int? success;
   bool? error;
-  List<PipelineNetworkData>? data;
+  dynamic  data;
 
   GetPipelineNetworkModel({
     this.success,
@@ -22,7 +22,7 @@ class GetPipelineNetworkModel {
   factory GetPipelineNetworkModel.fromJson(Map<String, dynamic> json) => GetPipelineNetworkModel(
     success: json["success"] ?? "",
     error: json["error"] ?? "",
-    data: json["data"] == null ? null : List<PipelineNetworkData>.from(json["data"].map((x) => PipelineNetworkData.fromJson(x))),
+    data: json['data'] is String ? json['data'] : List<PipelineNetworkData>.from(json["data"].map((x) => PipelineNetworkData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {

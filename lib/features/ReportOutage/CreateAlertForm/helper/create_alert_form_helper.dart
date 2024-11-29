@@ -229,22 +229,22 @@ class CreateAlertFormHelper {
         Utils.errorSnackBar(
             msg: "The Incident Type field is required.", context: context);
         return false;
+      } else if (incidentIndication.id == null) {
+        Utils.errorSnackBar(
+            msg: "The Incident Indication Type field is required.",
+            context: context);
+        return false;
       } else if (asset.isEmpty) {
         Utils.errorSnackBar(
             msg: "The Asset Type Id is required.", context: context);
-        return false;
-      } else if (address.isEmpty) {
-        Utils.errorSnackBar(
-            msg: "The Address field is required.", context: context);
         return false;
       } else if (landmark.isEmpty) {
         Utils.errorSnackBar(
             msg: "The Landmark field is required.", context: context);
         return false;
-      } else if (incidentIndication.id == null) {
+      } else if (address.isEmpty) {
         Utils.errorSnackBar(
-            msg: "The Incident Indication Type field is required.",
-            context: context);
+            msg: "The Address field is required.", context: context);
         return false;
       }
       return true;

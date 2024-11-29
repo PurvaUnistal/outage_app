@@ -18,12 +18,26 @@ class SelectTabChangedEvent extends ManageAlertEvent {
   // TODO: implement props
   List<Object> get props => [tabIndex,context];
 }
-class SelectReportChangedEvent extends ManageAlertEvent {
-  final String incidentTypeId;
-  final String incidentId;
+
+class ManagePageRefreshDataEvent extends ManageAlertEvent {
   final BuildContext context;
-  SelectReportChangedEvent({required this.incidentTypeId,required this.incidentId, required this.context});
+  ManagePageRefreshDataEvent({required this.context});
+  @override
+  List<Object?> get props => [context];
+}
+
+class SelectPageSelectDataEvent extends ManageAlertEvent {
+  final int index;
+  SelectPageSelectDataEvent({required this.index});
+  @override
+  List<Object?> get props => [index];
+}
+
+class SelectSearchPriorityEvent extends ManageAlertEvent {
+  final String searchPriority;
+  SelectSearchPriorityEvent({required this.searchPriority});
   @override
   // TODO: implement props
-  List<Object> get props => [incidentTypeId,incidentId, context];
+  List<Object> get props => [searchPriority];
 }
+

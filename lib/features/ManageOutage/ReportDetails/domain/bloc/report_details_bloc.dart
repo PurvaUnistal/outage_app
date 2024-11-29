@@ -51,26 +51,10 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-  //  await _fetchIncidentActionApi(context: event.context, incidentTypeId: incidentTypeId);
     await _fetchIncidentTypeActionApi(context: event.context, incidentTypeId: incidentTypeId,incidentId: incidentId);
     _eventCompleted(emit);
   }
 
-
- /* _fetchIncidentActionApi(
-      {required BuildContext context, required String incidentTypeId}) async {
-    var res = await ReportDetailsHelper.getIncidentActionApi(
-      context: context,
-      incidentTypeId: incidentTypeId,
-    );
-    if (res != null) {
-      incidentActionModel = res;
-      if (incidentActionModel.data != null) {
-        listOfIncidentAction = incidentActionModel.data!;
-      }
-      return res;
-    }
-  }*/
 
   _fetchIncidentTypeActionApi({
         required BuildContext context,
@@ -117,10 +101,16 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         await _fetchIncidentTypeActionApi(context: event.context, incidentTypeId: incidentTypeId,incidentId: incidentId);
           Utils.successSnackBar(msg: "Successful update", context: event.context);
         isBtnLoader = false;
+        currentActionStatus = event.actionStatus;
+        _eventCompleted(emit);
+      }else{
+        isBtnLoader = false;
+        currentActionStatus = event.actionStatus;
         _eventCompleted(emit);
       }
     }catch(e){
       isBtnLoader = false;
+      currentActionStatus = event.actionStatus;
       _eventCompleted(emit);
     }
 }

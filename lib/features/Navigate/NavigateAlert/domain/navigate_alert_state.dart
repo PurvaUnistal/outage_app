@@ -43,6 +43,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final String role;
   final String baseUrl;
   final CameraPosition cameraPosition;
+  Completer<GoogleMapController> googleMapController;
 
   final TextEditingController tfGisController;
   final TextEditingController gasValveGISController;
@@ -52,7 +53,8 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final TextEditingController gasCouplerGISController;
   final TextEditingController gasReducerGISController;
   final TextEditingController gasEndCapGISController;
-
+  final TextEditingController startLocationController;
+  final TextEditingController destinationLocationController;
 
   final List<String> listOfTfGisId;
   final List<String> listOfGasValveGISId;
@@ -103,6 +105,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.nameofLocation,
     required this.role,
     required this.cameraPosition,
+    required this.googleMapController,
     required this.tfGisController,
     required this.gasValveGISController,
     required this.gasRegulatorGISController,
@@ -111,6 +114,8 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.gasCouplerGISController,
     required this.gasReducerGISController,
     required this.gasEndCapGISController,
+    required this.startLocationController,
+    required this.destinationLocationController,
 
     required this.currentMapType,
     required this.markersPointList,
@@ -156,6 +161,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     nameofLocation,
     role,
     cameraPosition,
+    googleMapController,
     baseUrl,
     tfGisController,
     gasValveGISController,
@@ -165,7 +171,8 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     gasCouplerGISController,
     gasReducerGISController,
     gasEndCapGISController,
-
+    startLocationController,
+    destinationLocationController,
 
     currentMapType,
     markersPointList,

@@ -79,6 +79,7 @@ class ReportDetailsHelper{
 
     };
     log("jsonBody-->${body}");
+    log("Apis.incidentActionProgress-->${Apis.incidentActionProgress}");
     try {
       var res = await ApiHelper.postData(urlEndPoint: "${Apis.incidentActionProgress}", formData: body, context: context,);
       if(res != null){
