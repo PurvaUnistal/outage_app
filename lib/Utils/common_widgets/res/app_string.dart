@@ -44,14 +44,15 @@ class AppString {
   static const String incidentIndication = 'Incident Indication';
   static const String chargeArea = 'Charge Area';
   static const String area = 'Area';
-  static const String tfGis = 'TF GIS';
+  static const String gasTfGis = 'Gas TF GIS';
   static const String gasValveGIS = 'Gas Valve GIS';
   static const String gasRegulatorGIS = 'Gas Regulator GIS';
   static const String gasTeeGIS = 'Gas Tee GIS';
   static const String gasElbowGIS = 'Gas Elbow GIS';
   static const String gasCouplerGIS = 'Gas Coupler GIS';
   static const String gasReducerGIS = 'Gas Reducer GIS';
-  static const String gasEndCapGIS = 'Gas EndCap GIS';
+  static const String gasEndCapGIS = 'Gas End Cap GIS';
+  static const String gasConsumerGIS = 'Gas Consumer GIS';
   static const String controlRoom = 'Control Room';
   static const String description = 'Description';
   static const String remarks = 'Remarks';

@@ -3,41 +3,42 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
+import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/common_style.dart';
 import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_event.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_state.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 
 class NavigatePopWidget extends StatelessWidget {
   final BuildContext mContext;
+
   const NavigatePopWidget({super.key, required this.mContext});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
       builder: (context, state) {
-        if(state is FetchNavigateAlertDataState ){
+        if (state is FetchNavigateAlertDataState) {
           return SingleChildScrollView(
             child: Dialog(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.white70,
               insetPadding: EdgeInsets.all(10),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(height: 16.0),
+                  CommonStyle.vertical(context: context),
                   Text(
                     state.nameofLocation,
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 16.0),
+                  CommonStyle.vertical(context: context),
                   _tfWidget(dataState: state),
-                  SizedBox(height: 16.0),
                   _valveWidget(dataState: state),
-                  SizedBox(height: 16.0),
                   _regulatorWidget(dataState: state),
-                  SizedBox(height: 16.0),
-                  _teeWidget(dataState: state),
+                  _consumerWidget(dataState: state),
+                  /*   _teeWidget(dataState: state),
                   SizedBox(height: 16.0),
                   _elbowWidget(dataState: state),
                   SizedBox(height: 16.0),
@@ -46,9 +47,9 @@ class NavigatePopWidget extends StatelessWidget {
                   _reducerWidget(dataState: state),
                   SizedBox(height: 16.0),
                   _endCapWidget(dataState: state),
-                  SizedBox(height: 16.0),
+                  SizedBox(height: 16.0),*/
                   _closeBtn(),
-                  SizedBox(height: 16.0),
+                  CommonStyle.vertical(context: context),
                 ],
               ),
             ),
@@ -60,25 +61,37 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _tfWidget({required FetchNavigateAlertDataState dataState}){
-    return  ListTile(
+  Widget height() {
+    return SizedBox(
+      height: MediaQuery
+          .of(mContext)
+          .size
+          .height * 0.0001,
+    );
+  }
+
+  Widget _tfWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxTf,
-        activeColor: Colors.cyanAccent,
+        activeColor: Colors.red,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxTFGisEvent(
-                  checkBoxTf: val!, context: mContext));
+              SelectCheckBoxTFGisEvent(checkBoxTf: val!, context: mContext));
         },
       ),
       title: dataState.isGasTfLoader == false
           ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.cyanAccent,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0),
+          child: Image.asset(
+            AssetPath.tf,
+            width: 20,
+            height: 20,
+          ),
         ),
-        label: AppString.tfGis,
-        hintText: AppString.tfGis,
+        label: AppString.gasTfGis,
+        hintText: AppString.gasTfGis,
         enabled: dataState.checkBoxTf == true ? true : false,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         keyboardType: TextInputType.number,
@@ -86,8 +99,7 @@ class NavigatePopWidget extends StatelessWidget {
         suggestions: dataState.listOfTfGisId,
         onSelected: (val) {
           BlocProvider.of<NavigateAlertBloc>(mContext)
-              .add(SelectTFGisEvent(
-              tfGisId: val, context: mContext));
+              .add(SelectTFGisEvent(tfGisId: val, context: mContext));
           Navigator.pop(mContext);
         },
       )
@@ -95,11 +107,11 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _valveWidget({required FetchNavigateAlertDataState dataState}){
-    return   ListTile(
+  Widget _valveWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxValve,
-        activeColor: Colors.green,
+        activeColor: Colors.purpleAccent,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxValveGisEvent(
@@ -108,9 +120,13 @@ class NavigatePopWidget extends StatelessWidget {
       ),
       title: dataState.isGasValveLoader == false
           ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.green,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0),
+          child: Image.asset(
+            AssetPath.valve,
+            width: 20,
+            height: 20,
+          ),
         ),
         label: AppString.gasValveGIS,
         hintText: AppString.gasValveGIS,
@@ -130,11 +146,11 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _regulatorWidget({required FetchNavigateAlertDataState dataState}){
-    return   ListTile(
+  Widget _regulatorWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxRegulator,
-        activeColor: Colors.green,
+        activeColor: Colors.yellowAccent.shade400,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxRegulatorGisEvent(
@@ -143,9 +159,13 @@ class NavigatePopWidget extends StatelessWidget {
       ),
       title: dataState.isGasRegulatorLoader == false
           ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.green,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0),
+          child: Image.asset(
+            AssetPath.regulator,
+            width: 20,
+            height: 20,
+          ),
         ),
         label: AppString.gasRegulatorGIS,
         hintText: AppString.gasRegulatorGIS,
@@ -165,15 +185,53 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _teeWidget({required FetchNavigateAlertDataState dataState}){
-    return   ListTile(
+  Widget _consumerWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
+      leading: Checkbox(
+        value: dataState.checkBoxConsumer,
+        activeColor: Colors.orange.shade900,
+        onChanged: (bool? val) {
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
+              SelectCheckBoxConsumerGisEvent(
+                  checkBoxConsumer: val!, context: mContext));
+        },
+      ),
+      title: dataState.isGasConsumerLoader == false
+          ? AutoCompleteTextFieldWidget(
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0),
+          child: Image.asset(
+            AssetPath.consumer,
+            width: 20,
+            height: 20,
+          ),
+        ),
+        label: AppString.gasConsumerGIS,
+        hintText: AppString.gasConsumerGIS,
+        enabled: dataState.checkBoxConsumer == true ? true : false,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        keyboardType: TextInputType.number,
+        controller: dataState.gasConsumerGISController,
+        suggestions: dataState.listOfGasConsumerGISId,
+        onSelected: (val) {
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
+              SelectConsumerGISValueEvent(
+                  gasConsumerGISId: val, context: mContext));
+          Navigator.pop(mContext);
+        },
+      )
+          : DottedLoaderWidget(),
+    );
+  }
+
+  Widget _teeWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxTee,
         activeColor: Colors.green,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxTeeGisEvent(
-                  checkBoxTee: val!, context: mContext));
+              SelectCheckBoxTeeGisEvent(checkBoxTee: val!, context: mContext));
         },
       ),
       title: dataState.isGasTeeLoader == false
@@ -200,8 +258,8 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _elbowWidget({required FetchNavigateAlertDataState dataState}){
-    return   ListTile(
+  Widget _elbowWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxElbow,
         activeColor: Colors.green,
@@ -235,8 +293,8 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _couplerWidget({required FetchNavigateAlertDataState dataState}){
-    return   ListTile(
+  Widget _couplerWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxCoupler,
         activeColor: Colors.green,
@@ -270,8 +328,8 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _reducerWidget({required FetchNavigateAlertDataState dataState}){
-    return   ListTile(
+  Widget _reducerWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxReducer,
         activeColor: Colors.green,
@@ -305,8 +363,8 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _endCapWidget({required FetchNavigateAlertDataState dataState}){
-    return   ListTile(
+  Widget _endCapWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxEndCap,
         activeColor: Colors.green,
@@ -340,16 +398,17 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _closeBtn(){
+  Widget _closeBtn() {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: Align(
         alignment: Alignment.bottomRight,
-        child: ButtonWidget(onPressed: (){
-          Navigator.pop(mContext, true);
-        }, text: "Close"),
+        child: ButtonWidget(
+            onPressed: () {
+              Navigator.pop(mContext, true);
+            },
+            text: "Close"),
       ),
     );
   }
 }
-

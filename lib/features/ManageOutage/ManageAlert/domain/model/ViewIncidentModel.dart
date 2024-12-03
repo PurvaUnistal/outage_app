@@ -53,6 +53,7 @@ class ViewIncidentData {
   String? createdBy;
   dynamic updatedBy;
   String? createdAt;
+  String? addedDate;
   String? updatedAt;
   String? status;
   ActionStatus? actionStatus;
@@ -105,6 +106,7 @@ class ViewIncidentData {
         this.createdBy,
         this.updatedBy,
         this.createdAt,
+        this.addedDate,
         this.updatedAt,
         this.status,
         this.actionStatus,
@@ -157,6 +159,7 @@ class ViewIncidentData {
     createdBy = json['created_by'] ?? "";
     updatedBy = json['updated_by'] ?? "";
     createdAt = json['created_at'] ?? "";
+    addedDate = json['added_date'] ?? "";
     updatedAt = json['updated_at'] ?? "";
     status = json['status'] ?? "";
   //  actionStatus = json['action_status'] ?? "";
@@ -214,6 +217,7 @@ class ViewIncidentData {
     data['created_by'] = this.createdBy;
     data['updated_by'] = this.updatedBy;
     data['created_at'] = this.createdAt;
+    data['added_date'] = this.addedDate;
     data['updated_at'] = this.updatedAt;
     data['status'] = this.status;
     data['action_status'] = this.actionStatus;

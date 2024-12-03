@@ -130,13 +130,18 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
 
   Widget _nameWidget(
       {required FetchReportDetailsDataState dataState, required int i}) {
-    return RowWidget(
+    return Text(
+      dataState.listOfIncidentTypeAction[i].name!,
+      textAlign: TextAlign.start,
+      style: Styles.titleNormalBlack,
+    );
+   /* return RowWidget(
       widget1: Text("Name : ", style: Styles.titleGreen),
       widget2: Text(
         dataState.listOfIncidentTypeAction[i].name!,
         style: Styles.titleNormalBlack,
       ),
-    );
+    );*/
   }
 
   Widget _dividerWidget(

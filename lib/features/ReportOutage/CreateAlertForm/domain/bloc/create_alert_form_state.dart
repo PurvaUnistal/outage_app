@@ -42,7 +42,6 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
 
   final TfGisData tfGisValue;
   final List<TfGisData> listOfTfGis;
-  final List<String> listOfAssetTypeId;
 
   final TextEditingController assetTypeIdController;
   final TextEditingController assetIdController;
@@ -74,7 +73,6 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
     required this.listOfAsset,
     required this.tfGisValue,
     required this.listOfTfGis,
-    required this.listOfAssetTypeId,
     required this.incidentIndicationModel,
     required this.incidentIndicationValue,
     required this.listOfIncidentIndication,
@@ -110,7 +108,6 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
         listOfAsset,
         tfGisValue,
         listOfTfGis,
-    listOfAssetTypeId,
         incidentIndicationModel,
         incidentIndicationValue,
         listOfIncidentIndication,

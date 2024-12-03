@@ -192,20 +192,15 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
   }
 
   Widget _assetTypeIdController({required FetchCreateAlertFormDataState dataState}) {
-    return AutoCompleteTextFieldWidget(
+    return TextFieldWidget(
       prefixIcon: Icon(Icons.location_on, color: Colors.cyanAccent,),
       label: AppString.assetTypeId,
       hintText: AppString.assetTypeId,
-      keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      enabled: false,
       controller: dataState.assetTypeIdController,
-      suggestions: dataState.listOfAssetTypeId,
-      onSelected: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectAssetTypeIdValueEvent(assetTypeId: val,context: context));
-      },
     );
   }
+
   Widget _assetTypeIdDropdown({required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<TfGisData>(
       star: AppString.star,

@@ -59,14 +59,7 @@ class SelectTfGisValueEvent extends CreateAlertFormEvent {
   // TODO: implement props
   List<Object> get props => [tfGisValue,context];
 }
-class SelectAssetTypeIdValueEvent extends CreateAlertFormEvent {
-  final String assetTypeId;
-  final BuildContext context;
-  SelectAssetTypeIdValueEvent({required this.assetTypeId, required this.context});
-  @override
-  // TODO: implement props
-  List<Object> get props => [assetTypeId,context];
-}
+
 
 class CaptureCameraPhotoEvent extends CreateAlertFormEvent {
   @override

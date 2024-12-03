@@ -68,7 +68,7 @@ class ActionItemsWidget extends StatelessWidget {
                 subtitle: viewIncidentData.priority.toString()),
             _rowSubtitleWidget(
                 title: "Report Date : ",
-                subtitle: viewIncidentData.createdAt.toString()),
+                subtitle: viewIncidentData.addedDate.toString()),
             Divider(),
             Container(
               decoration: BoxDecoration(

@@ -13,6 +13,7 @@ import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bl
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_state.dart';
 import '../../../../Utils/common_widgets/res/app_string.dart';
+import 'widget/legend_widget.dart';
 
 class ReportAlertView extends StatefulWidget {
   const ReportAlertView({super.key});
@@ -71,6 +72,8 @@ class _ReportAlertViewState extends State<ReportAlertView> {
                         children: [
                           _mapTypeButtonWidget(dataState: dataState),
                           SizedBox(height: 16.0),
+                          _legendButtonWidget(dataState: dataState),
+                          SizedBox(height: 16.0),
                           _currentLocationButtonWidget(dataState: dataState),
                           SizedBox(height: 16.0),
                           _filterButtonWidget(dataState: dataState),
@@ -90,7 +93,7 @@ class _ReportAlertViewState extends State<ReportAlertView> {
       mapType: dataState.currentMapType,
       compassEnabled: true,
       myLocationEnabled: true,
-      myLocationButtonEnabled: true,
+    //  myLocationButtonEnabled: true,
       markers: dataState.markersPointList,
       polylines: dataState.polylineList,
       initialCameraPosition: dataState.cameraPosition,
@@ -171,6 +174,26 @@ class _ReportAlertViewState extends State<ReportAlertView> {
       ),
       onPressed: () => BlocProvider.of<ReportAlertBloc>(context)
           .add(SelectFilterButtonEvent(context: context)),
+    );
+  }
+  Widget _legendButtonWidget({required FetchReportAlertDataState dataState}) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: AppColor.primer,
+      child: Icon(
+        Icons.info_outline,
+        size: 21.0,
+        color: AppColor.white,
+      ),
+      onPressed: () async {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return LegendPopWidget(
+                mContext: context,
+              );
+            });
+      },
     );
   }
 }

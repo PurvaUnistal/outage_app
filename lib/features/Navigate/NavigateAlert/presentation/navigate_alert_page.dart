@@ -11,9 +11,10 @@ import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:igl_outage_app/Utils/common_widgets/text_form_widget.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_event.dart';
-import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/Navigate_alert_state.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/presentation/widget/legend_widget.dart';
 import '../../../../Utils/common_widgets/res/app_string.dart';
 
 class NavigateAlertView extends StatefulWidget {
@@ -77,6 +78,8 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
                         CommonStyle.vertical(context: context),*/
                         _mapTypeButtonWidget(dataState: dataState),
                         SizedBox(height: 16.0),
+                        _legendButtonWidget(dataState: dataState),
+                        SizedBox(height: 16.0),
                         _currentLocationButtonWidget(dataState: dataState),
                         SizedBox(height: 16.0),
                         _filterButtonWidget(dataState: dataState),
@@ -119,7 +122,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
       mapType: dataState.currentMapType,
       compassEnabled: true,
       myLocationEnabled: true,
-      myLocationButtonEnabled: true,
+     // myLocationButtonEnabled: true,
       markers: dataState.markersPointList,
       polylines: dataState.polylineList,
       initialCameraPosition: dataState.cameraPosition,
@@ -127,12 +130,10 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         dataState.googleMapController.complete(controller);
       },
       onTap: (latLng) {
-        dataState.polylineList.isNotEmpty
-            ? BlocProvider.of<NavigateAlertBloc>(context).add(
+        BlocProvider.of<NavigateAlertBloc>(context).add(
                 SelectGoogleMapButtonEvent(
-                    context: context, latLngOnTap: latLng))
-            : (latLng) {};
-      },
+                    context: context, latLngOnTap: latLng));
+        },
     );
   }
 
@@ -200,6 +201,26 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
       ),
       onPressed: () => BlocProvider.of<NavigateAlertBloc>(context)
           .add(SelectFilterButtonEvent(context: context)),
+    );
+  }
+  Widget _legendButtonWidget({required FetchNavigateAlertDataState dataState}) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: AppColor.primer,
+      child: Icon(
+        Icons.info_outline,
+        size: 21.0,
+        color: AppColor.white,
+      ),
+      onPressed: () async {
+        await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return LegendPopWidget(
+              mContext: context,
+            );
+        });
+      },
     );
   }
 }

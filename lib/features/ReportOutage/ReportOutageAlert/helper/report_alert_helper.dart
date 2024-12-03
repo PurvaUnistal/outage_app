@@ -4,20 +4,21 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:igl_outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/PipelineModel.dart';
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
+import 'package:path_provider/path_provider.dart';
 import '../presentation/widget/alert_dialog_widget.dart';
 
 class ReportAlertHelper {
   static Future<void> clearCache() async {
-    Directory path = Directory("/data/user/0/unistal.igloutage.app/cache/");
+   /* Directory path = Directory("/data/user/0/unistal.igloutage.app/cache/");
 
     if (await path.exists()) {
       List<FileSystemEntity> files = path.listSync();
@@ -26,11 +27,10 @@ class ReportAlertHelper {
           await f.delete();
         }
       }
-    }
+    }*/
 
     Directory path2 =
-        Directory("/data/user/0/unistal.igloutage.app/cache/file_picker/");
-
+        Directory("/data/user/0/unistal.igloutage.app/file_picker/");
     if (await path2.exists()) {
       path2.deleteSync(recursive: true);
     }
@@ -40,6 +40,10 @@ class ReportAlertHelper {
 
     if (await path3.exists()) {
       path3.deleteSync(recursive: true);
+    }
+    final cacheDir = await getTemporaryDirectory();
+    if (cacheDir.existsSync()) {
+      cacheDir.deleteSync(recursive: true);
     }
   }
 
@@ -85,12 +89,6 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getTFGis + json, context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
         return response;
       }
     } catch (e) {
@@ -113,12 +111,6 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getGasValueGis + json, context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
         return response;
       }
     } catch (e) {
@@ -141,12 +133,6 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getRegulatorGis + json, context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
         return response;
       }
     } catch (e) {
@@ -171,12 +157,6 @@ class ReportAlertHelper {
           context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
         return response;
       }
     } catch (e) {
@@ -201,12 +181,6 @@ class ReportAlertHelper {
           context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
         return response;
       }
     } catch (e) {
@@ -231,12 +205,6 @@ class ReportAlertHelper {
           context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
         return response;
       }
     } catch (e) {
@@ -261,12 +229,6 @@ class ReportAlertHelper {
           context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
         return response;
       }
     } catch (e) {
@@ -275,8 +237,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getEndCapGisApi(
-      {required BuildContext context}) async {
+  static Future<GetTfGisModel?> getEndCapGisApi({required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
     try {
@@ -291,12 +252,29 @@ class ReportAlertHelper {
           context: context);
       if (res != null) {
         GetTfGisModel response = GetTfGisModel.fromJson(res);
-        if (response.data!.isNotEmpty) {
-          if (await HiveDataBase.allGisDataBox!.isOpen) {
-            await HiveDataBase.allGisDataBox!.clear();
-            HiveDataBase.allGisDataBox!.addAll(response.data!);
-          }
-        }
+        return response;
+      }
+    } catch (e) {
+      log("getGasValueGis-->${e.toString()}");
+    }
+    return null;
+  }
+
+  static Future<GetTfGisModel?> getConsumerGisApi({required BuildContext context}) async {
+    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
+    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    try {
+      Map<String, String> para = {
+        "type": "End Cap",
+        "ga_id": gaId,
+        "areas": areas,
+      };
+      String json = Uri(queryParameters: para).query;
+      var res = await ApiHelper.getData(
+          urlEndPoint: Apis.getNonControllableFittingGis + json,
+          context: context);
+      if (res != null) {
+        GetTfGisModel response = GetTfGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -318,13 +296,40 @@ class ReportAlertHelper {
     String json = Uri(queryParameters: para).query;
     try {
       log(Apis.getPipelineNetwork + json);
-      var res = await ApiHelper.getData(urlEndPoint: Apis.getPipelineNetwork + json, context: context);
-      if(res != null){
-        GetPipelineNetworkModel response = GetPipelineNetworkModel.fromJson(res);
+      var res = await ApiHelper.getData(
+          urlEndPoint: Apis.getPipelineNetwork + json, context: context);
+      if (res != null) {
+        GetPipelineNetworkModel response =
+            GetPipelineNetworkModel.fromJson(res);
         return response;
       }
     } catch (e) {
       log("getPipelineNetwork-->${e.toString()}");
+    }
+    return null;
+  }
+
+  static Future<PipelineModel?> getPipelineApi({
+    required BuildContext context,
+  }) async {
+    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
+    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    Map<String, String> para = {
+      "ga_id": gaId,
+      "areas": areas,
+    };
+    String json = Uri(queryParameters: para).query;
+    try {
+      log("Apis.getPipeline-->${Apis.getPipeline + json}");
+      var res = await ApiHelper.getData(
+          urlEndPoint: Apis.getPipeline + json, context: context);
+      if (res != null) {
+        PipelineModel response =
+        PipelineModel.fromJson(res);
+        return response;
+      }
+    } catch (e) {
+      log("getPipeline-->${e.toString()}");
     }
     return null;
   }

@@ -1,9 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:igl_outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:igl_outage_app/Utils/common_widgets/text_form_widget.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:igl_outage_app/features/Login/domain/bloc/login_bloc.dart';
 import 'package:igl_outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_bloc.dart';
@@ -18,12 +19,14 @@ import 'features/ManageOutage/ManageAlert/domain/bloc/manage_alert_bloc.dart';
 import 'features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
+
+import 'features/Navigate/NavigateAlert/presentation/widget/search_location.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var appDir = (await getTemporaryDirectory()).path;
   new Directory(appDir).delete(recursive: true);
-  await HiveDataBase().init();
   await ReportAlertHelper.clearCache();
   await Future.delayed(Duration(seconds: 1));
   runApp(MyApp());
@@ -35,7 +38,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   void initState() {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     super.initState();
@@ -43,14 +45,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: AppColor.primer));
-    return MultiBlocProvider (
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: AppColor.primer));
+    return MultiBlocProvider(
         providers: [
           BlocProvider(create: (BuildContext context) => LoginBloc()),
           BlocProvider(create: (BuildContext context) => HomeBloc()),
           BlocProvider(create: (BuildContext context) => ManageAlertBloc()),
           BlocProvider(create: (BuildContext context) => CreateAlertFormBloc()),
-          BlocProvider(create: (BuildContext context) => MaintenanceAlertBloc()),
+          BlocProvider(
+              create: (BuildContext context) => MaintenanceAlertBloc()),
           BlocProvider(create: (BuildContext context) => NavigateAlertBloc()),
           BlocProvider(create: (BuildContext context) => ReportAlertBloc()),
           BlocProvider(create: (BuildContext context) => ReportDetailsBloc()),
@@ -66,104 +70,120 @@ class _MyAppState extends State<MyApp> {
               seedColor: AppColor.primer,
             ),
           ),
-       //   home: PolylineClickExample(),
-          initialRoute: RoutesName.splash,
+       //  home: MapScreen (),
+           initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,
         ));
   }
 }
 
 
-class PolylineClickExample extends StatefulWidget {
+
+
+class MapScreen extends StatefulWidget {
   @override
-  _PolylineClickExampleState createState() => _PolylineClickExampleState();
+  _MapScreenState createState() => _MapScreenState();
 }
 
-class _PolylineClickExampleState extends State<PolylineClickExample> {
-  late GoogleMapController _controller;
+class _MapScreenState extends State<MapScreen> {
+  GoogleMapController? _mapController;
   Set<Polyline> _polylines = {};
-  List<LatLng> polylineCoordinates = [
-    LatLng(37.42796133580664, -122.085749655962),
-    LatLng(37.43061033082363, -122.088497749281),
-    LatLng(37.43296265331129, -122.091589879415),
-  ];
+  LatLng _start = LatLng(37.7749, -122.4194); // San Francisco
+  LatLng _end = LatLng(34.0522, -118.2437); // Los Angeles
 
   @override
   void initState() {
     super.initState();
-    _addPolyline();
+    _fetchRoute();
   }
 
-  void _addPolyline() {
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId('test_polyline'),
-        points: polylineCoordinates,
-        width: 5,
-        color: Colors.blue,
-      ),
-    );
-  }
+  Future<void> _fetchRoute() async {
+    final String apiKey = 'AIzaSyAGSC08nb7Cq2mSVqaZWNVX4cIPdUSONps';
+    final String url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${_start.latitude},${_start.longitude}&destination=${_end.latitude},${_end.longitude}&key=$apiKey';
+print("url--->${url}");
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final points = data['routes'][0]['overview_polyline']['points'];
+        final List<LatLng> polylineCoordinates = _decodePolyline(points);
 
-  void _onMapTapped(LatLng tappedPoint) {
-    for (int i = 0; i < polylineCoordinates.length - 1; i++) {
-      final start = polylineCoordinates[i];
-      final end = polylineCoordinates[i + 1];
-
-      if (_isPointNearLine(tappedPoint, start, end, 10.0)) { // 10 meters threshold
-        print("Polyline clicked!");
-        // Perform actions when polyline is clicked
-        break;
+        setState(() {
+          _polylines.add(Polyline(
+            polylineId: PolylineId('route'),
+            points: polylineCoordinates,
+            color: Colors.blue,
+            width: 5,
+          ));
+        });
+      } else {
+        throw Exception('Failed to load route');
       }
+    } catch (e) {
+      print(e);
     }
   }
 
-  bool _isPointNearLine(LatLng point, LatLng start, LatLng end, double threshold) {
-    double distance = _distanceFromPointToLine(point, start, end);
-    return distance < threshold;
-  }
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> coordinates = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
 
-  double _distanceFromPointToLine(LatLng point, LatLng start, LatLng end) {
-    // Calculate the distance from `point` to the line segment `start`-`end`.
-    final double A = point.latitude - start.latitude;
-    final double B = point.longitude - start.longitude;
-    final double C = end.latitude - start.latitude;
-    final double D = end.longitude - start.longitude;
+    while (index < len) {
+      int shift = 0, result = 0;
+      int b;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
 
-    final double dot = A * C + B * D;
-    final double len_sq = C * C + D * D;
-    final double param = len_sq != 0 ? dot / len_sq : -1;
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
 
-    double xx, yy;
-
-    if (param < 0) {
-      xx = start.latitude;
-      yy = start.longitude;
-    } else if (param > 1) {
-      xx = end.latitude;
-      yy = end.longitude;
-    } else {
-      xx = start.latitude + param * C;
-      yy = start.longitude + param * D;
+      coordinates.add(LatLng(lat / 1E5, lng / 1E5));
     }
 
-    final double dx = point.latitude - xx;
-    final double dy = point.longitude - yy;
-    return sqrt(dx * dx + dy * dy) * 111320; // Convert to meters
+    return coordinates;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Polyline Click Example')),
+      appBar: AppBar(
+        title: Text("Route Between Two Places"),
+      ),
       body: GoogleMap(
-      //  onMapCreated: (controller) => _controller = controller,
         initialCameraPosition: CameraPosition(
-          target: LatLng(37.42796133580664, -122.085749655962),
-          zoom: 12,
+          target: _start,
+          zoom: 6,
         ),
+        onMapCreated: (controller) {
+          _mapController = controller;
+        },
         polylines: _polylines,
-        onTap: _onMapTapped,
+        markers: {
+          Marker(
+            markerId: MarkerId('start'),
+            position: _start,
+            infoWindow: InfoWindow(title: 'Start'),
+          ),
+          Marker(
+            markerId: MarkerId('end'),
+            position: _end,
+            infoWindow: InfoWindow(title: 'End'),
+          ),
+        },
       ),
     );
   }

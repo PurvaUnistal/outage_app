@@ -183,3 +183,21 @@ class SelectCheckBoxEndCapGisEvent extends ReportAlertEvent {
   // TODO: implement props
   List<Object> get props => [context, checkBoxEndCap];
 }
+
+class SelectConsumerGISValueEvent extends ReportAlertEvent {
+  final BuildContext context;
+  final String gasConsumerGISId;
+  SelectConsumerGISValueEvent({required this.context, required this.gasConsumerGISId});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, gasConsumerGISId];
+}
+
+class SelectCheckBoxConsumerGisEvent extends ReportAlertEvent {
+  final BuildContext context;
+  final bool checkBoxConsumer;
+  SelectCheckBoxConsumerGisEvent({required this.context, required this.checkBoxConsumer});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, checkBoxConsumer];
+}

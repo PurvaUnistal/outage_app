@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +10,10 @@ import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/helper/navigate_alert_helper.dart';
 import 'package:igl_outage_app/features/Navigate/NavigateAlert/presentation/widget/navigate_pop_widget.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
@@ -18,8 +22,6 @@ import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/mo
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/decodePolyline.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
-import 'Navigate_alert_event.dart';
-import 'Navigate_alert_state.dart';
 
 class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   NavigateAlertBloc() : super(NavigateAlertInitialState()) {
@@ -50,6 +52,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
     on<SelectCheckBoxEndCapGisEvent>(_selectCheckBoxEndCapGis);
     on<SelectEndCapGISValueEvent>(_selectEndCapGISValue);
+
+    on<SelectCheckBoxConsumerGisEvent>(_selectCheckBoxConsumerGis);
+    on<SelectConsumerGISValueEvent>(_selectConsumerGISValue);
   }
 
   bool isLoader = false;
@@ -70,6 +75,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   bool isGasReducerLoader = false;
   bool checkBoxEndCap = false;
   bool isGasEndCapLoader = false;
+  bool checkBoxConsumer = false;
+  bool isGasConsumerLoader = false;
 
   String scheme = '';
   String role = '';
@@ -79,8 +86,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   String loginLong = '';
   String nameofLocation = '';
 
-  TextEditingController startLocationController = TextEditingController();
-  TextEditingController destinationLocationController = TextEditingController();
   TextEditingController tfGisController = TextEditingController();
   TextEditingController gasValveGISController = TextEditingController();
   TextEditingController gasRegulatorGISController = TextEditingController();
@@ -89,6 +94,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   TextEditingController gasCouplerGISController = TextEditingController();
   TextEditingController gasReducerGISController = TextEditingController();
   TextEditingController gasEndCapGISController = TextEditingController();
+  TextEditingController startLocationController = TextEditingController();
+  TextEditingController destinationLocationController = TextEditingController();
+  TextEditingController gasConsumerGISController = TextEditingController();
 
   GetPipelineGisModel gasPipelineModel = GetPipelineGisModel();
   List<GetPipelineGisData> listOfPipelineGIS = [];
@@ -136,6 +144,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   List<TfGisData> listOfFilterGasEndCapGIS = [];
   List<String> listOfGasEndCapGISId = [];
 
+  GetTfGisModel gasConsumerGISModel = GetTfGisModel();
+  List<TfGisData> listOfGasConsumerGIS = [];
+  List<TfGisData> listOfFilterConsumerGIS = [];
+  List<String> listOfGasConsumerGISId = [];
+
   GetPipelineNetworkModel pipelineNetworkModel = GetPipelineNetworkModel();
   PipelineNetworkData pipelineNetworkData = PipelineNetworkData();
   List<PipelineNetworkData> listOfPipelineNetwork = [];
@@ -167,8 +180,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   MapType currentMapType = MapType.normal;
   Completer<GoogleMapController> googleMapController = Completer();
-  CameraPosition cameraPosition =
-      CameraPosition(target: LatLng(0, 0), zoom: AppString.zoom);
+  CameraPosition cameraPosition = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: AppString.zoom,
+  );
 
   _pageLoad(NavigateAlertLoadEvent event, emit) async {
     emit(NavigateAlertInitialState());
@@ -176,8 +191,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     isPipelineLoader = false;
     await _clearMarkerPolylineField();
     await _clearTextField();
-     startLocationController.text = "";
-     destinationLocationController.text = "";
+    startLocationController.text = "";
+    destinationLocationController.text = "";
     gasPipelineModel = GetPipelineGisModel();
     listOfPipelineGIS = [];
     gasValueGISModel = GetTfGisModel();
@@ -221,6 +236,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     listOfFilterGasEndCapGIS = [];
     listOfGasEndCapGISId = [];
 
+    gasConsumerGISModel = GetTfGisModel();
+    listOfGasConsumerGIS = [];
+    listOfFilterConsumerGIS = [];
+    listOfGasConsumerGISId = [];
+
     pipelineNetworkModel = GetPipelineNetworkModel();
     pipelineNetworkData = PipelineNetworkData();
     listOfPipelineNetwork = [];
@@ -229,27 +249,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     latLngOnTap = LatLng(0, 0);
     latLngGis = [];
     markersPointList = {};
-    tfMarkersPointList = {};
-    valveMarkersPointList = {};
-    regulatorMarkersPointList = {};
-    teeMarkersPointList = {};
-    elbowMarkersPointList = {};
-    couplerMarkersPointList = {};
-    reducerMarkersPointList = {};
-    endCapMarkersPointList = {};
-    googleMapController = Completer();
     polylineList = {};
-    tfPolylineList = {};
-    valvePolylineList = {};
-    regulatorPolylineList = {};
-    teePolylineList = {};
-    elbowPolylineList = {};
-    couplerPolylineList = {};
-    reducerPolylineList = {};
-    endCapPolylineList = {};
-
+    googleMapController = Completer();
     currentMapType = MapType.normal;
-    cameraPosition = CameraPosition(target: LatLng(0, 0), zoom: AppString.zoom);
     scheme = await SharedPref.getString(key: PrefsValue.schema);
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
@@ -264,8 +266,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _currentLoginLocation() async {
-    final Uint8List markerIcon = await ReportAlertHelper.getBytesFromAsset(
-        'assets/icons/pipeMarker.png', 100);
+    final Uint8List markerIcon =
+        await ReportAlertHelper.getBytesFromAsset(AssetPath.loginPin, 100);
     cameraPosition =
         CameraPosition(target: loginPosition, zoom: AppString.zoom);
     List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -410,7 +412,24 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     }
   }
 
-  _fetchPipelineNetworkApi(
+  _fetchGasConsumerGisApi({
+    required BuildContext context,
+  }) async {
+    var res = await ReportAlertHelper.getConsumerGisApi(
+      context: context,
+    );
+    if (res != null) {
+      gasConsumerGISModel = res;
+      if (gasConsumerGISModel.data != null) {
+        listOfGasConsumerGIS = gasConsumerGISModel.data!;
+        listOfGasConsumerGISId =
+            listOfGasConsumerGIS.map((e) => e.id!).toList();
+        return res;
+      }
+    }
+  }
+
+  /*_fetchPipelineNetworkApi(
       {required BuildContext context,
       required String latitude,
       required String longitude}) async {
@@ -429,37 +448,48 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           latLngGis = await DecodePolyline.decodePolyline(
               listOfPipelineNetwork[i].geomencode!);
           if (tfGisController.text.isNotEmpty) {
+            final Uint8List tfIcon =
+                await ReportAlertHelper.getBytesFromAsset(AssetPath.tf, 50);
             tfMarkersPointList.addAll(await NavigateAlertHelper.createMarker(
               latlngList: latLngGis,
               context: context,
-              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueViolet),
+              markerIcon: BitmapDescriptor.fromBytes(tfIcon),
             ));
+
             tfPolylineList.addAll(await ReportAlertHelper.createPolyLine(
-                color: Colors.pink, latlngList: latLngGis, context: context));
+                color: Colors.yellow.shade900,
+                latlngList: latLngGis,
+                context: context));
             markersPointList.addAll(tfMarkersPointList);
             polylineList.addAll(tfPolylineList);
           } else if (gasValveGISController.text.isNotEmpty) {
+            final Uint8List valveIcon =
+                await ReportAlertHelper.getBytesFromAsset(AssetPath.valve, 50);
             valveMarkersPointList.addAll(await NavigateAlertHelper.createMarker(
               latlngList: latLngGis,
               context: context,
-              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueGreen),
+              markerIcon: BitmapDescriptor.fromBytes(valveIcon),
             ));
             valvePolylineList.addAll(await ReportAlertHelper.createPolyLine(
-                color: Colors.green, latlngList: latLngGis, context: context));
+                color: Colors.purpleAccent,
+                latlngList: latLngGis,
+                context: context));
             markersPointList.addAll(valveMarkersPointList);
             polylineList.addAll(valvePolylineList);
           } else if (gasRegulatorGISController.text.isNotEmpty) {
+            final Uint8List regulatorIcon =
+                await ReportAlertHelper.getBytesFromAsset(
+                    AssetPath.regulator, 50);
             regulatorMarkersPointList
                 .addAll(await NavigateAlertHelper.createMarker(
               latlngList: latLngGis,
               context: context,
-              markerIcon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueYellow),
+              markerIcon: BitmapDescriptor.fromBytes(regulatorIcon),
             ));
             regulatorPolylineList.addAll(await ReportAlertHelper.createPolyLine(
-                color: Colors.green, latlngList: latLngGis, context: context));
+                color: Colors.yellowAccent.shade400,
+                latlngList: latLngGis,
+                context: context));
             markersPointList.addAll(regulatorMarkersPointList);
             polylineList.addAll(regulatorPolylineList);
           } else if (gasRegulatorGISController.text.isNotEmpty) {
@@ -539,13 +569,148 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       }
       GoogleMapController controller = await googleMapController.future;
       if (markersPointList.isNotEmpty) {
-        currentPosition = LatLng(markersPointList.last.position.latitude, markersPointList.last.position.longitude);
+        currentPosition = LatLng(markersPointList.last.position.latitude,
+            markersPointList.last.position.longitude);
         controller.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(target: currentPosition, zoom: AppString.zoom)
-        ));
+            CameraPosition(target: currentPosition, zoom: 14)));
       }
     }
+  }*/
+
+  Future<void> _fetchPipelineNetworkApi({
+    required BuildContext context,
+    required String latitude,
+    required String longitude,
+  }) async {
+    // Clear existing markers and polylines
+    await _clearMarkerPolylineField();
+
+    // Fetch pipeline network data
+    var res = await ReportAlertHelper.getPipelineNetworkApi(
+      context: context,
+      latitude: latitude,
+      longitude: longitude,
+    );
+
+    if (res == null) return;
+    pipelineNetworkModel = res;
+
+    if (pipelineNetworkModel.data?.isEmpty ?? true) {
+      return Utils.errorSnackBar(msg: "No data Found", context: context);
+    }
+
+    listOfPipelineNetwork = pipelineNetworkModel.data!;
+
+    // Configuration mapping GIS controllers to their specific attributes
+    final gisConfigs = [
+      {
+        'controller': tfGisController,
+        'iconPath': AssetPath.tf,
+        'iconSize': 50,
+        'color': Colors.yellow.shade900,
+        'markerList': tfMarkersPointList,
+        'polylineList': tfPolylineList,
+      },
+      {
+        'controller': gasValveGISController,
+        'iconPath': AssetPath.valve,
+        'iconSize': 50,
+        'color': Colors.purpleAccent,
+        'markerList': valveMarkersPointList,
+        'polylineList': valvePolylineList,
+      },
+      {
+        'controller': gasRegulatorGISController,
+        'iconPath': AssetPath.regulator,
+        'iconSize': 50,
+        'color': Colors.yellowAccent.shade400,
+        'markerList': regulatorMarkersPointList,
+        'polylineList': regulatorPolylineList,
+      },
+      {
+        'controller': gasTeeGISController,
+        'iconPath': null,
+        'iconSize': 50,
+        'color': Colors.green,
+        'markerList': teeMarkersPointList,
+        'polylineList': teePolylineList,
+      },
+      // Add additional configurations here...
+    ];
+
+    // Process each pipeline network
+    for (var network in listOfPipelineNetwork) {
+      latLngGis = await DecodePolyline.decodePolyline(network.geomencode!);
+
+      for (var config in gisConfigs) {
+        var controller = config['controller'] as TextEditingController;
+        if (controller.text.isNotEmpty) {
+          await _processNetworkSegment(
+            context: context,
+            latLngList: latLngGis,
+            iconPath: config['iconPath'] as String?,
+            iconSize: config['iconSize'] as int,
+            polylineColor: config['color'] as Color,
+            markerList: config['markerList'] as Set<Marker>,
+            polylineCoList: config['polylineList'] as Set<Polyline>,
+          );
+          break; // Stop after processing the first matching condition
+        }
+      }
+    }
+
+    // Animate camera to the last marker if available
+    if (markersPointList.isNotEmpty) {
+      GoogleMapController controller = await googleMapController.future;
+      currentPosition = LatLng(
+        markersPointList.last.position.latitude,
+        markersPointList.last.position.longitude,
+      );
+      controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: currentPosition, zoom: 14),
+        ),
+      );
+    }
   }
+
+  Future<void> _processNetworkSegment({
+    required BuildContext context,
+    required List<LatLng> latLngList,
+    String? iconPath,
+    required int iconSize,
+    required Color polylineColor,
+    required Set<Marker> markerList,
+    required Set<Polyline> polylineCoList,
+  }) async {
+    // Create marker icon
+    BitmapDescriptor markerIcon;
+    if (iconPath != null) {
+      final Uint8List iconBytes = await ReportAlertHelper.getBytesFromAsset(iconPath, iconSize);
+      markerIcon = BitmapDescriptor.fromBytes(iconBytes);
+    } else {
+      markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
+    }
+
+    // Add markers
+    var markers = await NavigateAlertHelper.createMarker(
+      latlngList: latLngList,
+      context: context,
+      markerIcon: markerIcon,
+    );
+    markerList.addAll(markers);
+    markersPointList.addAll(markers);
+
+    // Add polylines
+    var polylines = await ReportAlertHelper.createPolyLine(
+      color: polylineColor,
+      latlngList: latLngList,
+      context: context,
+    );
+    polylineCoList.addAll(polylines);
+    polylineList.addAll(polylines);
+  }
+
 
   _selectMapTypeButton(SelectMapTypeButtonEvent event, emit) {
     currentMapType =
@@ -555,15 +720,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   _selectCurrentMarkerButton(SelectCurrentMarkerButtonEvent event, emit) async {
     Position? currentPoint = await CurrentLocation.getCurrentLocation();
-    String? currentAddress = await CurrentLocation.getAddress();
-    print("currentAddress-->${currentAddress}");
     GoogleMapController controller = await googleMapController.future;
-    if (currentPoint != null && currentAddress != null) {
+    if (currentPoint != null) {
       currentPosition = LatLng(currentPoint.latitude, currentPoint.longitude);
-      startLocationController.text = currentAddress;
       controller.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: currentPosition, zoom: 14)
-      ));
+          CameraPosition(target: currentPosition, zoom: 14)));
       markersPointList.add(Marker(
         markerId: MarkerId(nameofLocation),
         position: currentPosition,
@@ -574,7 +735,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckBoxTFGis(SelectCheckBoxTFGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxTf = event.checkBoxTf;
     isGasTfLoader = true;
     _eventCompleted(emit);
@@ -587,7 +748,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectTFGisValue(SelectTFGisEvent event, emit) async {
-    listOfFilterTfGis = [];
+    /*listOfFilterTfGis = [];
+    _clearMarkerPolylineField();
     tfGisController.text = event.tfGisId;
     if (tfGisController.text.isNotEmpty && gasValveGISController.text.isEmpty) {
       await SharedPref.setString(
@@ -604,14 +766,48 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             context: event.context,
             latitude: listOfFilterTfGis[0].latitude!,
             longitude: listOfFilterTfGis[0].longitude!);
+        isPipelineLoader = false;
+        _eventCompleted(emit);
       }
-      isPipelineLoader = false;
-      _eventCompleted(emit);
+    }*/
+    // Clear previous state
+    listOfFilterTfGis.clear();
+    _clearMarkerPolylineField();
+    tfGisController.text = event.tfGisId;
+
+    // Validate input
+    if (tfGisController.text.isNotEmpty && gasValveGISController.text.isEmpty) {
+      // Store the selected TF GIS ID
+      await SharedPref.setString(
+        key: PrefsValue.assetTypeId,
+        value: tfGisController.text,
+      );
+
+      // Filter the list of TF GIS
+      listOfFilterTfGis = listOfTfGis
+          .where((listData) => listData.id.toString() == event.tfGisId.toString())
+          .toList();
+
+      // Fetch pipeline network if filter results exist
+      if (listOfFilterTfGis.isNotEmpty) {
+        isPipelineLoader = true;
+        _eventCompleted(emit);
+
+        final selectedTfGis = listOfFilterTfGis.first;
+        await _fetchPipelineNetworkApi(
+          context: event.context,
+          latitude: selectedTfGis.latitude!,
+          longitude: selectedTfGis.longitude!,
+        );
+
+        isPipelineLoader = false;
+        _eventCompleted(emit);
+      }
     }
   }
 
   _selectCheckBoxValveGis(SelectCheckBoxValveGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxValve = event.checkBoxValve;
     isGasValveLoader = true;
     _eventCompleted(emit);
@@ -625,7 +821,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   _selectValveGISValue(SelectValveGISValueEvent event, emit) async {
     listOfFilterGasValueGIS = [];
+    _clearMarkerPolylineField();
     gasValveGISController.text = event.gasValveGISId;
+    markersPointList = {};
+    _currentLoginLocation();
     if (gasValveGISController.text.isNotEmpty && tfGisController.text.isEmpty) {
       await SharedPref.setString(
           key: PrefsValue.assetTypeId, value: gasValveGISController.text);
@@ -641,15 +840,15 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             context: event.context,
             latitude: listOfFilterGasValueGIS[0].latitude!,
             longitude: listOfFilterGasValueGIS[0].longitude!);
+        isPipelineLoader = false;
+        _eventCompleted(emit);
       }
-      isPipelineLoader = false;
-      _eventCompleted(emit);
     }
   }
 
   _selectCheckBoxRegulatorGis(
       SelectCheckBoxRegulatorGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxRegulator = event.checkBoxRegulator;
     isGasRegulatorLoader = true;
     _eventCompleted(emit);
@@ -662,7 +861,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectRegulatorGISValue(SelectRegulatorGISValueEvent event, emit) async {
-    listOfFilterGasValueGIS = [];
+    listOfFilterGasRegulatorGIS = [];
+    _clearMarkerPolylineField();
     gasRegulatorGISController.text = event.gasRegulatorGISId;
     if (gasRegulatorGISController.text.isNotEmpty) {
       await SharedPref.setString(
@@ -686,7 +886,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckBoxTeeGis(SelectCheckBoxTeeGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxTee = event.checkBoxTee;
     isGasTeeLoader = true;
     _eventCompleted(emit);
@@ -698,7 +898,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectTeeGISValue(SelectTeeGISValueEvent event, emit) async {
-    listOfFilterGasValueGIS = [];
+    listOfFilterGasTeeGIS = [];
+    _clearMarkerPolylineField();
     gasTeeGISController.text = event.gasTeeGISId;
     if (gasTeeGISController.text.isNotEmpty) {
       await SharedPref.setString(
@@ -722,7 +923,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckBoxElbowGis(SelectCheckBoxElbowGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxElbow = event.checkBoxElbow;
     isGasElbowLoader = true;
     _eventCompleted(emit);
@@ -734,7 +935,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectElbowGISValue(SelectElbowGISValueEvent event, emit) async {
-    listOfFilterGasValueGIS = [];
+    listOfFilterGasElbowGIS = [];
+    _clearMarkerPolylineField();
     gasElbowGISController.text = event.gasElbowGISId;
     if (gasElbowGISController.text.isNotEmpty) {
       await SharedPref.setString(
@@ -752,15 +954,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             latitude: listOfFilterGasElbowGIS[0].latitude!,
             longitude: listOfFilterGasElbowGIS[0].longitude!);
       }
-      markersPointList.addAll(elbowMarkersPointList);
-      polylineList.addAll(elbowPolylineList);
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
   }
 
   _selectCheckBoxCouplerGis(SelectCheckBoxCouplerGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxCoupler = event.checkBoxCoupler;
     isGasCouplerLoader = true;
     _eventCompleted(emit);
@@ -772,7 +972,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCouplerGISValue(SelectCouplerGISValueEvent event, emit) async {
-    listOfFilterGasValueGIS = [];
+    listOfFilterGasCouplerGIS = [];
+    _clearMarkerPolylineField();
     gasCouplerGISController.text = event.gasCouplerGISId;
     if (gasCouplerGISController.text.isNotEmpty) {
       await SharedPref.setString(
@@ -790,15 +991,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             latitude: listOfFilterGasCouplerGIS[0].latitude!,
             longitude: listOfFilterGasCouplerGIS[0].longitude!);
       }
-      markersPointList.addAll(couplerMarkersPointList);
-      polylineList.addAll(couplerPolylineList);
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
   }
 
   _selectCheckBoxReducerGis(SelectCheckBoxReducerGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxReducer = event.checkBoxReducer;
     isGasReducerLoader = true;
     _eventCompleted(emit);
@@ -810,7 +1009,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectReducerGISValue(SelectReducerGISValueEvent event, emit) async {
-    listOfFilterGasValueGIS = [];
+    listOfFilterGasReducerGIS = [];
+    _clearMarkerPolylineField();
+
     gasReducerGISController.text = event.gasReducerGISId;
     if (gasReducerGISController.text.isNotEmpty) {
       await SharedPref.setString(
@@ -828,15 +1029,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             latitude: listOfFilterGasReducerGIS[0].latitude!,
             longitude: listOfFilterGasReducerGIS[0].longitude!);
       }
-      markersPointList.addAll(reducerMarkersPointList);
-      polylineList.addAll(reducerPolylineList);
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
   }
 
   _selectCheckBoxEndCapGis(SelectCheckBoxEndCapGisEvent event, emit) async {
-    await _clearTextField();
+    await _clearPopTextField();
     checkBoxEndCap = event.checkBoxEndCap;
     isGasEndCapLoader = true;
     _eventCompleted(emit);
@@ -849,6 +1048,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   _selectEndCapGISValue(SelectEndCapGISValueEvent event, emit) async {
     listOfFilterGasEndCapGIS = [];
+    _clearMarkerPolylineField();
     gasEndCapGISController.text = event.gasEndCapGISId;
     if (gasEndCapGISController.text.isNotEmpty) {
       await SharedPref.setString(
@@ -866,30 +1066,75 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             latitude: listOfFilterGasEndCapGIS[0].latitude!,
             longitude: listOfFilterGasEndCapGIS[0].longitude!);
       }
-      markersPointList.addAll(endCapMarkersPointList);
-      polylineList.addAll(endCapPolylineList);
+      isPipelineLoader = false;
+      _eventCompleted(emit);
+    }
+  }
+
+  _selectCheckBoxConsumerGis(SelectCheckBoxConsumerGisEvent event, emit) async {
+    await _clearPopTextField();
+    checkBoxConsumer = event.checkBoxConsumer;
+    isGasConsumerLoader = true;
+    _eventCompleted(emit);
+    await _fetchGasConsumerGisApi(context: event.context);
+    await SharedPref.setString(
+        key: PrefsValue.assetId, value: tfGisModel.assetId ?? "");
+    isGasConsumerLoader = false;
+    _eventCompleted(emit);
+  }
+
+  _selectConsumerGISValue(SelectConsumerGISValueEvent event, emit) async {
+    listOfFilterConsumerGIS = [];
+    _clearMarkerPolylineField();
+    gasConsumerGISController.text = event.gasConsumerGISId;
+    if (gasConsumerGISController.text.isNotEmpty) {
+      await SharedPref.setString(
+          key: PrefsValue.assetTypeId, value: gasConsumerGISController.text);
+      for (var listData in listOfGasConsumerGIS) {
+        if (listData.id.toString() == event.gasConsumerGISId.toString()) {
+          listOfFilterConsumerGIS.add(listData);
+        }
+      }
+      if (listOfFilterConsumerGIS.isNotEmpty) {
+        isPipelineLoader = true;
+        _eventCompleted(emit);
+        await _fetchPipelineNetworkApi(
+            context: event.context,
+            latitude: listOfFilterConsumerGIS[0].latitude!,
+            longitude: listOfFilterConsumerGIS[0].longitude!);
+      }
       isPipelineLoader = false;
       _eventCompleted(emit);
     }
   }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
+    final Uint8List pinIcon =
+        await ReportAlertHelper.getBytesFromAsset(AssetPath.pin, 50);
     Set<Marker> tempMarker = Set.from(markersPointList);
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        event.latLngOnTap.latitude, event.latLngOnTap.longitude);
+    if (placemarks.isNotEmpty) {
+      Placemark place = placemarks[0];
+      nameofLocation = '${place.thoroughfare}, ${place.subLocality}, ${place.administrativeArea}, ${place.locality}, ${place.country}';
+   print("nameofLocation-->${nameofLocation}");
+    }
     tempMarker.add(
       Marker(
         markerId: MarkerId('Pipeline'),
         position: event.latLngOnTap,
-        infoWindow: InfoWindow(title: 'Pickup Point'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+        infoWindow: InfoWindow(title: 'Pickup Point', snippet: nameofLocation),
+        icon: BitmapDescriptor.fromBytes(pinIcon),
       ),
     );
-
     markersPointList = tempMarker;
     _eventCompleted(emit);
   }
 
   _selectFilterButton(SelectFilterButtonEvent event, emit) async {
     await _clearPopTextField();
+    await _currentLoginLocation();
     await showDialog(
         context: event.context,
         builder: (BuildContext context) {
@@ -928,6 +1173,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     gasCouplerGISController.text = "";
     gasReducerGISController.text = "";
     gasEndCapGISController.text = "";
+    gasConsumerGISController.text = "";
   }
 
   _clearPopTextField() {
@@ -939,6 +1185,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     isGasCouplerLoader = false;
     isGasReducerLoader = false;
     isGasEndCapLoader = false;
+    isGasConsumerLoader = false;
+    tfGisController.text = "";
     gasValveGISController.text = "";
     gasRegulatorGISController.text = "";
     gasTeeGISController.text = "";
@@ -946,9 +1194,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     gasCouplerGISController.text = "";
     gasReducerGISController.text = "";
     gasEndCapGISController.text = "";
+    gasConsumerGISController.text = "";
   }
 
   _clearMarkerPolylineField() {
+    markersPointList = {};
+    polylineList = {};
+    _currentLoginLocation();
     latLngGis = [];
     tfMarkersPointList = {};
     valveMarkersPointList = {};
@@ -988,6 +1240,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       isGasReducerLoader: isGasReducerLoader,
       checkBoxEndCap: checkBoxEndCap,
       isGasEndCapLoader: isGasEndCapLoader,
+      checkBoxConsumer: checkBoxConsumer,
+      isGasConsumerLoader: isGasConsumerLoader,
       scheme: scheme,
       baseUrl: baseUrl,
       userName: userName,
@@ -1013,6 +1267,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       gasEndCapGISController: gasEndCapGISController,
       startLocationController: startLocationController,
       destinationLocationController: destinationLocationController,
+      gasConsumerGISController: gasConsumerGISController,
       listOfTfGisId: listOfTfGisId,
       listOfGasValveGISId: listOfGasValveGISId,
       listOfGasRegulatorGISId: listOfGasRegulatorGISId,
@@ -1021,6 +1276,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       listOfGasCouplerGISId: listOfGasCouplerGISId,
       listOfGasReducerGISId: listOfGasReducerGISId,
       listOfGasEndCapGISId: listOfGasEndCapGISId,
+      listOfGasConsumerGISId: listOfGasConsumerGISId,
     ));
   }
 }

@@ -38,6 +38,8 @@ class FetchReportAlertDataState extends ReportAlertState {
   final bool isGasReducerLoader;
   final bool checkBoxEndCap;
   final bool isGasEndCapLoader;
+  final bool checkBoxConsumer;
+  final bool isGasConsumerLoader;
   final String scheme;
   final String userName;
   final String nameofLocation;
@@ -54,7 +56,8 @@ class FetchReportAlertDataState extends ReportAlertState {
   final TextEditingController gasCouplerGISController;
   final TextEditingController gasReducerGISController;
   final TextEditingController gasEndCapGISController;
-  
+  final TextEditingController gasConsumerGISController;
+
 
   final List<String> listOfTfGisId;
   final List<String> listOfGasValveGISId;
@@ -64,6 +67,7 @@ class FetchReportAlertDataState extends ReportAlertState {
   final List<String> listOfGasCouplerGISId;
   final List<String> listOfGasReducerGISId;
   final List<String> listOfGasEndCapGISId;
+  final List<String> listOfGasConsumerGISId;
 
   final MapType currentMapType;
   final Set<Marker> markersPointList;
@@ -98,6 +102,8 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.isGasReducerLoader,
     required this.checkBoxEndCap,
     required this.isGasEndCapLoader,
+    required this.checkBoxConsumer,
+    required this.isGasConsumerLoader,
 
     required this.scheme,
     required this.baseUrl,
@@ -114,6 +120,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.gasCouplerGISController,
     required this.gasReducerGISController,
     required this.gasEndCapGISController,
+    required this.gasConsumerGISController,
 
     required this.currentMapType,
     required this.markersPointList,
@@ -133,6 +140,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.listOfGasCouplerGISId,
     required this.listOfGasReducerGISId,
     required this.listOfGasEndCapGISId,
+    required this.listOfGasConsumerGISId,
   });
   @override
   List<Object?> get props => [
@@ -154,6 +162,8 @@ class FetchReportAlertDataState extends ReportAlertState {
     isGasReducerLoader,
     checkBoxEndCap,
     isGasEndCapLoader,
+    checkBoxConsumer,
+    isGasConsumerLoader,
     scheme,
     userName,
     nameofLocation,
@@ -169,6 +179,7 @@ class FetchReportAlertDataState extends ReportAlertState {
     gasCouplerGISController,
     gasReducerGISController,
     gasEndCapGISController,
+    gasConsumerGISController,
 
 
     currentMapType,
@@ -188,5 +199,6 @@ class FetchReportAlertDataState extends ReportAlertState {
     listOfGasCouplerGISId,
     listOfGasReducerGISId,
     listOfGasEndCapGISId,
+    listOfGasConsumerGISId,
   ];
 }

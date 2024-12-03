@@ -7,7 +7,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:igl_outage_app/Utils/common_widgets/GetImage/get_image_widget.dart';
-import 'package:igl_outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Routes/routes_name.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_event.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
@@ -27,11 +26,9 @@ class CreateAlertFormBloc
     on<SelectIncidentTypeValueEvent>(_selectIncidentTypeValue);
     on<SelectIncidentIndicationValueEvent>(_selectIncidentIndicationValue);
     on<SelectAssetValueEvent>(_selectAssetValue);
-    on<SelectAssetTypeIdValueEvent>(_selectAssetTypeIdValueEvent);
     on<SelectTfGisValueEvent>(_selectTfGisValue);
     on<CaptureCameraPhotoEvent>(_captureCameraPhoto);
     on<CaptureGalleryPhotoEvent>(_captureGalleryPhoto);
-    //   on<SelectAudioEvent>(_selectAudio);
     on<SubmitAddIncidentBtnEvent>(_submitBtn);
   }
 
@@ -78,8 +75,6 @@ class CreateAlertFormBloc
   TfGisData tfGisValue = TfGisData();
   List<TfGisData> listOfTfGis = [];
 
-  List<String> listOfAssetTypeId = [];
-
   TfGisData valveGisValue = TfGisData();
   List<TfGisData> listOfValveGis = [];
 
@@ -118,8 +113,9 @@ class CreateAlertFormBloc
     remarksController.text = "";
 
     await ReportAlertHelper.clearCache();
-    assetId =
-        await SharedPref.getString(key: PrefsValue.assetId);
+    assetId = await SharedPref.getString(key: PrefsValue.assetId);
+    assetTypeIdController.text =
+        await SharedPref.getString(key: PrefsValue.assetTypeId);
     markerLatitudeController.text =
         await SharedPref.getString(key: PrefsValue.markerLat);
     markerLongitudeController.text =
@@ -129,23 +125,12 @@ class CreateAlertFormBloc
     userName = await SharedPref.getString(key: PrefsValue.userName);
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
     await _getCurrentPosition();
-    await _filterAssetType();
     await _fetchIncidentIndicationApi(context: event.context);
     await _fetchIncidentTypeApi(context: event.context, moduleId: "");
-    await _fetchAssetLocationSourceApi(context: event.context,);
+    await _fetchAssetLocationSourceApi(
+      context: event.context,
+    );
     _eventCompleted(emit);
-  }
-
-  _filterAssetType() async {
-    if (assetId == "2") {
-      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.assetTypeId);
-      listOfValveGis = await HiveDataBase.allGisDataBox!.values.toList();
-      listOfAssetTypeId = await listOfValveGis.map((e) => e.id!).toSet().toList();
-    } else if (assetId == "7") {
-      assetTypeIdController.text = await SharedPref.getString(key: PrefsValue.assetTypeId);
-      listOfTfGis = await HiveDataBase.allGisDataBox!.values.toList();
-      listOfAssetTypeId = await listOfTfGis.map((e) => e.id!).toSet().toList();
-    }
   }
 
   _getCurrentPosition() async {
@@ -167,7 +152,9 @@ class CreateAlertFormBloc
     }
   }
 
-  _fetchIncidentIndicationApi({required BuildContext context,}) async {
+  _fetchIncidentIndicationApi({
+    required BuildContext context,
+  }) async {
     var res = await CreateAlertFormHelper.getIncidentIndicationApi(
       context: context,
     );
@@ -216,11 +203,6 @@ class CreateAlertFormBloc
     _eventCompleted(emit);
   }
 
-  _selectAssetTypeIdValueEvent(SelectAssetTypeIdValueEvent event, emit) {
-    assetTypeIdController.text = event.assetTypeId;
-    _eventCompleted(emit);
-  }
-
   _selectTfGisValue(SelectTfGisValueEvent event, emit) {
     tfGisValue = event.tfGisValue;
     _eventCompleted(emit);
@@ -250,48 +232,48 @@ class CreateAlertFormBloc
   }
 */
   _submitBtn(SubmitAddIncidentBtnEvent event, emit) async {
-     try{
-    var validationCheck = await CreateAlertFormHelper.validationSubmit(
-        context: event.context,
-        incidentType: incidentTypeValue,
-        incidentIndication: incidentIndicationValue,
-        asset: assetIdController.text.trim().toString(),
-        assetId: assetId.toString(),
-        address: addressController.text.trim().toString(),
-        landmark: landmarkController.text.trim().toString(),
-        photo: photo);
-    if (await validationCheck == true) {
-      isBtnLoader = false;
-      _eventCompleted(emit);
-      var res = await CreateAlertFormHelper.addIncidentData(
-        context: event.context,
-        incidentType: incidentTypeValue,
-        incidentIndication: incidentIndicationValue,
-        assetId: assetIdController.text.trim().toString(),
-        assetInternalId: assetId.toString(),
-        address: addressController.text.trim().toString(),
-        landmark: landmarkController.text.trim().toString(),
-        photo: photo,
-        currentLat: currentLatitudeController.text.trim().toString(),
-        currentLong: currentLongitudeController.text.trim().toString(),
-        markerLat: markerLatitudeController.text.trim().toString(),
-        markerLong: markerLongitudeController.text.trim().toString(),
-        description: descriptionController.text.trim().toString(),
-      );
-      if (res != null) {
+    try {
+      var validationCheck = await CreateAlertFormHelper.validationSubmit(
+          context: event.context,
+          incidentType: incidentTypeValue,
+          incidentIndication: incidentIndicationValue,
+          asset: assetIdController.text.trim().toString(),
+          assetId: assetId.toString(),
+          address: addressController.text.trim().toString(),
+          landmark: landmarkController.text.trim().toString(),
+          photo: photo);
+      if (await validationCheck == true) {
         isBtnLoader = false;
         _eventCompleted(emit);
-        Utils.successSnackBar(msg: res.data!, context: event.context);
-        Navigator.pushReplacementNamed(
-          event.context,
-          RoutesName.outageApp,
+        var res = await CreateAlertFormHelper.addIncidentData(
+          context: event.context,
+          incidentType: incidentTypeValue,
+          incidentIndication: incidentIndicationValue,
+          assetId: assetIdController.text.trim().toString(),
+          assetInternalId: assetId.toString(),
+          address: addressController.text.trim().toString(),
+          landmark: landmarkController.text.trim().toString(),
+          photo: photo,
+          currentLat: currentLatitudeController.text.trim().toString(),
+          currentLong: currentLongitudeController.text.trim().toString(),
+          markerLat: markerLatitudeController.text.trim().toString(),
+          markerLong: markerLongitudeController.text.trim().toString(),
+          description: descriptionController.text.trim().toString(),
         );
-      } else {
-        isBtnLoader = false;
-        _eventCompleted(emit);
+        if (res != null) {
+          isBtnLoader = false;
+          _eventCompleted(emit);
+          Utils.successSnackBar(msg: res.data!, context: event.context);
+          Navigator.pushReplacementNamed(
+            event.context,
+            RoutesName.outageApp,
+          );
+        } else {
+          isBtnLoader = false;
+          _eventCompleted(emit);
+        }
       }
-    }
-    }catch(e){
+    } catch (e) {
       isBtnLoader = false;
       log("submit--->${e.toString()}");
       _eventCompleted(emit);
@@ -317,7 +299,6 @@ class CreateAlertFormBloc
       assetModel: assetModel,
       assetValue: assetValue,
       listOfAsset: listOfAsset,
-      listOfAssetTypeId: listOfAssetTypeId,
       listOfTfGis: listOfTfGis,
       tfGisValue: tfGisValue,
       assetTypeIdController: assetTypeIdController,
