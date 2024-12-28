@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 
 abstract class ReportAlertState extends Equatable {}
 
@@ -21,6 +19,7 @@ class ReportAlertPageLoadState extends ReportAlertState {
 
 class FetchReportAlertDataState extends ReportAlertState {
   final bool isLoader;
+  final bool isAllPipeLine;
   final bool isPipelineLoader;
   final bool checkBoxTf;
   final bool isGasTfLoader;
@@ -69,11 +68,13 @@ class FetchReportAlertDataState extends ReportAlertState {
   final List<String> listOfGasEndCapGISId;
   final List<String> listOfGasConsumerGISId;
 
+  final Set<Circle> circles;
   final MapType currentMapType;
   final Set<Marker> markersPointList;
   final LatLng currentPosition;
   final LatLng loginPosition;
-  final Set<Polyline> polylineList;
+  final LatLng closestPoint;
+  final Set<Polyline> polylinePointList;
 
 
   final GetPipelineNetworkModel pipelineNetworkModel;
@@ -84,6 +85,7 @@ class FetchReportAlertDataState extends ReportAlertState {
 
   FetchReportAlertDataState({
     required this.isLoader,
+    required this.isAllPipeLine,
     required this.isPipelineLoader,
 
     required this.checkBoxTf,
@@ -122,11 +124,13 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.gasEndCapGISController,
     required this.gasConsumerGISController,
 
+    required this.circles,
     required this.currentMapType,
     required this.markersPointList,
     required this.currentPosition,
     required this.loginPosition,
-    required this.polylineList,
+    required this.closestPoint,
+    required this.polylinePointList,
 
     required this.pipelineNetworkModel,
     required this.pipelineNetworkData,
@@ -145,6 +149,7 @@ class FetchReportAlertDataState extends ReportAlertState {
   @override
   List<Object?> get props => [
     isLoader,
+    isAllPipeLine,
     isPipelineLoader,
     checkBoxTf,
     isGasTfLoader,
@@ -182,11 +187,13 @@ class FetchReportAlertDataState extends ReportAlertState {
     gasConsumerGISController,
 
 
+    circles,
     currentMapType,
     markersPointList,
     currentPosition,
     loginPosition,
-    polylineList,
+    closestPoint,
+    polylinePointList,
     pipelineNetworkModel,
     pipelineNetworkData,
     listOfPipelineNetwork,

@@ -58,38 +58,35 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
   }
 
   Widget _itemBuilder({required FetchNavigateAlertDataState dataState}) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-          appBar: _appBarWidget(dataState: dataState),
-          body: Stack(children: <Widget>[
-            _googleMapWidget(dataState: dataState),
-            dataState.isPipelineLoader == false
-                ? Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [  CommonStyle.vertical(context: context),
-                     /*   _startLocationWidget(dataState: dataState),
-                        CommonStyle.vertical(context: context),
-                        _destinationLocationWidget(dataState: dataState),
-                        CommonStyle.vertical(context: context),*/
-                        _mapTypeButtonWidget(dataState: dataState),
-                        SizedBox(height: 16.0),
-                        _legendButtonWidget(dataState: dataState),
-                        SizedBox(height: 16.0),
-                        _currentLocationButtonWidget(dataState: dataState),
-                        SizedBox(height: 16.0),
-                        _filterButtonWidget(dataState: dataState),
-                      ],
-                    ),
+    return Scaffold(
+        appBar: _appBarWidget(dataState: dataState),
+        body: Stack(children: <Widget>[
+          _googleMapWidget(dataState: dataState),
+          dataState.isPipelineLoader == false
+              ? Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [  CommonStyle.vertical(context: context),
+                   /*   _startLocationWidget(dataState: dataState),
+                      CommonStyle.vertical(context: context),
+                      _destinationLocationWidget(dataState: dataState),
+                      CommonStyle.vertical(context: context),*/
+                      _mapTypeButtonWidget(dataState: dataState),
+                      SizedBox(height: 16.0),
+                      _legendButtonWidget(dataState: dataState),
+                      SizedBox(height: 16.0),
+                      _currentLocationButtonWidget(dataState: dataState),
+                      SizedBox(height: 16.0),
+                      _filterButtonWidget(dataState: dataState),
+                    ],
                   ),
-                )
-                : WaveLoaderWidget(),
-          ])),
-    );
+                ),
+              )
+              : WaveLoaderWidget(),
+        ]));
   }
 
   _appBarWidget({required FetchNavigateAlertDataState dataState}) {
@@ -124,11 +121,15 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
       myLocationEnabled: true,
      // myLocationButtonEnabled: true,
       markers: dataState.markersPointList,
-      polylines: dataState.polylineList,
+      polylines: dataState.polylinePointList,
       initialCameraPosition: dataState.cameraPosition,
       onMapCreated: (GoogleMapController controller) {
         dataState.googleMapController.complete(controller);
       },
+      /*minMaxZoomPreference: MinMaxZoomPreference(14.0, 23.0),
+      onCameraMove: (position) async {
+        BlocProvider.of<NavigateAlertBloc>(context).add(OnCameraMoveEvent(context: context));
+      },*/
       onTap: (latLng) {
         BlocProvider.of<NavigateAlertBloc>(context).add(
                 SelectGoogleMapButtonEvent(

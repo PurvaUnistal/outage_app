@@ -1,15 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
-import '../model/GetAreaModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import '../model/GetAssetModel.dart';
-import '../model/GetChargeAreaModel.dart';
-import '../model/GetControlRoomModel.dart';
 import '../model/GetIncidentIndicationModel.dart';
 import '../model/GetIncidentTypeModel.dart';
-import '../model/GetLocationSourceModel.dart';
-import '../model/GetModuleTypeModel.dart';
-import '../model/GetPriorityTypeModel.dart';
 
 abstract class CreateAlertFormEvent extends Equatable{}
 
@@ -52,7 +46,7 @@ class SelectAssetValueEvent extends CreateAlertFormEvent {
 }
 
 class SelectTfGisValueEvent extends CreateAlertFormEvent {
-  final TfGisData tfGisValue;
+  final GasGisData tfGisValue;
   final BuildContext context;
   SelectTfGisValueEvent({required this.tfGisValue, required this.context});
   @override

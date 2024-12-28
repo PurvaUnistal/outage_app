@@ -6,13 +6,15 @@ import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
 
 class WavyBackground extends StatelessWidget {
   final Widget child;
-  WavyBackground({required this.child});
+
+  const WavyBackground({required this.child, Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Background image
         Container(
-          height:double.infinity,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage(AssetPath.pipeback),
@@ -20,60 +22,29 @@ class WavyBackground extends StatelessWidget {
             ),
           ),
         ),
-        Opacity(
-          opacity: 0.9,
-          child: Container(
-            height:double.infinity,
-            decoration: BoxDecoration(
-                color: Colors.white
-            ),
-          ),
+        // White overlay with opacity
+        Container(
+          color: Colors.white.withOpacity(0.9),
         ),
+        // Header, content, and footer
         Column(
-          children: <Widget>[
+          children: [
             Flexible(child: WavyHeader()),
             Flexible(child: child),
-            Flexible(child: CircleFooter())
+            Flexible(child: CircleFooter()),
           ],
-
         ),
+        // Footer text
         Positioned(
           bottom: 0,
           left: 0,
           right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Flexible(
-                  child: Text(
-                    AppString.companyName,
-                    textAlign: TextAlign.start,
-                    style: Styles.relB,
-                  )),
-              Flexible(
-                  child: Text(
-                    AppString.version,
-                    textAlign: TextAlign.start,
-                    style: Styles.relB,
-                  )),
-            ],
-          ),
+          child: FooterText(),
         ),
       ],
     );
   }
 }
-
-List<Color> orangeGradients = [
-  AppColor.primer,
-  AppColor.primer40,
-];
-
-List<Color> aquaGradients = [
-  AppColor.primer1,
-  AppColor.primer1_40,
-];
 
 class WavyHeader extends StatelessWidget {
   @override
@@ -81,56 +52,15 @@ class WavyHeader extends StatelessWidget {
     return ClipPath(
       clipper: TopWaveClipper(),
       child: Container(
+        height: MediaQuery.of(context).size.height / 3.5,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              colors: orangeGradients,
-              begin: Alignment.topLeft,
-              end: Alignment.center),
-        ),
-        height: MediaQuery.of(context).size.height / 3.5,
-      ),
-    );
-  }
-}
-
-class WavyFooter extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomLeft,
-      children: [
-        ClipPath(
-          clipper: FooterWaveClipper(),
-          child: Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height / 3,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: aquaGradients,
-                  begin: Alignment.center,
-                  end: Alignment.bottomRight),
-
-            ),
+            colors: [AppColor.primer, AppColor.primer40],
+            begin: Alignment.topLeft,
+            end: Alignment.center,
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-                child: Text(
-                  AppString.companyName,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                )),
-            Flexible(
-                child: Text(
-                  AppString.version,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                )),
-          ],
-        )
-      ],
+      ),
     );
   }
 }
@@ -139,39 +69,57 @@ class CircleFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      alignment: Alignment.bottomLeft,
       children: [
-        CircleGreen(),
-        CircleYellow(),
+        ColoredCircle(
+          color: AppColor.primer,
+          offset: Offset(-70, 90),
+          size: 120,
+        ),
+        ColoredCircle(
+          color: AppColor.primer1,
+          offset: Offset(0, 210),
+          size: 140,
+        ),
       ],
     );
   }
 }
 
-class CircleGreen extends StatelessWidget {
+class ColoredCircle extends StatelessWidget {
+  final Color color;
+  final Offset offset;
+  final double size;
+
+  const ColoredCircle({required this.color, required this.offset, required this.size});
+
   @override
   Widget build(BuildContext context) {
     return Transform.translate(
-      offset: Offset(-70.0, 90.0),
+      offset: offset,
       child: Material(
-        color: AppColor.primer,
-        child: Padding(padding: EdgeInsets.all(120)),
-        shape: CircleBorder(side: BorderSide(color:  AppColor.white, width: 15.0)),
+        color: color,
+        shape: CircleBorder(side: BorderSide(color: AppColor.white, width: 15)),
+        child: Padding(padding: EdgeInsets.all(size)),
       ),
     );
   }
 }
 
-class CircleYellow extends StatelessWidget {
+class FooterText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: Offset(0.0, 210.0),
-      child: Material(
-        color: AppColor.primer1,
-        child: Padding(padding: EdgeInsets.all(140)),
-        shape: CircleBorder(side: BorderSide(color: AppColor.white, width: 15.0)),
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          AppString.companyName,
+          style: Styles.relB,
+        ),
+        Text(
+          AppString.version,
+          style: Styles.relB,
+        ),
+      ],
     );
   }
 }
@@ -179,65 +127,45 @@ class CircleYellow extends StatelessWidget {
 class TopWaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    // This is where we decide what part of our image is going to be visible.
-    var path = Path();
+    final path = Path();
     path.lineTo(0.0, size.height);
 
-    var firstControlPoint = new Offset(size.width / 7, size.height - 30);
-    var firstEndPoint = new Offset(size.width / 6, size.height / 1.5);
+    final firstControlPoint = Offset(size.width / 7, size.height - 30);
+    final firstEndPoint = Offset(size.width / 6, size.height / 1.5);
 
-    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
-        firstEndPoint.dx, firstEndPoint.dy);
+    path.quadraticBezierTo(
+      firstControlPoint.dx,
+      firstControlPoint.dy,
+      firstEndPoint.dx,
+      firstEndPoint.dy,
+    );
 
-    var secondControlPoint = Offset(size.width / 5, size.height / 4);
-    var secondEndPoint = Offset(size.width / 1.5, size.height / 5);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
-        secondEndPoint.dx, secondEndPoint.dy);
+    final secondControlPoint = Offset(size.width / 5, size.height / 4);
+    final secondEndPoint = Offset(size.width / 1.5, size.height / 5);
 
-    var thirdControlPoint =
-    Offset(size.width - (size.width / 9), size.height / 6);
-    var thirdEndPoint = Offset(size.width, 0.0);
-    path.quadraticBezierTo(thirdControlPoint.dx, thirdControlPoint.dy,
-        thirdEndPoint.dx, thirdEndPoint.dy);
+    path.quadraticBezierTo(
+      secondControlPoint.dx,
+      secondControlPoint.dy,
+      secondEndPoint.dx,
+      secondEndPoint.dy,
+    );
 
-    ///move from bottom right to top
+    final thirdControlPoint = Offset(size.width - (size.width / 9), size.height / 6);
+    final thirdEndPoint = Offset(size.width, 0.0);
+
+    path.quadraticBezierTo(
+      thirdControlPoint.dx,
+      thirdControlPoint.dy,
+      thirdEndPoint.dx,
+      thirdEndPoint.dy,
+    );
+
     path.lineTo(size.width, 0.0);
-
-    ///finally close the path by reaching start point from top right corner
     path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-class FooterWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    path.moveTo(size.width, 0.0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0.0, size.height);
-    path.lineTo(0.0, size.height - 60);
-    var secondControlPoint = Offset(size.width - (size.width / 6), size.height);
-    var secondEndPoint = Offset(size.width, 0.0);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
-        secondEndPoint.dx, secondEndPoint.dy);
 
     return path;
   }
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-class YellowCircleClipper extends CustomClipper<Rect?> {
-  @override
-  Rect? getClip(Size? size) {
-    return null;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Rect> oldClipper) => false;
 }

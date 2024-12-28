@@ -9,7 +9,7 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text("Do you want to create alert ?",
+      title: Text("Do you want to create Report Incident?",
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 15,
@@ -23,19 +23,23 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
 
             children: [
-              ButtonWidget(
-                text : "No",
-                onPressed: ()=> Navigator.pop(context),),
+              Flexible(
+                child: ButtonWidget(
+                  text : "No",
+                  onPressed: ()=> Navigator.pop(context),),
+              ),
               SizedBox(width: 12,),
-              ButtonWidget(
-                text : "Yes",
-                onPressed: (){
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (buildContext) => const CreateAlertFormView()),
-                  );
-                },),
+              Flexible(
+                child: ButtonWidget(
+                  text : "Yes",
+                  onPressed: (){
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (buildContext) => const CreateAlertFormView()),
+                    );
+                  },),
+              ),
             ],
           ),
         ],

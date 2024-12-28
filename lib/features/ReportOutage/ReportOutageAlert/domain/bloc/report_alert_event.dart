@@ -193,6 +193,7 @@ class SelectConsumerGISValueEvent extends ReportAlertEvent {
   List<Object> get props => [context, gasConsumerGISId];
 }
 
+
 class SelectCheckBoxConsumerGisEvent extends ReportAlertEvent {
   final BuildContext context;
   final bool checkBoxConsumer;
@@ -200,4 +201,20 @@ class SelectCheckBoxConsumerGisEvent extends ReportAlertEvent {
   @override
   // TODO: implement props
   List<Object> get props => [context, checkBoxConsumer];
+}
+
+class OnCameraMoveEvent extends ReportAlertEvent {
+  final BuildContext context;
+  OnCameraMoveEvent({required this.context,});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context,];
+}
+
+class ResetFilterEvent extends ReportAlertEvent {
+  final BuildContext context;
+  ResetFilterEvent({required this.context});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context];
 }

@@ -2,7 +2,7 @@
 
 class AppString {
   static double  zoom = 15;
-  static String version = "Version : Outage-1.28.11.24";
+  static String version = "Version : Outage-1.28.12.24";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";
@@ -44,15 +44,15 @@ class AppString {
   static const String incidentIndication = 'Incident Indication';
   static const String chargeArea = 'Charge Area';
   static const String area = 'Area';
-  static const String gasTfGis = 'Gas TF GIS';
-  static const String gasValveGIS = 'Gas Valve GIS';
-  static const String gasRegulatorGIS = 'Gas Regulator GIS';
-  static const String gasTeeGIS = 'Gas Tee GIS';
-  static const String gasElbowGIS = 'Gas Elbow GIS';
-  static const String gasCouplerGIS = 'Gas Coupler GIS';
-  static const String gasReducerGIS = 'Gas Reducer GIS';
-  static const String gasEndCapGIS = 'Gas End Cap GIS';
-  static const String gasConsumerGIS = 'Gas Consumer GIS';
+  static const String gasTfGis = 'TF';
+  static const String gasValveGIS = 'Valve';
+  static const String gasRegulatorGIS = 'Regulator';
+  static const String gasTeeGIS = 'Tee';
+  static const String gasElbowGIS = 'Elbow';
+  static const String gasCouplerGIS = 'Coupler';
+  static const String gasReducerGIS = 'Reducer';
+  static const String gasEndCapGIS = 'End Cap';
+  static const String gasConsumerGIS = 'Consumer';
   static const String controlRoom = 'Control Room';
   static const String description = 'Description';
   static const String remarks = 'Remarks';
@@ -62,8 +62,8 @@ class AppString {
   static const String meterNumber = 'Meter Number';
   static const String assets = 'Assets';
   static const String assetTypeId = 'Assets Type Id';
-  static const String gasTfGisId = 'Gas TF GIS Id';
-  static const String gasValveGisId = 'Gas Valve GIS Id';
+  static const String gasTfGisId = 'TF Id';
+  static const String gasValveGisId = 'Valve Id';
   static const String location = 'Location';
   static const String securityGuardName = 'Security Guard Name';
   static const String securityGuardId = 'Security Guard ID';

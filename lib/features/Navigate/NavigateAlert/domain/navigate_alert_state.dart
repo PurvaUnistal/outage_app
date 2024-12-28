@@ -73,7 +73,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final Set<Marker> markersPointList;
   final LatLng currentPosition;
   final LatLng loginPosition;
-  final Set<Polyline> polylineList;
+  final Set<Polyline> polylinePointList;
 
 
   final GetPipelineNetworkModel pipelineNetworkModel;
@@ -128,7 +128,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.markersPointList,
     required this.currentPosition,
     required this.loginPosition,
-    required this.polylineList,
+    required this.polylinePointList,
 
     required this.pipelineNetworkModel,
     required this.pipelineNetworkData,
@@ -189,7 +189,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     markersPointList,
     currentPosition,
     loginPosition,
-    polylineList,
+    polylinePointList,
     pipelineNetworkModel,
     pipelineNetworkData,
     listOfPipelineNetwork,

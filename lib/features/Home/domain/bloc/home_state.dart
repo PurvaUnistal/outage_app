@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:igl_outage_app/features/Login/domain/model/login_model.dart';
 
 abstract class HomeState extends Equatable {}
@@ -20,6 +21,9 @@ class FetchHomeDataState extends HomeState {
   final String userName;
   final String role;
   final String baseUrl;
+  final List<String> paths;
+  final List<String> iconText;
+  final List<Widget> navigatorView;
   final List<Accessright> listOFAccessRight;
 
 
@@ -27,9 +31,12 @@ class FetchHomeDataState extends HomeState {
     required this.isLoader,
     required this.scheme,
     required this.baseUrl,
-    required this.listOFAccessRight,
     required this.userName,
     required this.role,
+    required this.paths,
+    required this.iconText,
+    required this.navigatorView,
+    required this.listOFAccessRight,
   });
   @override
   List<Object> get props => [
@@ -38,6 +45,9 @@ class FetchHomeDataState extends HomeState {
     userName,
     role,
     baseUrl,
+    paths,
+    iconText,
+    navigatorView,
     listOFAccessRight,
   ];
 }

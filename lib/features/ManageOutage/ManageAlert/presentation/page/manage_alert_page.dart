@@ -64,40 +64,37 @@ class _ManageAlertViewState extends State<ManageAlertView>
   }
 
   Widget _itemBuilder({required FetchManageAlertDataState dataState}) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBarWidget(
-          title: AppString.manageAlert,
-          boolLeading: true,
-          actions: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dataState.userName,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                ),
-                Text(
-                  dataState.scheme,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                )
-              ],
-            ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
+    return Scaffold(
+      appBar: AppBarWidget(
+        title: AppString.manageAlert,
+        boolLeading: true,
+        actions: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _searchPriorityController(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              _tabControllerWidget(dataState: dataState),
+              Text(
+                dataState.userName,
+                textAlign: TextAlign.start,
+                style: Styles.rel,
+              ),
+              Text(
+                dataState.scheme,
+                textAlign: TextAlign.start,
+                style: Styles.rel,
+              )
             ],
           ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            _searchPriorityController(dataState: dataState),
+            CommonStyle.vertical(context: context),
+            _tabControllerWidget(dataState: dataState),
+          ],
         ),
       ),
     );

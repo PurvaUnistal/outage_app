@@ -47,37 +47,34 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
   }
 
   Widget _itemBuilder({required FetchMaintenanceAlertDataState dataState}) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBarWidget(
-          title: AppString.maintenanceAlert,
-          boolLeading: true,
-          actions: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dataState.userName,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                ),
-                Text(
-                  dataState.scheme,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                )
-              ],
-            ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 15),
-          child: Center(
-            child: Text("No data founds", style: Styles.labels,),
-          )
-        ),
+    return Scaffold(
+      appBar: AppBarWidget(
+        title: AppString.maintenanceAlert,
+        boolLeading: true,
+        actions: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                dataState.userName,
+                textAlign: TextAlign.start,
+                style: Styles.rel,
+              ),
+              Text(
+                dataState.scheme,
+                textAlign: TextAlign.start,
+                style: Styles.rel,
+              )
+            ],
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 15),
+        child: Center(
+          child: Text("No data founds", style: Styles.labels,),
+        )
       ),
     );
   }

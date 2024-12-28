@@ -33,6 +33,7 @@ class LegendPopWidget extends StatelessWidget {
                   _row(name: AppString.gasCouplerGIS,path: AssetPath.coupler),
                   _row(name: AppString.gasReducerGIS,path: AssetPath.reduce),
                   _row(name: AppString.gasEndCapGIS,path: AssetPath.endcap),*/
+                  SizedBox(height: 16.0),
                   _closeBtn(),
                   SizedBox(height: 16.0),
                 ],
@@ -58,10 +59,11 @@ class LegendPopWidget extends StatelessWidget {
     );
   }
   Widget _closeBtn(){
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Align(
-        alignment: Alignment.bottomRight,
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Container(
+        padding: EdgeInsets.only(right: 10),
+        width: MediaQuery.of(mContext).size.width * 0.4,
         child: ButtonWidget(onPressed: (){
           Navigator.pop(mContext, true);
         }, text: "Close"),

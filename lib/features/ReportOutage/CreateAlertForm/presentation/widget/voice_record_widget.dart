@@ -1,109 +1,122 @@
-// import 'dart:io';
-//
-// import 'package:flutter/foundation.dart';
-// import 'package:flutter/material.dart';
-// import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
-// import 'package:igl_outage_app/Utils/common_widgets/text_widget.dart';
-// import 'package:igl_outage_app/Utils/common_widgets/voideRecord/platform/audio_player.dart';
-// import 'package:igl_outage_app/Utils/common_widgets/voideRecord/platform/audio_recorder.dart';
-//
-// class VoiceRecordWidget extends StatefulWidget {
-//   const VoiceRecordWidget({super.key});
-//
-//   @override
-//   State<VoiceRecordWidget> createState() => _VoiceRecordWidgetState();
-// }
-//
-// class _VoiceRecordWidgetState extends State<VoiceRecordWidget> {
-//   bool showPlayer = false;
-//   String? audioPath;
-//
-//   @override
-//   void initState() {
-//     showPlayer = false;
-//     super.initState();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     double size =  MediaQuery.of(context).size.height - MediaQuery.of(context).size.width;
-//     return  MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: Scaffold(
-//         body: Column(
-//           children: [
-//             showPlayer == false ?
-//             Align(
-//               alignment: Alignment.centerRight,
-//               child: IconButton(
-//                   onPressed: () async {
-//                     if(audioPath != null){
-//                       if(audioPath.toString().isNotEmpty){
-//                         final file = File(audioPath.toString());
-//                         if (await file.exists()) {
-//                           file.delete();
-//                         }
-//                       }
-//                     }
-//                     Navigator.pop(!context.mounted? context : context);
-//                   }, icon: Icon(Icons.close, color: AppColor.primer,)),
-//             ) : const SizedBox.shrink(),
-//
-//             Expanded(
-//               child: Center(
-//                 child: showPlayer
-//                     ? Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: 25),
-//                   child: AudioPlayer(
-//                     source: audioPath!,
-//                     onDelete: () {
-//                       setState(() => showPlayer = false);
-//                     },
-//                   ),
-//                 )
-//                     : Recorder(
-//                   onStop: (path) {
-//                     if (kDebugMode) print('Recorded file path: $path');
-//                     setState(() {
-//                       audioPath = path;
-//                       showPlayer = true;
-//                     });
-//                   },
-//                 ),
-//               ),
-//             ),
-//             showPlayer ?
-//             _actionButton()
-//                 : const SizedBox.shrink(),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _actionButton() {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//       children: [
-//         TextButton(onPressed: () async {
-//           if(audioPath != null){
-//             if(audioPath.toString().isNotEmpty){
-//               final file = File(audioPath.toString());
-//               if (await file.exists()) {
-//                 file.delete();
-//               }
-//             }
-//           }
-//           Navigator.pop(!context.mounted? context : context);
-//         }, child: Text(
-//           "Cancel", )),
-//
-//         IconButton(
-//             onPressed: () {
-//               Navigator.pop(context, audioPath.toString());
-//             }, icon: Icon(Icons.done, color: AppColor.primer,)),
-//       ],
-//     );
-//   }
-//
-// }
+import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+class VoiceRecordWidget extends StatefulWidget {
+  @override
+  _VoiceRecordWidgetState createState() => _VoiceRecordWidgetState();
+}
+
+class _VoiceRecordWidgetState extends State<VoiceRecordWidget> {
+  final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
+  final FlutterSoundPlayer _player = FlutterSoundPlayer();
+  bool _isRecording = false;
+  bool _isPlaying = false;
+  String? _audioPath;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeRecorder();
+    _player.openPlayer();
+  }
+
+  Future<void> _initializeRecorder() async {
+    final status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException("Microphone permission not granted");
+    }
+    await _recorder.openRecorder();
+  }
+
+  Future<void> _startRecording() async {
+    _audioPath = "audio_${DateTime.now().millisecondsSinceEpoch}.aac";
+    await _recorder.startRecorder(toFile: _audioPath);
+    setState(() => _isRecording = true);
+  }
+
+  Future<void> _stopRecording() async {
+    await _recorder.stopRecorder();
+    setState(() => _isRecording = false);
+  }
+
+  Future<void> _playAudio() async {
+    if (_audioPath?.isEmpty ?? true) return;
+    try {
+      await _player.startPlayer(
+        fromURI: _audioPath,
+        codec: Codec.aacADTS,
+      );
+      setState(() => _isPlaying = true);
+      /*  _player.startPlayerCompleted.listen((_) {
+        if (mounted) {
+          setState(() => _isPlaying = false);
+        }
+      });*/
+    } catch (e) {
+      print("Error playing audio: $e");
+    }
+  }
+
+  Future<void> _stopAudio() async {
+    await _player.stopPlayer();
+    setState(() => _isPlaying = false);
+  }
+
+  @override
+  void dispose() {
+    _recorder.closeRecorder();
+    _player.closePlayer();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                  onPressed: _isRecording ? _stopRecording : _startRecording,
+                  icon: _isRecording
+                      ? Icon(Icons.stop_circle_outlined)
+                      : Icon(
+                          Icons.play_circle_outline_outlined,
+                          color: AppColor.primer,
+                        )),
+              Text(
+                _isRecording ? "Stop Recording" : "Start Recording",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.primer,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ],
+          ),
+          _isRecording == false ? Container() : Row(
+            children: [
+              IconButton(
+                onPressed: _isPlaying ? _stopAudio : _playAudio,
+                icon: Icon(Icons.play_circle_outline_outlined, color: AppColor.primer,)
+              ),
+              Text(
+                _isPlaying ? "Stop Audio" : "Play Audio",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.primer,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

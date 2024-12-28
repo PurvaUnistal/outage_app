@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import '../model/GetAssetModel.dart';
 import '../model/GetIncidentIndicationModel.dart';
 
@@ -40,8 +40,8 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final GetAssetData assetValue;
   final List<GetAssetData> listOfAsset;
 
-  final TfGisData tfGisValue;
-  final List<TfGisData> listOfTfGis;
+  final GasGisData tfGisValue;
+  final List<GasGisData> listOfTfGis;
 
   final TextEditingController assetTypeIdController;
   final TextEditingController assetIdController;
@@ -114,7 +114,7 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
         tfGisIdController,
         valveGisIdController,
         assetIdController,
-    assetTypeIdController,
+        assetTypeIdController,
         markerLatitudeController,
         markerLongitudeController,
         currentLatitudeController,

@@ -10,7 +10,7 @@ class ButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-    //  width: MediaQuery.of(context).size.width  / 0.2,
+      width: MediaQuery.of(context).size.width  / 0.2,
     //  margin: EdgeInsets.symmetric(horizontal: 80),
       child: ElevatedButton(
         style: ButtonStyle(

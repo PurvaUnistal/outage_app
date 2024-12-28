@@ -1,17 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/common_style.dart';
-import 'package:igl_outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/dropdown_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/image_pop_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/image_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:igl_outage_app/Utils/common_widgets/row_widget.dart';
@@ -21,8 +21,9 @@ import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentIndicationModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 
+import 'widget/voice_record_widget.dart';
 
 class CreateAlertFormView extends StatefulWidget {
   const CreateAlertFormView({super.key});
@@ -34,7 +35,8 @@ class CreateAlertFormView extends StatefulWidget {
 class _CreateAlertFormViewState extends State<CreateAlertFormView> {
   @override
   void initState() {
-    BlocProvider.of<CreateAlertFormBloc>(context).add(CreateAlertFormLoadEvent(context: context));
+    BlocProvider.of<CreateAlertFormBloc>(context)
+        .add(CreateAlertFormLoadEvent(context: context));
     super.initState();
   }
 
@@ -44,7 +46,7 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
       child: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
         builder: (context, state) {
           if (state is FetchCreateAlertFormDataState) {
-            return  _itemBuilder(dataState: state);
+            return _itemBuilder(dataState: state);
           } else {
             return const Center(child: SpinLoader());
           }
@@ -52,11 +54,14 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
       ),
     );
   }
+
   Future<bool> _onWillPop() async {
     return (await showDialog(
-        context: context,
-        builder: (BuildContext mContext) =>
-            MessageBoxTwoButtonPopWidget(message: "Do you want to Create Alert Form?", okButtonText: "Exit", onPressed: () => Navigator.of(context).pop(true)))) ??
+            context: context,
+            builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
+                message: "Do you want to Create Alert Form?",
+                okButtonText: "Exit",
+                onPressed: () => Navigator.of(context).pop(true)))) ??
         false;
   }
 
@@ -87,16 +92,15 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
           child: ListView(
             children: [
               CommonStyle.vertical(context: context),
               RowWidget(
                   widget1: _currentLatController(dataState: dataState),
-                  widget2: _currentLongController(dataState: dataState)
-              ),
+                  widget2: _currentLongController(dataState: dataState)),
               CommonStyle.vertical(context: context),
-            /*  _tfValveIdController(dataState: dataState),
+              /*  _tfValveIdController(dataState: dataState),
               CommonStyle.vertical(context: context),*/
               _incidentTypeDropdown(dataState: dataState),
               CommonStyle.vertical(context: context),
@@ -126,74 +130,92 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
       ),
     );
   }
-  Widget _tfValveIdController({required FetchCreateAlertFormDataState dataState}){
+
+  Widget _tfValveIdController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
         star: AppString.star,
-        label: dataState.tfGisIdController.text == ""? AppString.gasValveGisId:AppString.gasTfGisId,
-        hintText: dataState.tfGisIdController.text == "" ? AppString.gasValveGisId: AppString.gasTfGisId,
+        label: dataState.tfGisIdController.text == ""
+            ? AppString.gasValveGisId
+            : AppString.gasTfGisId,
+        hintText: dataState.tfGisIdController.text == ""
+            ? AppString.gasValveGisId
+            : AppString.gasTfGisId,
         enabled: false,
-        controller:dataState.tfGisIdController.text == "" ? dataState.valveGisIdController : dataState.tfGisIdController
-    );
+        controller: dataState.tfGisIdController.text == ""
+            ? dataState.valveGisIdController
+            : dataState.tfGisIdController);
   }
-  Widget _currentLatController({required FetchCreateAlertFormDataState dataState}){
+
+  Widget _currentLatController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
         star: AppString.star,
         label: AppString.currentLat,
         hintText: AppString.currentLat,
         enabled: true,
-        controller:dataState.currentLatitudeController
-    );
+        controller: dataState.currentLatitudeController);
   }
-  Widget _currentLongController({required FetchCreateAlertFormDataState dataState}){
+
+  Widget _currentLongController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
         star: AppString.star,
         label: AppString.currentLong,
         hintText: AppString.currentLong,
         enabled: true,
-        controller:dataState.currentLongitudeController
-    );
+        controller: dataState.currentLongitudeController);
   }
 
-  Widget _incidentTypeDropdown({required FetchCreateAlertFormDataState dataState}) {
+  Widget _incidentTypeDropdown(
+      {required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetIncidentTypeData>(
       star: AppString.star,
       label: AppString.incidentType,
       hint: AppString.incidentType,
-      dropdownValue: dataState.incidentTypeValue.id == null ? null : dataState.incidentTypeValue,
+      dropdownValue: dataState.incidentTypeValue.id == null
+          ? null
+          : dataState.incidentTypeValue,
       items: dataState.listOfIncidentType,
       onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectIncidentTypeValueEvent(incidentTypeValue: val!,context: context));
+        BlocProvider.of<CreateAlertFormBloc>(context).add(
+            SelectIncidentTypeValueEvent(
+                incidentTypeValue: val!, context: context));
       },
     );
   }
-  Widget _incidentIndicationDropdown({required FetchCreateAlertFormDataState dataState}) {
+
+  Widget _incidentIndicationDropdown(
+      {required FetchCreateAlertFormDataState dataState}) {
     return DropdownWidget<GetIncidentIndicationData>(
       star: AppString.star,
       label: AppString.incidentIndication,
       hint: AppString.incidentIndication,
-      dropdownValue: dataState.incidentIndicationValue.id == null ? null : dataState.incidentIndicationValue,
+      dropdownValue: dataState.incidentIndicationValue.id == null
+          ? null
+          : dataState.incidentIndicationValue,
       items: dataState.listOfIncidentIndication,
       onChanged: (val) {
-        BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectIncidentIndicationValueEvent(incidentIndicationValue: val!,context: context));
+        BlocProvider.of<CreateAlertFormBloc>(context).add(
+            SelectIncidentIndicationValueEvent(
+                incidentIndicationValue: val!, context: context));
       },
     );
   }
 
-  Widget _assetIdController({required FetchCreateAlertFormDataState dataState}) {
-    return  TextFieldWidget(
+  Widget _assetIdController(
+      {required FetchCreateAlertFormDataState dataState}) {
+    return TextFieldWidget(
         star: AppString.star,
         label: AppString.assets,
         hintText: AppString.assets,
         enabled: false,
-        controller:dataState.assetIdController
-    );
+        controller: dataState.assetIdController);
   }
 
-  Widget _assetTypeIdController({required FetchCreateAlertFormDataState dataState}) {
+  Widget _assetTypeIdController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
-      prefixIcon: Icon(Icons.location_on, color: Colors.cyanAccent,),
       label: AppString.assetTypeId,
       hintText: AppString.assetTypeId,
       enabled: false,
@@ -201,64 +223,60 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
     );
   }
 
-  Widget _assetTypeIdDropdown({required FetchCreateAlertFormDataState dataState}) {
-    return DropdownWidget<TfGisData>(
+  Widget _assetTypeIdDropdown(
+      {required FetchCreateAlertFormDataState dataState}) {
+    return DropdownWidget<GasGisData>(
       star: AppString.star,
       label: AppString.assetTypeId,
       hint: AppString.assetTypeId,
-      dropdownValue: dataState.tfGisValue.id == null ? null : dataState.tfGisValue,
+      dropdownValue:
+          dataState.tfGisValue.id == null ? null : dataState.tfGisValue,
       items: dataState.listOfTfGis,
       onChanged: (val) {
         BlocProvider.of<CreateAlertFormBloc>(context)
-            .add(SelectTfGisValueEvent(tfGisValue: val!,context: context));
+            .add(SelectTfGisValueEvent(tfGisValue: val!, context: context));
       },
     );
   }
 
-  Widget _addressController({required FetchCreateAlertFormDataState dataState}) {
+  Widget _addressController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
         star: AppString.star,
         label: AppString.address,
         hintText: AppString.address,
-        controller:dataState.addressController
-    );
+        controller: dataState.addressController);
   }
 
-
-
-  Widget _landmarkController({required FetchCreateAlertFormDataState dataState}) {
+  Widget _landmarkController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
         star: AppString.star,
         label: AppString.landmark,
         hintText: AppString.landmark,
-        controller:dataState.landmarkController
-    );
+        controller: dataState.landmarkController);
   }
 
-
-
-
-  Widget _descriptionController({required FetchCreateAlertFormDataState dataState}) {
+  Widget _descriptionController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
-      //   star: AppString.star,
+        //   star: AppString.star,
         label: AppString.description,
         hintText: AppString.description,
-        controller:dataState.descriptionController
-    );
+        controller: dataState.descriptionController);
   }
 
-  Widget _remarksController({required FetchCreateAlertFormDataState dataState}) {
+  Widget _remarksController(
+      {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
-      //   star: AppString.star,
+        //   star: AppString.star,
         label: AppString.remarks,
         hintText: AppString.remarks,
-        controller:dataState.remarksController
-    );
+        controller: dataState.remarksController);
   }
 
-  Widget _image({required FetchCreateAlertFormDataState dataState}){
+  Widget _image({required FetchCreateAlertFormDataState dataState}) {
     return Row(
-
       children: [
         ImageWidget(
           star: AppString.star,
@@ -273,49 +291,57 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
                   return ImagePopWidget(
                     onTapCamera: () async {
                       Navigator.of(context).pop();
-                      BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureCameraPhotoEvent());
+                      BlocProvider.of<CreateAlertFormBloc>(context)
+                          .add(CaptureCameraPhotoEvent());
                     },
                     onTapGallery: () async {
                       Navigator.of(context).pop();
-                      BlocProvider.of<CreateAlertFormBloc>(context).add(CaptureGalleryPhotoEvent());
+                      BlocProvider.of<CreateAlertFormBloc>(context)
+                          .add(CaptureGalleryPhotoEvent());
                     },
                   );
                 });
           },
         ),
-        SizedBox(width: 12,),
-       /* IconButton(
+        SizedBox(
+          width: 12,
+        ),
+        IconButton(
           onPressed: () async {
-            double size =  MediaQuery.of(!context.mounted ? context : context).size.height
-                - MediaQuery.of(!context.mounted ? context : context).size.width;
+            double size = MediaQuery.of(!context.mounted ? context : context)
+                    .size
+                    .height -
+                MediaQuery.of(!context.mounted ? context : context).size.width;
             var res = await showCupertinoModalPopup<dynamic>(
-              context: !context.mounted ? context : context,
-              builder: (BuildContext context) => Container(
-                height: size * 0.70,
-                padding: const EdgeInsets.only(top: 6.0),
-                margin: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                ),
-                child: const SafeArea(
-                  top: false,
-                  child: VoiceRecordWidget(),
-                ),
-              ),
-            );
-            if(res != null){
-              BlocProvider.of<CreateAlertFormBloc>(!context.mounted ? context : context,)
-                  .add(SelectAudioEvent(audioPath: res.toString()));
-            }
-          }, icon: Icon(Icons.mic, color: dataState.audioRecordFile.path.isNotEmpty ? AppColor.primer :AppColor.grey,),
+                context: !context.mounted ? context : context,
+                builder: (BuildContext context) {
+                  return Container(
+                    height: size * 0.70,
+                    padding: const EdgeInsets.only(top: 6.0),
+                    margin: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: SafeArea(
+                      top: false,
+                      child: VoiceRecordWidget(),
+                    ),
+                  );
+                });
+            if (res != null) {}
+          },
+          icon: Icon(
+            Icons.mic,
+            color: AppColor.white,
+          ),
           style: IconButton.styleFrom(backgroundColor: AppColor.primer),
-        ),*/
-      /*  CircleAvatar(
-            backgroundColor: AppColor.primer,
-            child: Center(child: IconButton(onPressed: (){}, icon: Icon(Icons.mic,color: AppColor.white,size: 18,))))*/
+        ),
       ],
     );
   }
@@ -323,10 +349,11 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
   Widget _button({required FetchCreateAlertFormDataState dataState}) {
     return dataState.isBtnLoader == false
         ? ButtonWidget(
-        text: AppString.submit,
-        onPressed: () {
-          BlocProvider.of<CreateAlertFormBloc>(context).add(SubmitAddIncidentBtnEvent(context: context));
-        })
+            text: AppString.submit,
+            onPressed: () {
+              BlocProvider.of<CreateAlertFormBloc>(context)
+                  .add(SubmitAddIncidentBtnEvent(context: context));
+            })
         : DottedLoaderWidget();
   }
 }

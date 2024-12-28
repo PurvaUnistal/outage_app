@@ -14,7 +14,7 @@ import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/mode
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentIndicationModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/helper/create_alert_form_helper.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/preference_utils.dart';
@@ -42,6 +42,7 @@ class CreateAlertFormBloc
   String userName = '';
   String baseUrl = '';
   String assetId = '';
+  String locationSource = '';
 
   TextEditingController assetIdController = TextEditingController();
   TextEditingController assetTypeIdController = TextEditingController();
@@ -72,11 +73,11 @@ class CreateAlertFormBloc
   List<GetAssetData> listOfAsset = [];
   List<GetAssetData> listOfFilterAsset = [];
 
-  TfGisData tfGisValue = TfGisData();
-  List<TfGisData> listOfTfGis = [];
+  GasGisData tfGisValue = GasGisData();
+  List<GasGisData> listOfTfGis = [];
 
-  TfGisData valveGisValue = TfGisData();
-  List<TfGisData> listOfValveGis = [];
+  GasGisData valveGisValue = GasGisData();
+  List<GasGisData> listOfValveGis = [];
 
   _pageLoad(CreateAlertFormLoadEvent event, emit) async {
     emit(CreateAlertFormInitialState());
@@ -84,6 +85,7 @@ class CreateAlertFormBloc
     audioRecordFile = File("");
     isLoader = false;
     isBtnLoader = false;
+    locationSource = "";
 
     incidentTypeModel = GetIncidentTypeModel();
     incidentTypeValue = GetIncidentTypeData();
@@ -98,10 +100,10 @@ class CreateAlertFormBloc
     listOfAsset = [];
     listOfFilterAsset = [];
 
-    tfGisValue = TfGisData();
+    tfGisValue = GasGisData();
     listOfTfGis = [];
 
-    valveGisValue = TfGisData();
+    valveGisValue = GasGisData();
     listOfValveGis = [];
 
     assetTypeIdController.text = "";
@@ -167,7 +169,7 @@ class CreateAlertFormBloc
     }
   }
 
-  _fetchAssetLocationSourceApi({
+  Future _fetchAssetLocationSourceApi({
     required BuildContext context,
   }) async {
     var res = await CreateAlertFormHelper.getAssetLocationSourceApi(
@@ -177,15 +179,28 @@ class CreateAlertFormBloc
       assetModel = res;
       if (assetModel.data != null) {
         listOfAsset = assetModel.data!;
-        for (var assetIdData in listOfAsset)
-          if (assetId == assetIdData.id) {
-            listOfFilterAsset.add(assetIdData);
+        print("assetId--->$assetId");
+        print("assetTypeIdController--->$assetTypeIdController.text");
+        if(assetId != ''){
+          listOfFilterAsset = listOfAsset.where((assetIdData) => assetId == assetIdData.id).toList();
+          if (listOfFilterAsset.isNotEmpty) {
             assetIdController.text = listOfFilterAsset[0].assetName!;
+            locationSource = "1";
+          }else if(assetId == "0"){
+            assetIdController.text = "Consumer";
+            locationSource = "2";
+          }else{
+            assetIdController.text = "";
           }
+        }else{
+          assetIdController.text = "";
+          assetTypeIdController.text = "";
+        }
         return res;
       }
     }
   }
+
 
   _selectIncidentTypeValue(SelectIncidentTypeValueEvent event, emit) {
     incidentTypeValue = event.incidentTypeValue;
@@ -249,8 +264,10 @@ class CreateAlertFormBloc
           context: event.context,
           incidentType: incidentTypeValue,
           incidentIndication: incidentIndicationValue,
-          assetId: assetIdController.text.trim().toString(),
-          assetInternalId: assetId.toString(),
+          locationSource: locationSource,
+          customeId: locationSource == "2" ? assetTypeIdController.text.trim().toString() : "",
+          assetTypeId: assetId.toString(),
+          assetInternalId: locationSource == "1" ? assetTypeIdController.text.trim().toString() : "",
           address: addressController.text.trim().toString(),
           landmark: landmarkController.text.trim().toString(),
           photo: photo,

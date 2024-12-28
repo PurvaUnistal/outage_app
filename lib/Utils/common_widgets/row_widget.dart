@@ -13,6 +13,7 @@ class RowWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(child: widget1),
+        CommonStyle.widthSpace(context: context),
         Flexible(child: widget2),
       ],
     );

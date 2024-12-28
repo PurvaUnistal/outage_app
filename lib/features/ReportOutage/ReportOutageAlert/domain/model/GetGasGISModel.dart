@@ -7,28 +7,28 @@ import 'package:hive/hive.dart';
 import 'package:igl_outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
 
 
-GetTfGisModel getTfGisModelFromJson(String str) => GetTfGisModel.fromJson(json.decode(str));
+GetGasGisModel getTfGisModelFromJson(String str) => GetGasGisModel.fromJson(json.decode(str));
 
-String getTfGisModelToJson(GetTfGisModel data) => json.encode(data.toJson());
+String getTfGisModelToJson(GetGasGisModel data) => json.encode(data.toJson());
 
-class GetTfGisModel {
+class GetGasGisModel {
   int? success;
   bool? error;
   String? assetId;
-  List<TfGisData>? data;
+  List<GasGisData>? data;
 
-  GetTfGisModel({
+  GetGasGisModel({
     this.success,
     this.error,
     this.assetId,
     this.data,
   });
 
-  factory GetTfGisModel.fromJson(Map<String, dynamic> json) => GetTfGisModel(
+  factory GetGasGisModel.fromJson(Map<String, dynamic> json) => GetGasGisModel(
     success: json["success"] ?? "",
     error: json["error"] ?? "",
     assetId: json["assetid"] ?? "",
-    data: json["data"] == null ? null : List<TfGisData>.from(json["data"].map((x) => TfGisData.fromJson(x))),
+    data: json["data"] == null ? null : List<GasGisData>.from(json["data"].map((x) => GasGisData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -39,27 +39,31 @@ class GetTfGisModel {
   };
 }
 
-class TfGisData {
+class GasGisData {
   String? id;
   String? latitude;
   String? longitude;
+  String? valveId;
 
-  TfGisData({
+  GasGisData({
     this.id,
     this.latitude,
     this.longitude,
+    this.valveId,
   });
 
-  factory TfGisData.fromJson(Map<String, dynamic> json) => TfGisData(
+  factory GasGisData.fromJson(Map<String, dynamic> json) => GasGisData(
     id: json["id"] ?? "",
     latitude: json["latitude"] ?? "",
     longitude: json["longitude"] ?? "",
+    valveId: json["valve_id"] ?? "",
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "latitude": latitude,
     "longitude": longitude,
+    "valve_id": valveId,
   };
   @override
   String toString() {

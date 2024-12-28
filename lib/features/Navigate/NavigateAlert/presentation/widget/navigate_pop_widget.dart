@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
@@ -38,17 +37,17 @@ class NavigatePopWidget extends StatelessWidget {
                   _valveWidget(dataState: state),
                   _regulatorWidget(dataState: state),
                   _consumerWidget(dataState: state),
-                  /*   _teeWidget(dataState: state),
-                  SizedBox(height: 16.0),
-                  _elbowWidget(dataState: state),
-                  SizedBox(height: 16.0),
-                  _couplerWidget(dataState: state),
-                  SizedBox(height: 16.0),
-                  _reducerWidget(dataState: state),
-                  SizedBox(height: 16.0),
-                  _endCapWidget(dataState: state),
-                  SizedBox(height: 16.0),*/
-                  _closeBtn(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+
+                      children: [
+                        Flexible(child: _resetBtn()),
+                        SizedBox(width : 12),
+                        Flexible(child: _closeBtn()),
+                      ],
+                    ),
+                  ),
                   CommonStyle.vertical(context: context),
                 ],
               ),
@@ -74,7 +73,7 @@ class NavigatePopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxTf,
-        activeColor: Colors.red,
+        activeColor: Colors.yellow.shade900,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxTFGisEvent(checkBoxTf: val!, context: mContext));
@@ -93,8 +92,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasTfGis,
         hintText: AppString.gasTfGis,
         enabled: dataState.checkBoxTf == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.tfGisController,
         suggestions: dataState.listOfTfGisId,
         onSelected: (val) {
@@ -111,7 +109,7 @@ class NavigatePopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxValve,
-        activeColor: Colors.purpleAccent,
+        activeColor: Colors.deepOrange,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxValveGisEvent(
@@ -131,8 +129,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasValveGIS,
         hintText: AppString.gasValveGIS,
         enabled: dataState.checkBoxValve == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasValveGISController,
         suggestions: dataState.listOfGasValveGISId,
         onSelected: (val) {
@@ -150,7 +147,7 @@ class NavigatePopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxRegulator,
-        activeColor: Colors.yellowAccent.shade400,
+        activeColor: Colors.yellowAccent.shade700,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxRegulatorGisEvent(
@@ -170,8 +167,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasRegulatorGIS,
         hintText: AppString.gasRegulatorGIS,
         enabled: dataState.checkBoxRegulator == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasRegulatorGISController,
         suggestions: dataState.listOfGasRegulatorGISId,
         onSelected: (val) {
@@ -189,7 +185,7 @@ class NavigatePopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxConsumer,
-        activeColor: Colors.orange.shade900,
+        activeColor: Colors.green,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckBoxConsumerGisEvent(
@@ -209,8 +205,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasConsumerGIS,
         hintText: AppString.gasConsumerGIS,
         enabled: dataState.checkBoxConsumer == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasConsumerGISController,
         suggestions: dataState.listOfGasConsumerGISId,
         onSelected: (val) {
@@ -243,8 +238,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasTeeGIS,
         hintText: AppString.gasTeeGIS,
         enabled: dataState.checkBoxTee == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasTeeGISController,
         suggestions: dataState.listOfGasTeeGISId,
         onSelected: (val) {
@@ -278,8 +272,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasElbowGIS,
         hintText: AppString.gasElbowGIS,
         enabled: dataState.checkBoxElbow == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasElbowGISController,
         suggestions: dataState.listOfGasElbowGISId,
         onSelected: (val) {
@@ -313,8 +306,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasCouplerGIS,
         hintText: AppString.gasCouplerGIS,
         enabled: dataState.checkBoxCoupler == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasCouplerGISController,
         suggestions: dataState.listOfGasCouplerGISId,
         onSelected: (val) {
@@ -348,8 +340,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasReducerGIS,
         hintText: AppString.gasReducerGIS,
         enabled: dataState.checkBoxReducer == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasReducerGISController,
         suggestions: dataState.listOfGasReducerGISId,
         onSelected: (val) {
@@ -383,8 +374,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasEndCapGIS,
         hintText: AppString.gasEndCapGIS,
         enabled: dataState.checkBoxEndCap == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        keyboardType: TextInputType.number,
+       
         controller: dataState.gasEndCapGISController,
         suggestions: dataState.listOfGasEndCapGISId,
         onSelected: (val) {
@@ -398,17 +388,21 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
+
   Widget _closeBtn() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Align(
-        alignment: Alignment.bottomRight,
-        child: ButtonWidget(
-            onPressed: () {
-              Navigator.pop(mContext, true);
-            },
-            text: "Close"),
-      ),
-    );
+    return ButtonWidget(
+        onPressed: () {
+          Navigator.pop(mContext, true);
+        },
+        text: "Close");
+  }
+
+  Widget _resetBtn() {
+    return ButtonWidget(
+        onPressed: () {
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
+              ResetFilterEvent(context: mContext));
+        },
+        text: "Reset");
   }
 }

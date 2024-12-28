@@ -3,7 +3,7 @@ import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_widget.d
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
-import 'package:igl_outage_app/features/Login/presentation/login_view.dart';
+import 'package:igl_outage_app/features/Login/presentation/page/login_page.dart';
 
 class LogoutWidget extends StatelessWidget {
   const LogoutWidget({super.key});
@@ -12,7 +12,7 @@ class LogoutWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 4.9,
+      height: MediaQuery.of(context).size.height / 3.9,
       margin: EdgeInsets.all(MediaQuery.of(context).size.height * 0.04),
       child: SingleChildScrollView(
         child: Column(
@@ -32,8 +32,8 @@ class LogoutWidget extends StatelessWidget {
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.04,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+            //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ButtonWidget(
                     text: AppString.logout,
@@ -41,11 +41,13 @@ class LogoutWidget extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const LoginView()),
+                              builder: (context) => const LoginPage()),
                           (route) => false);
                       await SharedPref.clearAll();
                     }),
-
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
                 ButtonWidget(
                     text: AppString.no,
                     onPressed: () {

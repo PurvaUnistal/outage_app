@@ -15,7 +15,7 @@ class BackgroundInfoWidget extends StatelessWidget {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 30.0),
+            padding: const EdgeInsets.only(bottom: 28.0),
             child: child,
           ),
           Positioned(
@@ -23,7 +23,11 @@ class BackgroundInfoWidget extends StatelessWidget {
               left: 0,
               right: 0,
               child: Container(
-                  decoration: BoxDecoration(color: AppColor.primer),
+                  decoration: BoxDecoration( gradient: LinearGradient(
+                    colors: [Colors.blue.shade800, Colors.blue.shade400],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(

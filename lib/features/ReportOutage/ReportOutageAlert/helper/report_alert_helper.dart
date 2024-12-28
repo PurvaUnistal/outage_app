@@ -6,10 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
-import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetTFGISModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/PipelineModel.dart';
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
@@ -75,7 +75,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getTFGisApi(
+  static Future<GetGasGisModel?> getTFGisApi(
       {required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
@@ -88,7 +88,7 @@ class ReportAlertHelper {
       var res = await ApiHelper.getData(
           urlEndPoint: Apis.getTFGis + json, context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -97,7 +97,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getGasValueGisApi(
+  static Future<GetGasGisModel?> getGasValueGisApi(
       {required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
@@ -110,7 +110,7 @@ class ReportAlertHelper {
       var res = await ApiHelper.getData(
           urlEndPoint: Apis.getGasValueGis + json, context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -119,7 +119,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getRegulatorGisApi(
+  static Future<GetGasGisModel?> getRegulatorGisApi(
       {required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
@@ -132,7 +132,7 @@ class ReportAlertHelper {
       var res = await ApiHelper.getData(
           urlEndPoint: Apis.getRegulatorGis + json, context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -141,7 +141,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getTeeGisApi(
+  static Future<GetGasGisModel?> getTeeGisApi(
       {required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
@@ -156,7 +156,7 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getNonControllableFittingGis + json,
           context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -165,7 +165,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getElbowGisApi(
+  static Future<GetGasGisModel?> getElbowGisApi(
       {required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
@@ -180,7 +180,7 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getNonControllableFittingGis + json,
           context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -189,7 +189,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getCouplerGisApi(
+  static Future<GetGasGisModel?> getCouplerGisApi(
       {required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
@@ -204,7 +204,7 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getNonControllableFittingGis + json,
           context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -213,7 +213,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getReducerGisApi(
+  static Future<GetGasGisModel?> getReducerGisApi(
       {required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
@@ -228,7 +228,7 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getNonControllableFittingGis + json,
           context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -237,7 +237,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getEndCapGisApi({required BuildContext context}) async {
+  static Future<GetGasGisModel?> getEndCapGisApi({required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
     try {
@@ -251,7 +251,7 @@ class ReportAlertHelper {
           urlEndPoint: Apis.getNonControllableFittingGis + json,
           context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -260,21 +260,22 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetTfGisModel?> getConsumerGisApi({required BuildContext context}) async {
+  static Future<GetGasGisModel?> getConsumerGisApi({required BuildContext context}) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String schema = await SharedPref.getString(key: PrefsValue.schema);
     try {
       Map<String, String> para = {
-        "type": "End Cap",
+        "schema": schema,
         "ga_id": gaId,
         "areas": areas,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getNonControllableFittingGis + json,
+          urlEndPoint: Apis.getConsumerGis + json,
           context: context);
       if (res != null) {
-        GetTfGisModel response = GetTfGisModel.fromJson(res);
+        GetGasGisModel response = GetGasGisModel.fromJson(res);
         return response;
       }
     } catch (e) {
@@ -311,12 +312,17 @@ class ReportAlertHelper {
 
   static Future<PipelineModel?> getPipelineApi({
     required BuildContext context,
+    required String latitude,
+    required String longitude,
   }) async {
     String gaId = await SharedPref.getString(key: PrefsValue.gaId);
     String areas = await SharedPref.getString(key: PrefsValue.areas);
     Map<String, String> para = {
       "ga_id": gaId,
       "areas": areas,
+      "latitude": latitude,
+      "longitude": longitude,
+      "buffer": "1.5",
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -368,8 +374,7 @@ class ReportAlertHelper {
           },
         ));
       }
-    } catch (_) {}
-    ;
+    } catch (_) {};
     return markersPointList;
   }
 
@@ -384,11 +389,14 @@ class ReportAlertHelper {
         polylineList.add(Polyline(
           polylineId: PolylineId(latlngList.toString()),
           visible: true,
-          width: 8,
+          width: 6,
           points: latlngList,
           color: color,
           jointType: JointType.bevel,
           onTap: () async {},
+           /* endCap: Cap.squareCap,
+            geodesic: false,
+            patterns: [PatternItem.dot, PatternItem.gap(10)]*/
         ));
       }
     } catch (_) {}
@@ -404,4 +412,46 @@ class ReportAlertHelper {
         .buffer
         .asUint8List();
   }
+
+  static Color getPolylineColor(int value) {
+    if (value < 0 || value > 50) {
+      return Colors.green;
+    } else if (value < 63 || value > 90) {
+      return Colors.red;
+    } else if (value < 100 || value > 140) {
+      return Colors.purple;
+    } else if (value < 150 || value > 200) {
+      return Colors.teal;
+    } else {
+      return Colors.blue.shade800;
+    }
+  }
+
+  static LatLngBounds calculateLatLngBounds(List<LatLng> points) {
+    assert(points.isNotEmpty, "The list of LatLng points cannot be empty.");
+    double? north;
+    double? south;
+    double? east;
+    double? west;
+    for (LatLng point in points) {
+      if (north == null || point.latitude > north) {
+        north = point.latitude;
+      }
+      if (south == null || point.latitude < south) {
+        south = point.latitude;
+      }
+      if (east == null || point.longitude > east) {
+        east = point.longitude;
+      }
+      if (west == null || point.longitude < west) {
+        west = point.longitude;
+      }
+    }
+    return LatLngBounds(
+      southwest: LatLng(south!, west!),
+      northeast: LatLng(north!, east!),
+    );
+  }
+
+
 }

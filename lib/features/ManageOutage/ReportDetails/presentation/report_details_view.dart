@@ -8,7 +8,6 @@ import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.d
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
-import 'package:igl_outage_app/Utils/common_widgets/row_widget.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_bloc.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_event.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_state.dart';
@@ -61,70 +60,67 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
 
   Widget _itemBuilder({required FetchReportDetailsDataState dataState}) {
     int incidentTypeActionSize = dataState.listOfIncidentTypeAction.length;
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBarWidget(
-          title: "Report",
-          boolLeading: true,
-          actions: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dataState.userName,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                ),
-                Text(
-                  dataState.scheme,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                )
-              ],
-            ),
-          ],
-        ),
-        body: incidentTypeActionSize == 0
-            ? Center(
-            child: Text(
-              "No records found",
-              style: Styles.labels,
-            ))
-            :  ListView.builder(
-            shrinkWrap: true,
-            itemCount: incidentTypeActionSize,
-            itemBuilder: (BuildContext context, int i) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColor.primer1),
-                        borderRadius: BorderRadius.all(Radius.circular(8))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          _nameWidget(dataState: dataState, i: i),
-                          _dividerWidget(dataState: dataState, i: i),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _actionWidget(
-                                  dataState: dataState,
-                                  i: i,
-                                  listSize: incidentTypeActionSize),
-                              _statusWidget(dataState: dataState, i: i),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )),
-              );
-            }),
+    return Scaffold(
+      appBar: AppBarWidget(
+        title: "Report",
+        boolLeading: true,
+        actions: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                dataState.userName,
+                textAlign: TextAlign.start,
+                style: Styles.rel,
+              ),
+              Text(
+                dataState.scheme,
+                textAlign: TextAlign.start,
+                style: Styles.rel,
+              )
+            ],
+          ),
+        ],
       ),
+      body: incidentTypeActionSize == 0
+          ? Center(
+          child: Text(
+            "No records found",
+            style: Styles.labels,
+          ))
+          :  ListView.builder(
+          shrinkWrap: true,
+          itemCount: incidentTypeActionSize,
+          itemBuilder: (BuildContext context, int i) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColor.primer),
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        _nameWidget(dataState: dataState, i: i),
+                        _dividerWidget(dataState: dataState, i: i),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _actionWidget(
+                                dataState: dataState,
+                                i: i,
+                                listSize: incidentTypeActionSize),
+                            _statusWidget(dataState: dataState, i: i),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )),
+            );
+          }),
     );
   }
 
@@ -208,7 +204,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                               dataState.currentActionStatus == "4"
                           ? DottedLoaderWidget()
                           : ButtonColorWidget(
-                              color: AppColor.primer,
+                              color: AppColor.primer1,
                               text: "Complete",
                               onTap: () {
                                 BlocProvider.of<ReportDetailsBloc>(context)
@@ -252,7 +248,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                         : dataState.listOfIncidentTypeAction[i].actionStatus ==
                                 "4"
                             ? ButtonColorWidget(
-                                color: AppColor.primer,
+                                color: AppColor.primer1,
                                 text: "Completed",
                                 onTap: () {})
                             : Container());
@@ -284,7 +280,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                         : dataState.listOfIncidentTypeAction[i].actionStatus ==
                                 "4"
                             ? ButtonBorderWidget(
-                                color: AppColor.primer,
+                                color: AppColor.primer1,
                                 text: "Completed",
                                 onTap: () {})
                             : Container());

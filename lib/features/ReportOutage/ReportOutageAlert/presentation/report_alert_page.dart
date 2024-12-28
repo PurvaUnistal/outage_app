@@ -57,55 +57,55 @@ class _ReportAlertViewState extends State<ReportAlertView> {
   }
 
   Widget _itemBuilder({required FetchReportAlertDataState dataState}) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-          appBar: _appBarWidget(dataState: dataState),
-          body: Stack(children: <Widget>[
-            _googleMapWidget(dataState: dataState),
-            dataState.isPipelineLoader == false
-                ? Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Column(
-                        children: [
-                          _mapTypeButtonWidget(dataState: dataState),
-                          SizedBox(height: 16.0),
-                          _legendButtonWidget(dataState: dataState),
-                          SizedBox(height: 16.0),
-                          _currentLocationButtonWidget(dataState: dataState),
-                          SizedBox(height: 16.0),
-                          _filterButtonWidget(dataState: dataState),
-                        ],
-                      ),
+    return Scaffold(
+        appBar: _appBarWidget(dataState: dataState),
+        body: Stack(children: <Widget>[
+          _googleMapWidget(dataState: dataState),
+          dataState.isPipelineLoader == false
+              ? Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Column(
+                      children: [
+                        _mapTypeButtonWidget(dataState: dataState),
+                        SizedBox(height: 16.0),
+                        _legendButtonWidget(dataState: dataState),
+                        SizedBox(height: 16.0),
+                        _currentLocationButtonWidget(dataState: dataState),
+                        SizedBox(height: 16.0),
+                        _filterButtonWidget(dataState: dataState),
+                      ],
                     ),
-                  )
-                : WaveLoaderWidget(),
-          ])),
-    );
+                  ),
+                )
+              : WaveLoaderWidget(),
+        ]));
   }
 
   _googleMapWidget({required FetchReportAlertDataState dataState}) {
-    print("dataState.polylineList-->${dataState.polylineList.length}");
-    print("dataState.markersPointList-->${dataState.markersPointList.length}");
     return GoogleMap(
       mapType: dataState.currentMapType,
       compassEnabled: true,
       myLocationEnabled: true,
-    //  myLocationButtonEnabled: true,
+      circles: dataState.circles,
       markers: dataState.markersPointList,
-      polylines: dataState.polylineList,
+      polylines: dataState.polylinePointList,
       initialCameraPosition: dataState.cameraPosition,
       onMapCreated: (GoogleMapController controller) {
         dataState.googleMapController.complete(controller);
       },
+   //   onCameraMove: ,
+   //   minMaxZoomPreference: MinMaxZoomPreference(14.0, 23.0),
+   /*   onCameraIdle: () async {
+        BlocProvider.of<ReportAlertBloc>(context).add(OnCameraMoveEvent(context: context, ));
+      },*/
       onTap: (latLng) {
-        dataState.polylineList.isNotEmpty
-            ? BlocProvider.of<ReportAlertBloc>(context).add(
+        dataState.polylinePointList.isNotEmpty ?
+        BlocProvider.of<ReportAlertBloc>(context).add(
                 SelectGoogleMapButtonEvent(
                     context: context, latLngOnTap: latLng))
-            : (latLng) {};
+           : (latLng) {};
       },
     );
   }

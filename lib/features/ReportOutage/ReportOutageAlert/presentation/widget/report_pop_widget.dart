@@ -48,7 +48,17 @@ class ReportPopWidget extends StatelessWidget {
                   SizedBox(height: 16.0),
                   _endCapWidget(dataState: state),
                   SizedBox(height: 16.0),*/
-                  _closeBtn(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+
+                      children: [
+                        Flexible(child: _resetBtn()),
+                        SizedBox(width : 12),
+                        Flexible(child: _closeBtn()),
+                      ],
+                    ),
+                  ),
                   CommonStyle.vertical(context: context),
                 ],
               ),
@@ -65,7 +75,7 @@ class ReportPopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxTf,
-        activeColor: Colors.red,
+        activeColor: Colors.yellow.shade900,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
               SelectCheckBoxTFGisEvent(checkBoxTf: val!, context: mContext));
@@ -73,16 +83,18 @@ class ReportPopWidget extends StatelessWidget {
       ),
       title: dataState.isGasTfLoader == false
           ? AutoCompleteTextFieldWidget(
-              prefixIcon: Image.asset(
-                AssetPath.tf,
-                width: 20,
-                height: 20,
+              prefixIcon: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                child: Image.asset(
+                  AssetPath.tf,
+                  width: 20,
+                  height: 20,
+                ),
               ),
               label: AppString.gasTfGis,
               hintText: AppString.gasTfGis,
               enabled: dataState.checkBoxTf == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
+             
               controller: dataState.tfGisController,
               suggestions: dataState.listOfTfGisId,
               onSelected: (val) {
@@ -99,7 +111,7 @@ class ReportPopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxValve,
-        activeColor: Colors.purpleAccent,
+        activeColor: Colors.deepOrange,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
               SelectCheckBoxValveGisEvent(
@@ -108,16 +120,17 @@ class ReportPopWidget extends StatelessWidget {
       ),
       title: dataState.isGasValveLoader == false
           ? AutoCompleteTextFieldWidget(
-              prefixIcon: Image.asset(
-                AssetPath.valve,
-                width: 20,
-                height: 20,
+              prefixIcon: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                child: Image.asset(
+                  AssetPath.valve,
+                  width: 20,
+                  height: 20,
+                ),
               ),
               label: AppString.gasValveGIS,
               hintText: AppString.gasValveGIS,
               enabled: dataState.checkBoxValve == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
               controller: dataState.gasValveGISController,
               suggestions: dataState.listOfGasValveGISId,
               onSelected: (val) {
@@ -135,7 +148,7 @@ class ReportPopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxRegulator,
-        activeColor: Colors.yellowAccent.shade400,
+        activeColor: Colors.yellowAccent.shade700,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
               SelectCheckBoxRegulatorGisEvent(
@@ -155,9 +168,8 @@ class ReportPopWidget extends StatelessWidget {
               label: AppString.gasRegulatorGIS,
               hintText: AppString.gasRegulatorGIS,
               enabled: dataState.checkBoxRegulator == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
-              controller: dataState.gasRegulatorGISController,
+             
+        controller: dataState.gasRegulatorGISController,
               suggestions: dataState.listOfGasRegulatorGISId,
               onSelected: (val) {
                 BlocProvider.of<ReportAlertBloc>(mContext).add(
@@ -174,7 +186,7 @@ class ReportPopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkBoxConsumer,
-        activeColor: Colors.orange.shade900,
+        activeColor: Colors.green,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
               SelectCheckBoxConsumerGisEvent(
@@ -228,8 +240,7 @@ class ReportPopWidget extends StatelessWidget {
               label: AppString.gasTeeGIS,
               hintText: AppString.gasTeeGIS,
               enabled: dataState.checkBoxTee == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
+             
               controller: dataState.gasTeeGISController,
               suggestions: dataState.listOfGasTeeGISId,
               onSelected: (val) {
@@ -263,8 +274,7 @@ class ReportPopWidget extends StatelessWidget {
               label: AppString.gasElbowGIS,
               hintText: AppString.gasElbowGIS,
               enabled: dataState.checkBoxElbow == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
+             
               controller: dataState.gasElbowGISController,
               suggestions: dataState.listOfGasElbowGISId,
               onSelected: (val) {
@@ -298,8 +308,7 @@ class ReportPopWidget extends StatelessWidget {
               label: AppString.gasCouplerGIS,
               hintText: AppString.gasCouplerGIS,
               enabled: dataState.checkBoxCoupler == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
+             
               controller: dataState.gasCouplerGISController,
               suggestions: dataState.listOfGasCouplerGISId,
               onSelected: (val) {
@@ -333,8 +342,7 @@ class ReportPopWidget extends StatelessWidget {
               label: AppString.gasReducerGIS,
               hintText: AppString.gasReducerGIS,
               enabled: dataState.checkBoxReducer == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
+             
               controller: dataState.gasReducerGISController,
               suggestions: dataState.listOfGasReducerGISId,
               onSelected: (val) {
@@ -368,8 +376,7 @@ class ReportPopWidget extends StatelessWidget {
               label: AppString.gasEndCapGIS,
               hintText: AppString.gasEndCapGIS,
               enabled: dataState.checkBoxEndCap == true ? true : false,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              keyboardType: TextInputType.number,
+             
               controller: dataState.gasEndCapGISController,
               suggestions: dataState.listOfGasEndCapGISId,
               onSelected: (val) {
@@ -384,16 +391,19 @@ class ReportPopWidget extends StatelessWidget {
   }
 
   Widget _closeBtn() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Align(
-        alignment: Alignment.bottomRight,
-        child: ButtonWidget(
-            onPressed: () {
-              Navigator.pop(mContext, true);
-            },
-            text: "Close"),
-      ),
-    );
+    return ButtonWidget(
+        onPressed: () {
+          Navigator.pop(mContext, true);
+        },
+        text: "Close");
+  }
+
+  Widget _resetBtn() {
+    return ButtonWidget(
+        onPressed: () {
+          BlocProvider.of<ReportAlertBloc>(mContext).add(
+              ResetFilterEvent(context: mContext));
+        },
+        text: "Reset");
   }
 }

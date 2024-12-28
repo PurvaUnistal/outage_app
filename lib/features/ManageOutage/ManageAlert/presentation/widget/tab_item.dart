@@ -16,11 +16,13 @@ class TabItem extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-                fontSize: 12
+          Flexible(
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  fontSize: 10
+              ),
             ),
           ),
           count > 0
