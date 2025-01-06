@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -67,240 +68,74 @@ class _MyAppState extends State<MyApp> {
               seedColor: AppColor.primer,
             ),
           ),
-        //  home: GoogleMapPolylineSnapExample(),
+          // home: BlinkingMarkerMap(),
              initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,
         ));
   }
 }
 
-class GoogleMapPolylineSnapExample extends StatefulWidget {
+class BlinkingMarkerMap extends StatefulWidget {
   @override
-  _GoogleMapPolylineSnapExampleState createState() =>
-      _GoogleMapPolylineSnapExampleState();
+  _BlinkingMarkerMapState createState() => _BlinkingMarkerMapState();
 }
 
-class _GoogleMapPolylineSnapExampleState
-    extends State<GoogleMapPolylineSnapExample> {
-  late GoogleMapController _controller;
-  final List<LatLng> _polylinePoints = [
-    LatLng(37.42796133580664, -122.085749655962),
-    LatLng(37.42866133580664, -122.089749655962),
-    LatLng(37.42926133580664, -122.092749655962),
-  ];
-  Set<Polyline> _polylines = {};
-  Set<Marker> _marker = {};
-  LatLng? _closestPoint;
+class _BlinkingMarkerMapState extends State<BlinkingMarkerMap> {
+  late GoogleMapController _mapController;
+  Set<Marker> _markers = {};
+  late Timer _timer;
+  bool _isVisible = true;
+
+  final LatLng _markerPosition = LatLng(37.7749, -122.4194); // Example position
 
   @override
   void initState() {
     super.initState();
-    _initPolyline();
+    _startBlinkingMarker();
   }
 
-  void _initPolyline() {
-    _polylines.add(
-      Polyline(
-        polylineId: PolylineId('polyline_1'),
-        points: _polylinePoints,
-        color: Colors.blue,
-        width: 5,
-      ),
-    );
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
-  LatLng _findClosestPoint(LatLng tapPoint) {
-    double minDistance = double.infinity;
-    LatLng? closestPoint;
+  void _startBlinkingMarker() {
+    _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
+      setState(() {
+        _isVisible = !_isVisible;
 
-    for (int i = 0; i < _polylinePoints.length - 1; i++) {
-      final segmentStart = _polylinePoints[i];
-      final segmentEnd = _polylinePoints[i + 1];
-
-      final snappedPoint =
-          _getClosestPointOnSegment(segmentStart, segmentEnd, tapPoint);
-      final distance = _calculateDistance(tapPoint, snappedPoint);
-print("minDistance-->$minDistance");
-print("distance-->$distance");
-      if (distance < minDistance) {
-
-        minDistance = distance;
-        closestPoint = snappedPoint;
-      }
-    }
-    setState(() {
-      if (_closestPoint != null) {
-        _marker.add(Marker(
-          markerId: MarkerId('closest_point'),
-          position: _closestPoint!,
-          infoWindow: InfoWindow(title: 'Snapped Point'),
-        ));
-      }
+        // Update the marker
+        if (_isVisible) {
+          _markers.add(
+            Marker(
+              markerId: MarkerId('blinking_marker'),
+              position: _markerPosition,
+              infoWindow: InfoWindow(title: 'Blinking Marker'),
+            ),
+          );
+        } else {
+          _markers.removeWhere((marker) => marker.markerId.value == 'blinking_marker');
+        }
+      });
     });
-    return closestPoint!;
-  }
-
-  LatLng _getClosestPointOnSegment(LatLng start, LatLng end, LatLng point) {
-    final px = point.latitude;
-    final py = point.longitude;
-
-    final ax = start.latitude;
-    final ay = start.longitude;
-    final bx = end.latitude;
-    final by = end.longitude;
-
-    final abx = bx - ax;
-    final aby = by - ay;
-    final apx = px - ax;
-    final apy = py - ay;
-
-    final abSquared = abx * abx + aby * aby;
-    final apDotAb = apx * abx + apy * aby;
-    final t = max(0, min(1, apDotAb / abSquared));
-
-    return LatLng(ax + t * abx, ay + t * aby);
-  }
-
-  double _calculateDistance(LatLng p1, LatLng p2) {
-    const earthRadius = 6371000.0; // in meters
-
-    final lat1 = p1.latitude * pi / 180.0;
-    final lat2 = p2.latitude * pi / 180.0;
-    final deltaLat = (p2.latitude - p1.latitude) * pi / 180.0;
-    final deltaLng = (p2.longitude - p1.longitude) * pi / 180.0;
-
-    final a = sin(deltaLat / 2) * sin(deltaLat / 2) +
-        cos(lat1) * cos(lat2) * sin(deltaLng / 2) * sin(deltaLng / 2);
-    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return earthRadius * c;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Polyline Snap Example'),
+        title: Text('Blinking Marker'),
       ),
-      body: Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _polylinePoints.first,
-              zoom: 15,
-            ),
-            onMapCreated: (GoogleMapController controller) {
-              _controller = controller;
-            },
-            polylines: _polylines,
-            onTap: (LatLng position) {
-              setState(() {
-                _closestPoint = _findClosestPoint(position);
-              });
-            },
-            markers: _closestPoint != null ? _marker : {},
-          ),
-          if (_closestPoint != null)
-            Positioned(
-              bottom: 20,
-              left: 20,
-              child: Text(
-                'Snapped to: ${_closestPoint!.latitude}, ${_closestPoint!.longitude}',
-                style: TextStyle(fontSize: 16, backgroundColor: Colors.white),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class AudioRecordExample extends StatefulWidget {
-  @override
-  _AudioRecordExampleState createState() => _AudioRecordExampleState();
-}
-
-class _AudioRecordExampleState extends State<AudioRecordExample> {
-  final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
-  final FlutterSoundPlayer _player = FlutterSoundPlayer();
-  bool _isRecording = false;
-  bool _isPlaying = false;
-  String? _audioPath;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeRecorder();
-    _player.openPlayer();
-  }
-
-  Future<void> _initializeRecorder() async {
-    final status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      throw RecordingPermissionException("Microphone permission not granted");
-    }
-    await _recorder.openRecorder();
-  }
-
-  Future<void> _startRecording() async {
-    _audioPath = "audio_${DateTime.now().millisecondsSinceEpoch}.aac";
-    await _recorder.startRecorder(toFile: _audioPath);
-    setState(() => _isRecording = true);
-  }
-
-  Future<void> _stopRecording() async {
-    await _recorder.stopRecorder();
-    setState(() => _isRecording = false);
-  }
-
-  Future<void> _playAudio() async {
-    if (_audioPath?.isEmpty ?? true) return;
-    try {
-      await _player.startPlayer(
-        fromURI: _audioPath,
-        codec: Codec.aacADTS,
-      );
-      setState(() => _isPlaying = true);
-      /*  _player.startPlayerCompleted.listen((_) {
-        if (mounted) {
-          setState(() => _isPlaying = false);
-        }
-      });*/
-    } catch (e) {
-      print("Error playing audio: $e");
-    }
-  }
-
-  Future<void> _stopAudio() async {
-    await _player.stopPlayer();
-    setState(() => _isPlaying = false);
-  }
-
-  @override
-  void dispose() {
-    _recorder.closeRecorder();
-    _player.closePlayer();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Audio Record Example")),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: _isRecording ? _stopRecording : _startRecording,
-              child: Text(_isRecording ? "Stop Recording" : "Start Recording"),
-            ),
-            ElevatedButton(
-              onPressed: _isPlaying ? _stopAudio : _playAudio,
-              child: Text(_isPlaying ? "Stop Audio" : "Play Audio"),
-            ),
-          ],
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: _markerPosition,
+          zoom: 14,
         ),
+        markers: _markers,
+        onMapCreated: (controller) {
+          _mapController = controller;
+        },
       ),
     );
   }

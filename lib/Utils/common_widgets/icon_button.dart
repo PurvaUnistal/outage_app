@@ -3,15 +3,22 @@ import 'package:flutter/material.dart';
 import 'res/app_color.dart';
 
 class IconButtonWidget extends StatelessWidget {
-  final Function() onPressed;
+  final VoidCallback onPressed;
   final IconData iconData;
-  const IconButtonWidget({super.key, required this.onPressed, required this.iconData});
+  const IconButtonWidget(
+      {Key? key, required this.iconData, required this.onPressed})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(onPressed: onPressed, icon: Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Icon(iconData, color: AppColor.primer, size: 15,),
-    ));
+    return CircleAvatar(
+        backgroundColor: AppColor.primer,
+        child: IconButton(
+            onPressed: onPressed,
+            icon: Icon(
+              iconData,
+              size: 23.0,
+              color: AppColor.white,
+            )));
   }
 }

@@ -135,11 +135,7 @@ class _ManageAlertViewState extends State<ManageAlertView>
                 tabs: [
                   TabItem(
                       title: AppString.newData,
-                      count: dataState.listOfViewIncident
-                          .where((taskData) =>
-                              taskData.actionStatus == ActionStatus.newAction)
-                          .toList()
-                          .length),
+                        count: dataState.listOfViewIncident.where((taskData) => taskData.actionStatus == ActionStatus.newAction).toList().length),
                   TabItem(
                       title: AppString.inProgress,
                       count: dataState.listOfViewIncident
@@ -186,29 +182,6 @@ class _ManageAlertViewState extends State<ManageAlertView>
     );
   }
 
-/*  Widget _tabListController({required FetchManageAlertDataState dataState}) {
-    return  Flexible(
-      child: IndexedStack(
-        index: dataState.tabIndex,
-        children: [
-          ViewReportListWidget(
-            checkIncidentType:dataState.tabIndexLoader,
-            listOfViewIncident: dataState.listOfNewViewIncident,
-          ),
-          ViewReportListWidget(
-            checkIncidentType:dataState.tabIndexLoader,
-            listOfViewIncident:
-            dataState.listOfProgressViewIncident,
-          ),
-          ViewReportListWidget(
-            checkIncidentType:dataState.tabIndexLoader,
-            listOfViewIncident:
-            dataState.listOfCompletedViewIncident,
-          ),
-        ],
-      ),
-    );
-  }*/
 
   Widget _itemWidget({required FetchManageAlertDataState dataState}) {
     return dataState.listOfFilterViewIncident.isNotEmpty

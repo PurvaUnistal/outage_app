@@ -33,6 +33,7 @@ class Apis {
    static String getPipeline = baseUrl + "get-pipeline?";
    static String getIncidentAction = baseUrl + "outage/get-incident-action?";
    static String getIncidentTypeAction = baseUrl + "outage/get-incident-type-action-api?";
+   static String getValveConsumerAffect = baseUrl + "outage/get-valve-consumer-affect?";
    static String incidentActionProgress = baseUrl + "outage/get-incident-action-progress";
 
 

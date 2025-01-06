@@ -35,7 +35,8 @@ class TabItem extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                count > 9 ? "9+" : count.toString(),
+               // count > 9 ? "9+" : count.toString(),
+                 count.toString(),
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 12,
