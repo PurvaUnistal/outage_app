@@ -19,7 +19,6 @@ class ReportAlertPageLoadState extends ReportAlertState {
 
 class FetchReportAlertDataState extends ReportAlertState {
   final bool isLoader;
-  final bool isAllPipeLine;
   final bool isPipelineLoader;
   final bool checkBoxTf;
   final bool isGasTfLoader;
@@ -73,7 +72,6 @@ class FetchReportAlertDataState extends ReportAlertState {
   final Set<Marker> markersPointList;
   final LatLng currentPosition;
   final LatLng loginPosition;
-  final LatLng closestPoint;
   final Set<Polyline> polylinePointList;
 
 
@@ -85,7 +83,6 @@ class FetchReportAlertDataState extends ReportAlertState {
 
   FetchReportAlertDataState({
     required this.isLoader,
-    required this.isAllPipeLine,
     required this.isPipelineLoader,
 
     required this.checkBoxTf,
@@ -129,7 +126,6 @@ class FetchReportAlertDataState extends ReportAlertState {
     required this.markersPointList,
     required this.currentPosition,
     required this.loginPosition,
-    required this.closestPoint,
     required this.polylinePointList,
 
     required this.pipelineNetworkModel,
@@ -149,7 +145,6 @@ class FetchReportAlertDataState extends ReportAlertState {
   @override
   List<Object?> get props => [
     isLoader,
-    isAllPipeLine,
     isPipelineLoader,
     checkBoxTf,
     isGasTfLoader,
@@ -192,7 +187,6 @@ class FetchReportAlertDataState extends ReportAlertState {
     markersPointList,
     currentPosition,
     loginPosition,
-    closestPoint,
     polylinePointList,
     pipelineNetworkModel,
     pipelineNetworkData,

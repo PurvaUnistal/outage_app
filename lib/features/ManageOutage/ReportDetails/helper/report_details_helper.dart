@@ -5,6 +5,7 @@ import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentActionModel.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentActionProgressModel.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
+import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/model/consumer_affect_model.dart';
 import 'package:igl_outage_app/service/Apis.dart';
 import 'package:igl_outage_app/service/api_server_dio.dart';
 
@@ -54,6 +55,30 @@ class ReportDetailsHelper{
       }
     } catch (e) {
       log("IncidentActionModel-->${e.toString()}");
+    }
+    return null;
+  }
+
+  static Future<ConsumerAffectModel?> getValveConsumerAffectApi({
+    required BuildContext context,
+    required String incidentId,
+  }) async {
+    String schema = await SharedPref.getString(
+      key: PrefsValue.schema,
+    );
+    Map<String, String> para = {
+      "schema": schema,
+      "incidentId": incidentId,
+    };
+    String json = Uri(queryParameters: para).query;
+    try {
+      var res = await ApiHelper.getData(urlEndPoint: Apis.getValveConsumerAffect + json, context: context);
+      if(res != null){
+        ConsumerAffectModel response = ConsumerAffectModel.fromJson(res);
+        return response;
+      }
+    } catch (e) {
+      log("getValveConsumerAffect-->${e.toString()}");
     }
     return null;
   }

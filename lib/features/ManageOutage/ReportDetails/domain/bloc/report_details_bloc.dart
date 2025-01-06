@@ -1,12 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_event.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_state.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
+import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/model/consumer_affect_model.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/helper/report_details_helper.dart';
+import 'package:igl_outage_app/features/Navigate/NavigateAlert/helper/navigate_alert_helper.dart';
+import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
 import '../model/IncidentActionModel.dart';
 
 class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
@@ -24,7 +31,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   String baseUrl = '';
   String incidentTypeId = '';
   String incidentId = '';
-
+  LatLng incidentLocation = LatLng(0, 0);
 
   IncidentActionModel incidentActionModel = IncidentActionModel();
   List<IncidentActionData> listOfIncidentAction = [];
@@ -32,17 +39,49 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   IncidentTypeActionModel incidentTypeActionModel = IncidentTypeActionModel();
   List<IncidentTypeAction> listOfIncidentTypeAction = [];
 
+  ConsumerAffectModel consumerAffectModel = ConsumerAffectModel();
+  ConsumerData consumerData = ConsumerData();
+  ValveData valveData = ValveData();
+  List<ValveData> listOfValve = [];
+  List<ConsumerBPList> listOfConsumer = [];
+  List<LatLng> listOfConsumerPoint = [];
+  List<LatLng> listOfValvePoint = [];
+
+  Set<Marker> markersPointList = {};
+  Set<Marker> conMarkerPointList = {};
+  Set<Marker> valveMarkerPointList = {};
+  Set<Polyline> polylinePointList = {};
+  bool isBlinkMarker = true;
+  Timer timer = Timer(Duration.zero, () {});
+  Completer<GoogleMapController> googleMapController = Completer();
+
   _pageLoad(ReportDetailsLoadEvent event, emit) async {
     emit(ReportDetailsInitialState());
     isLoader = false;
-
-
     isBtnLoader = false;
+    isBlinkMarker = true;
+    incidentLocation = LatLng(0, 0);
+    timer = Timer(Duration.zero, () {});
+    googleMapController = Completer();
+    listOfConsumerPoint = [];
+    listOfValvePoint = [];
     incidentActionModel = IncidentActionModel();
     listOfIncidentAction = [];
 
-     incidentTypeActionModel = IncidentTypeActionModel();
-     listOfIncidentTypeAction = [];
+    incidentTypeActionModel = IncidentTypeActionModel();
+    listOfIncidentTypeAction = [];
+
+    consumerAffectModel = ConsumerAffectModel();
+    consumerData = ConsumerData();
+    valveData = ValveData();
+    listOfValve = [];
+    listOfConsumer = [];
+
+    markersPointList = {};
+    conMarkerPointList = {};
+    valveMarkerPointList = {};
+    polylinePointList = {};
+
 
     incidentTypeId = await SharedPref.getString(key: PrefsValue.incidentTypeId);
     incidentId = await SharedPref.getString(key: PrefsValue.incidentId);
@@ -51,15 +90,19 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     role = await SharedPref.getString(key: PrefsValue.userRole);
     userName = await SharedPref.getString(key: PrefsValue.userName);
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-    await _fetchIncidentTypeActionApi(context: event.context, incidentTypeId: incidentTypeId,incidentId: incidentId);
+    await _fetchIncidentTypeActionApi(
+        context: event.context,
+        incidentTypeId: incidentTypeId,
+        incidentId: incidentId);
+    await _fetchValveConsumerAffectApi(
+        context: event.context, incidentId: incidentId,);
     _eventCompleted(emit);
   }
 
-
   _fetchIncidentTypeActionApi({
-        required BuildContext context,
-        required String incidentTypeId,
-        required String incidentId,
+    required BuildContext context,
+    required String incidentTypeId,
+    required String incidentId,
   }) async {
     var res = await ReportDetailsHelper.getIncidentTypeActionApi(
       context: context,
@@ -70,21 +113,91 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       incidentTypeActionModel = res;
       if (incidentTypeActionModel.data != null) {
         listOfIncidentTypeAction = incidentTypeActionModel.data!;
-        for(var data in listOfIncidentTypeAction){
-          if(data.actionStatus == "1" ){
+        for (var data in listOfIncidentTypeAction) {
+          if (data.actionStatus == "1") {
             break;
-          } else if(data.actionStatus == null){
+          } else if (data.actionStatus == null) {
             data.actionStatusEnable = true;
             break;
-          }else{}
+          } else {}
         }
       }
       return res;
     }
   }
 
+  _fetchValveConsumerAffectApi({
+    required BuildContext context,
+    required String incidentId,
+  }) async {
+    try {
+      var res = await ReportDetailsHelper.getValveConsumerAffectApi(
+        context: context,
+        incidentId: incidentId,
+      );
+      if (res == null) throw Exception("No data returned");
+      consumerAffectModel = res;
+      if (consumerAffectModel.data != null) {
+        consumerData = consumerAffectModel.data!;
+        incidentLocation = _parseLatLng(
+         consumerData.incidentlat,
+          consumerData.incidentlong,
+        )!;
+        Set<Marker> tempMarker = {};
+        if (incidentLocation != null) {
+          var incidentMarker = await NavigateAlertHelper.createMarker(
+            latlngList: [incidentLocation],
+            context: context,
+            markerIcon: BitmapDescriptor.defaultMarker,
+          );
+          tempMarker.addAll(incidentMarker);
+        }
+        if (consumerData.consumer != null && consumerData.consumer.isNotEmpty) {
+          var consumerLatLngs = _getLatLngList(consumerData.consumer);
+          var consumerMarkers = await NavigateAlertHelper.createMarker(
+            latlngList: consumerLatLngs,
+            context: context,
+            markerIcon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          );
+          tempMarker.addAll(consumerMarkers);
+        }
+        if (consumerData.valve != null && consumerData.valve.isNotEmpty) {
+          var valveLatLngs = _getLatLngList(consumerData.valve[0]);
+          var valveMarkers = await NavigateAlertHelper.createMarker(
+            latlngList: valveLatLngs,
+            context: context,
+            markerIcon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          );
+          tempMarker.addAll(valveMarkers);
+        }
+        markersPointList.addAll(tempMarker);
+        print("markersPointList-->${markersPointList.length}");
+      }
+      return res;
+    } catch (e) {
+      print("Error in _fetchValveConsumerAffectApi: $e");
+    }
+  }
+
+  LatLng? _parseLatLng(String? lat, String? lng) {
+    double? latitude = double.tryParse(lat ?? '');
+    double? longitude = double.tryParse(lng ?? '');
+    return (latitude != null && longitude != null) ? LatLng(latitude, longitude) : null;
+  }
+
+
+  List<LatLng> _getLatLngList(List<dynamic> dataList) {
+    return dataList
+        .where((data) => data.latitude != null && data.longitude != null)
+        .map((data) => LatLng(double.parse(data.latitude!), double.parse(data.longitude!)))
+        .toList();
+  }
+
+
+
+
   _submitBtnEvent(SubmitBtnEvent event, emit) async {
-    try{
+    try {
       isBtnLoader = true;
       currentActionStatus = event.actionStatus;
       _eventCompleted(emit);
@@ -96,24 +209,27 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         status: event.actionStatus,
         row: event.row,
       );
-      if(res != null){
+      if (res != null) {
         print(res.data!.response);
-        await _fetchIncidentTypeActionApi(context: event.context, incidentTypeId: incidentTypeId,incidentId: incidentId);
-          Utils.successSnackBar(msg: "Successful update", context: event.context);
+        await _fetchIncidentTypeActionApi(
+            context: event.context,
+            incidentTypeId: incidentTypeId,
+            incidentId: incidentId);
+        Utils.successSnackBar(msg: "Successful update", context: event.context);
         isBtnLoader = false;
         currentActionStatus = event.actionStatus;
         _eventCompleted(emit);
-      }else{
+      } else {
         isBtnLoader = false;
         currentActionStatus = event.actionStatus;
         _eventCompleted(emit);
       }
-    }catch(e){
+    } catch (e) {
       isBtnLoader = false;
       currentActionStatus = event.actionStatus;
       _eventCompleted(emit);
     }
-}
+  }
 
   _eventCompleted(Emitter<ReportDetailsState> emit) {
     emit(FetchReportDetailsDataState(
@@ -124,10 +240,18 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       baseUrl: baseUrl,
       userName: userName,
       role: role,
-      incidentActionModel : incidentActionModel,
-      listOfIncidentAction : listOfIncidentAction,
-      incidentTypeActionModel : incidentTypeActionModel,
-      listOfIncidentTypeAction : listOfIncidentTypeAction,
+      incidentLocation:incidentLocation,
+      consumerAffectMode: consumerAffectModel,
+      consumerData: consumerData,
+      listOfValve: listOfValve,
+      listOfConsumer: listOfConsumer,
+      markersPointList: markersPointList,
+      googleMapController: googleMapController,
+      polylinePointList: polylinePointList,
+      incidentActionModel: incidentActionModel,
+      listOfIncidentAction: listOfIncidentAction,
+      incidentTypeActionModel: incidentTypeActionModel,
+      listOfIncidentTypeAction: listOfIncidentTypeAction,
     ));
   }
 }

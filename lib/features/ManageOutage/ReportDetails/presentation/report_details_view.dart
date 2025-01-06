@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/ButtonWidget/button_border_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:igl_outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:igl_outage_app/Utils/common_widgets/icon_button.dart';
 import 'package:igl_outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
@@ -32,6 +36,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
 
     super.initState();
   }
+  Completer<GoogleMapController> _controller = Completer();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +64,6 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   }
 
   Widget _itemBuilder({required FetchReportDetailsDataState dataState}) {
-    int incidentTypeActionSize = dataState.listOfIncidentTypeAction.length;
     return Scaffold(
       appBar: AppBarWidget(
         title: "Report",
@@ -83,46 +87,182 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
           ),
         ],
       ),
-      body: incidentTypeActionSize == 0
-          ? Center(
-          child: Text(
-            "No records found",
-            style: Styles.labels,
-          ))
-          :  ListView.builder(
+      body: Column(
+        children: [
+          _listOfConsumerAffect(dataState: dataState),
+          _listOfIncident(dataState: dataState),
+          _googleMap(dataState: dataState),
+        ],
+      ),
+    );
+  }
+
+  Widget _listOfConsumerAffect(
+      {required FetchReportDetailsDataState dataState}) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.09,
+      child: ListView.builder(
           shrinkWrap: true,
-          itemCount: incidentTypeActionSize,
+          scrollDirection: Axis.horizontal,
+          itemCount: dataState.listOfConsumer.length == 0 ||
+                  dataState.listOfValve.length == 0
+              ? dataState.listOfValve.length
+              : dataState.listOfConsumer.length,
           itemBuilder: (BuildContext context, int i) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColor.primer),
-                      borderRadius: BorderRadius.all(Radius.circular(8))),
+            return SizedBox(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: Card(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        _nameWidget(dataState: dataState, i: i),
-                        _dividerWidget(dataState: dataState, i: i),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _actionWidget(
-                                dataState: dataState,
-                                i: i,
-                                listSize: incidentTypeActionSize),
-                            _statusWidget(dataState: dataState, i: i),
-                          ],
-                        ),
-                      ],
-                    ),
-                  )),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _affectWidget(
+                              headline: "Valve Affected", label: "V033"),
+                     // headline: "Valve Affected", label: dataState.listOfValve[i].wkt!),
+                          _affectWidget(
+                            headline: "Customer Affected",
+                            label: dataState.listOfConsumer[i].bpNumber!,
+                          )
+                        ],
+                      ))),
             );
           }),
     );
   }
+
+  Widget _listOfIncident({required FetchReportDetailsDataState dataState}) {
+    int incidentTypeActionSize = dataState.listOfIncidentTypeAction.length;
+    return incidentTypeActionSize == 0
+        ? Center(
+            child: Text(
+            "No records found",
+            style: Styles.labels,
+          ))
+        : SizedBox(
+            height: MediaQuery.of(context).size.height / 2,
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: incidentTypeActionSize,
+                itemBuilder: (BuildContext context, int i) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: AppColor.primer),
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              _nameWidget(dataState: dataState, i: i),
+                              _dividerWidget(dataState: dataState, i: i),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _actionWidget(
+                                      dataState: dataState,
+                                      i: i,
+                                      listSize: incidentTypeActionSize),
+                                  _statusWidget(dataState: dataState, i: i),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )),
+                  );
+                }),
+          );
+  }
+
+  Widget _googleMap({required FetchReportDetailsDataState dataState}) {
+    return Flexible(
+        child: Stack(
+          children: [
+            GoogleMap(
+                  zoomControlsEnabled: false,
+                  cameraTargetBounds: CameraTargetBounds.unbounded,
+                  markers: Set<Marker>.of(dataState.markersPointList),
+                  initialCameraPosition:CameraPosition(target: dataState.incidentLocation, zoom: 12),
+                  onMapCreated: (GoogleMapController controller) {
+            dataState.googleMapController.complete(controller);
+                  },
+                ),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Column(
+                children: [
+                  IconButtonWidget(
+                    iconData: Icons.fullscreen_rounded,
+
+                    onPressed: () => _showDialog(dataState: dataState),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.009),
+                  IconButtonWidget(
+                    iconData: Icons.layers,
+                   onPressed: (){},
+                   /* onPressed: () => BlocProvider.of<RiserFormBloc>(context)
+                        .add(RiserMapTypeEvent(context: context)),*/
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ));
+  }
+
+  _showDialog({required FetchReportDetailsDataState dataState}) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Scaffold(
+              body: SafeArea(
+                child: Stack(
+                  children: [
+                    GoogleMap(
+                      initialCameraPosition: CameraPosition(target: dataState.incidentLocation, zoom: 12),
+                      markers: Set<Marker>.of(dataState.markersPointList),
+                      onMapCreated: (GoogleMapController controller) {
+                        if (!_controller.isCompleted) {
+                          _controller.complete(controller);
+                        }
+                      },
+                    ),
+                    Positioned(
+                        left: 15,
+                        top: 60,
+                        child: Column(
+                          children: [
+                            IconButtonWidget(
+                              iconData: Icons.fullscreen_exit_rounded,
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ))
+                  ],
+                ),
+              ));
+        });
+  }
+  Widget _affectWidget({required String headline, required String label}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          headline,
+          style: TextStyle(fontSize: 12, color: AppColor.primer),
+        ),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: AppColor.black),
+        )
+      ],
+    );
+  }
+
 
   Widget _nameWidget(
       {required FetchReportDetailsDataState dataState, required int i}) {
@@ -131,13 +271,6 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
       textAlign: TextAlign.start,
       style: Styles.titleNormalBlack,
     );
-   /* return RowWidget(
-      widget1: Text("Name : ", style: Styles.titleGreen),
-      widget2: Text(
-        dataState.listOfIncidentTypeAction[i].name!,
-        style: Styles.titleNormalBlack,
-      ),
-    );*/
   }
 
   Widget _dividerWidget(
@@ -179,21 +312,22 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                   SizedBox(
                     width: 8,
                   ),
-                  i != listSize - 1 ?  dataState.isBtnLoader == true &&
-                          dataState.currentActionStatus == "2"
-                      ? DottedLoaderWidget()
-                      : ButtonColorWidget(
-                          color: AppColor.primer1,
-                          text: "Skip",
-                          onTap: () {
-                            BlocProvider.of<ReportDetailsBloc>(context)
-                                .add(SubmitBtnEvent(
-                              context: context,
-                              incidentActionId: dataType.id.toString(),
-                              actionStatus: "2",
-                              row: i.toString(),
-                            ));
-                          })
+                  i != listSize - 1
+                      ? dataState.isBtnLoader == true &&
+                              dataState.currentActionStatus == "2"
+                          ? DottedLoaderWidget()
+                          : ButtonColorWidget(
+                              color: AppColor.primer1,
+                              text: "Skip",
+                              onTap: () {
+                                BlocProvider.of<ReportDetailsBloc>(context)
+                                    .add(SubmitBtnEvent(
+                                  context: context,
+                                  incidentActionId: dataType.id.toString(),
+                                  actionStatus: "2",
+                                  row: i.toString(),
+                                ));
+                              })
                       : Container(),
                 ],
               )
@@ -268,7 +402,9 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                 color: AppColor.red, text: "Not Started", onTap: () {})
             : dataType.actionStatus == "1"
                 ? ButtonBorderWidget(
-                    color: AppColor.yellow800, text: "In Progress", onTap: () {})
+                    color: AppColor.yellow800,
+                    text: "In Progress",
+                    onTap: () {})
                 : dataType.actionStatus == "2"
                     ? ButtonBorderWidget(
                         color: AppColor.grey, text: "Skipped", onTap: () {})
@@ -299,5 +435,4 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
       ],
     );
   }
-
 }

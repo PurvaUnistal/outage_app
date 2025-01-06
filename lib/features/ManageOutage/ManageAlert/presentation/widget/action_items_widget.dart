@@ -16,8 +16,8 @@ class ActionItemsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Set<Marker> markers = Set();
-    double lat = double.parse(viewIncidentData.latitude ?? " 0.0");
-    double lng = double.parse(viewIncidentData.longitude ?? " 0.0");
+    double lat = double.parse(viewIncidentData.incidentLatitude ?? " 0.0");
+    double lng = double.parse(viewIncidentData.incidentLongitude ?? " 0.0");
     LatLng latLng = LatLng(lat, lng);
     markers.clear();
     markers.add(Marker(
@@ -72,8 +72,7 @@ class ActionItemsWidget extends StatelessWidget {
             Divider(),
             Container(
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0) //
-                      ),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
                   border: Border.all(color: AppColor.primer, width: 1)),
               child: ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -81,16 +80,10 @@ class ActionItemsWidget extends StatelessWidget {
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height * 0.2,
                     child: GoogleMap(
+                      zoomControlsEnabled: false,
                       cameraTargetBounds: CameraTargetBounds.unbounded,
-                      tiltGesturesEnabled: true,
-                      scrollGesturesEnabled: false,
                       markers: markers,
-                      initialCameraPosition: CameraPosition(
-                          target: LatLng(
-                            lat,
-                            lng,
-                          ),
-                          zoom: AppString.zoom),
+                      initialCameraPosition: CameraPosition(target: LatLng(lat, lng,), zoom: 16),
                     )),
               ),
             ),

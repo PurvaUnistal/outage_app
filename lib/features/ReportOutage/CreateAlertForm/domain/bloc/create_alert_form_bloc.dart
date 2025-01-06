@@ -137,8 +137,10 @@ class CreateAlertFormBloc
 
   _getCurrentPosition() async {
     Position? currentPoint = await CurrentLocation.getCurrentLocation();
-    currentLatitudeController.text = currentPoint!.latitude.toString();
-    currentLongitudeController.text = currentPoint.longitude.toString();
+    if(currentPoint != null){
+      currentLatitudeController.text = currentPoint!.latitude.toString();
+      currentLongitudeController.text = currentPoint.longitude.toString();
+    }
   }
 
   _fetchIncidentTypeApi(

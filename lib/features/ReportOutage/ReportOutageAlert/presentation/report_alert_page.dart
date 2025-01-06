@@ -88,6 +88,7 @@ class _ReportAlertViewState extends State<ReportAlertView> {
       mapType: dataState.currentMapType,
       compassEnabled: true,
       myLocationEnabled: true,
+   //   liteModeEnabled: true,
       circles: dataState.circles,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,

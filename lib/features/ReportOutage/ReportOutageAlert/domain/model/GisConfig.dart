@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-/// Configuration class for GIS mapping
 class GisConfig {
   final String assetPath;
   final Color polylineColor;
@@ -16,9 +15,5 @@ class GisConfig {
     required this.markerList,
      this.polylineList,
   });
-}
-
-class GetPoints{
-
 }
 

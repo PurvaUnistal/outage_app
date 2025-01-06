@@ -427,31 +427,4 @@ class ReportAlertHelper {
     }
   }
 
-  static LatLngBounds calculateLatLngBounds(List<LatLng> points) {
-    assert(points.isNotEmpty, "The list of LatLng points cannot be empty.");
-    double? north;
-    double? south;
-    double? east;
-    double? west;
-    for (LatLng point in points) {
-      if (north == null || point.latitude > north) {
-        north = point.latitude;
-      }
-      if (south == null || point.latitude < south) {
-        south = point.latitude;
-      }
-      if (east == null || point.longitude > east) {
-        east = point.longitude;
-      }
-      if (west == null || point.longitude < west) {
-        west = point.longitude;
-      }
-    }
-    return LatLngBounds(
-      southwest: LatLng(south!, west!),
-      northeast: LatLng(north!, east!),
-    );
-  }
-
-
 }
