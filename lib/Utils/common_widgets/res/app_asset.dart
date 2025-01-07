@@ -30,4 +30,5 @@ class AssetPath {
   static String loginPin = 'assets/gis/location-pin.png';
   static String pin = 'assets/gis/pin.png';
   static String consumer = 'assets/gis/gas_consumer.png';
+  static String markerAnimation = 'assets/gis/markerAnimation.gif';
 }

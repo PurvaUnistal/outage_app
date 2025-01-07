@@ -33,23 +33,23 @@ class ConsumerAffectModel {
 
 class ConsumerData {
   final String? incidentId;
-  final String? incidentlat;
-  final String? incidentlong;
+  final String? latitude;
+  final String? longitude;
   final dynamic valve;
   final dynamic consumer;
 
   ConsumerData({
     this.incidentId,
-    this.incidentlat,
-    this.incidentlong,
+    this.latitude,
+    this.longitude,
     this.valve,
     this.consumer,
   });
 
   factory ConsumerData.fromJson(Map<String, dynamic> json) => ConsumerData(
         incidentId: json["incidentId"] ?? "",
-        incidentlat: json["incidentlat"] ?? "",
-        incidentlong: json["incidentlong"] ?? "",
+    latitude: json["incidentlat"] ?? "",
+    longitude: json["incidentlong"] ?? "",
 
         valve: json["valve"] == null
             ? null
@@ -67,8 +67,8 @@ class ConsumerData {
 
   Map<String, dynamic> toJson() => {
         "incidentId": incidentId,
-        "incidentlat": incidentlat,
-        "incidentlong": incidentlong,
+        "incidentlat": latitude,
+        "incidentlong": longitude,
         "valve": List<dynamic>.from(
             valve!.map((x) => List<dynamic>.from(x.map((x) => x.toJson())))),
         "Consumer": List<dynamic>.from(consumer!.map((x) => x.toJson())),
@@ -79,16 +79,16 @@ class ConsumerBPList {
   final String? wkt;
   final String? gid;
   final String? bpNumber;
-  final String? newOldLatitude;
-  final String? newOldLongitude;
+  final String? latitude;
+  final String? longitude;
   final String? tfNumber;
 
   ConsumerBPList({
     this.wkt,
     this.gid,
     this.bpNumber,
-    this.newOldLatitude,
-    this.newOldLongitude,
+    this.latitude,
+    this.longitude,
     this.tfNumber,
   });
 
@@ -96,8 +96,8 @@ class ConsumerBPList {
         wkt: json["wkt"] ?? "",
         gid: json["gid"] ?? "",
         bpNumber: json["bp_number"] ?? "",
-        newOldLatitude: json["new_old_latitude"] ?? "",
-        newOldLongitude: json["new_old_longitude"] ?? "",
+    latitude: json["new_old_latitude"] ?? "",
+    longitude: json["new_old_longitude"] ?? "",
         tfNumber: json["tf_number"] ?? "",
       );
 
@@ -105,8 +105,8 @@ class ConsumerBPList {
         "wkt": wkt,
         "gid": gid,
         "bp_number": bpNumber,
-        "new_old_latitude": newOldLatitude,
-        "new_old_longitude": newOldLongitude,
+        "new_old_latitude": latitude,
+        "new_old_longitude": longitude,
         "tf_number": tfNumber,
       };
 }

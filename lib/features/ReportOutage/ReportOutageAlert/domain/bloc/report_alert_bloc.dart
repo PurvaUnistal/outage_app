@@ -787,8 +787,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         }
       }).toList());
       if (filteredList.isNotEmpty) {
-        final Uint8List? iconBytes =
-            await ReportAlertHelper.getBytesFromAsset(assetPath, 80);
+        final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(assetPath, 80);
         LatLng location = LatLng(
           double.parse(filteredList[0].latitude!),
           double.parse(filteredList[0].longitude!),

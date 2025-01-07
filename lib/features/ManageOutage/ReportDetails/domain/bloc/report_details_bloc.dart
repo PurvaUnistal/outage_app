@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:igl_outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_event.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_state.dart';
@@ -131,6 +133,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     required String incidentId,
   }) async {
     try {
+      final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.markerAnimation, 80);
       var res = await ReportDetailsHelper.getValveConsumerAffectApi(
         context: context,
         incidentId: incidentId,
@@ -140,24 +143,24 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       if (consumerAffectModel.data != null) {
         consumerData = consumerAffectModel.data!;
         incidentLocation = _parseLatLng(
-         consumerData.incidentlat,
-          consumerData.incidentlong,
+         consumerData.latitude,
+          consumerData.longitude,
         )!;
         Set<Marker> tempMarker = {};
-        if (incidentLocation != null) {
+
           var incidentMarker = await NavigateAlertHelper.createMarker(
             latlngList: [incidentLocation],
             context: context,
             markerIcon: BitmapDescriptor.defaultMarker,
           );
           tempMarker.addAll(incidentMarker);
-        }
-        if (consumerData.consumer != null && consumerData.consumer.isNotEmpty) {
-          var consumerLatLngs = _getLatLngList(consumerData.consumer);
+
+          if (consumerData.consumer != null && consumerData.consumer.isNotEmpty) {
+          var consumerLatLngs = _getConLatLngList(consumerData.consumer);
           var consumerMarkers = await NavigateAlertHelper.createMarker(
             latlngList: consumerLatLngs,
             context: context,
-            markerIcon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            markerIcon:BitmapDescriptor.fromBytes(iconBytes!),
           );
           tempMarker.addAll(consumerMarkers);
         }
@@ -185,11 +188,17 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     return (latitude != null && longitude != null) ? LatLng(latitude, longitude) : null;
   }
 
+  List<LatLng> _getConLatLngList(List<dynamic> dataList) {
+    return dataList
+        .where((data) => data.latitude != null && data.longitude != null)
+        .map((data) => LatLng(double.parse(data.latitude!), double.parse(data.longitude!)))
+        .toList();
+  }
 
   List<LatLng> _getLatLngList(List<dynamic> dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
-        .map((data) => LatLng(double.parse(data.latitude!), double.parse(data.longitude!)))
+        .map((data) => LatLng(double.parse(data.longitude!), double.parse(data.latitude!)))
         .toList();
   }
 
