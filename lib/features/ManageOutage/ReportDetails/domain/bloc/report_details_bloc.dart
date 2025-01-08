@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -22,6 +21,39 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   ReportDetailsBloc() : super(ReportDetailsInitialState()) {
     on<ReportDetailsLoadEvent>(_pageLoad);
     on<SubmitBtnEvent>(_submitBtnEvent);
+  }
+// kya kiya h loade
+  _startBlinking() {
+    timer =  Timer.periodic(Duration(milliseconds: 1000), (timer) async {
+      if(this.isBlinkMarker) {
+        this.isBlinkMarker = false;
+      } else {
+        this.isBlinkMarker = true;
+      }
+      emit(ReportDetailsPageLoadState());
+      emit(FetchReportDetailsDataState(
+        isBlinkMarker:this.isBlinkMarker,
+        isLoader: isLoader,
+        isBtnLoader: isBtnLoader,
+        currentActionStatus: currentActionStatus,
+        scheme: scheme,
+        baseUrl: baseUrl,
+        userName: userName,
+        role: role,
+        incidentLocation: incidentLocation,
+        consumerAffectMode: consumerAffectModel,
+        consumerData: consumerData,
+        listOfValve: listOfValve,
+        listOfConsumer: listOfConsumer,
+        markersPointList: markersPointList,
+        googleMapController: googleMapController,
+        polylinePointList: polylinePointList,
+        incidentActionModel: incidentActionModel,
+        listOfIncidentAction: listOfIncidentAction,
+        incidentTypeActionModel: incidentTypeActionModel,
+        listOfIncidentTypeAction: listOfIncidentTypeAction,
+      ));
+    });
   }
 
   bool isLoader = false;
@@ -61,7 +93,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     emit(ReportDetailsInitialState());
     isLoader = false;
     isBtnLoader = false;
-    isBlinkMarker = true;
+    isBlinkMarker = isBlinkMarker;
     incidentLocation = LatLng(0, 0);
     timer = Timer(Duration.zero, () {});
     googleMapController = Completer();
@@ -84,7 +116,6 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     valveMarkerPointList = {};
     polylinePointList = {};
 
-
     incidentTypeId = await SharedPref.getString(key: PrefsValue.incidentTypeId);
     incidentId = await SharedPref.getString(key: PrefsValue.incidentId);
     print("incidentTypeId-->${incidentTypeId}");
@@ -97,7 +128,9 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         incidentTypeId: incidentTypeId,
         incidentId: incidentId);
     await _fetchValveConsumerAffectApi(
-        context: event.context, incidentId: incidentId,);
+      context: event.context,
+      incidentId: incidentId,
+    );
     _eventCompleted(emit);
   }
 
@@ -133,7 +166,8 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     required String incidentId,
   }) async {
     try {
-      final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.markerAnimation, 80);
+      final Uint8List? iconBytes =
+          await ReportAlertHelper.getBytesFromAsset("assets/gis/icons.gif", 80);
       var res = await ReportDetailsHelper.getValveConsumerAffectApi(
         context: context,
         incidentId: incidentId,
@@ -143,38 +177,35 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       if (consumerAffectModel.data != null) {
         consumerData = consumerAffectModel.data!;
         incidentLocation = _parseLatLng(
-         consumerData.latitude,
+          consumerData.latitude,
           consumerData.longitude,
         )!;
         Set<Marker> tempMarker = {};
 
-          var incidentMarker = await NavigateAlertHelper.createMarker(
-            latlngList: [incidentLocation],
-            context: context,
-            markerIcon: BitmapDescriptor.defaultMarker,
-          );
-          tempMarker.addAll(incidentMarker);
-
-          if (consumerData.consumer != null && consumerData.consumer.isNotEmpty) {
+        var incidentMarker = await NavigateAlertHelper.createMarker(
+          latlngList: [incidentLocation],
+          context: context,
+          markerIcon: BitmapDescriptor.defaultMarker,
+        );
+        tempMarker.addAll(incidentMarker);
+        if (consumerData.consumer != null && consumerData.consumer.isNotEmpty) {
           var consumerLatLngs = _getConLatLngList(consumerData.consumer);
           var consumerMarkers = await NavigateAlertHelper.createMarker(
             latlngList: consumerLatLngs,
             context: context,
-            markerIcon:BitmapDescriptor.fromBytes(iconBytes!),
+            markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
           );
           tempMarker.addAll(consumerMarkers);
         }
         if (consumerData.valve != null && consumerData.valve.isNotEmpty) {
-          var valveLatLngs = _getLatLngList(consumerData.valve[0]);
-          var valveMarkers = await NavigateAlertHelper.createMarker(
-            latlngList: valveLatLngs,
-            context: context,
-            markerIcon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-          );
-          tempMarker.addAll(valveMarkers);
+          listOfValvePoint = _getLatLngList(consumerData.valve[0]);
         }
         markersPointList.addAll(tempMarker);
         print("markersPointList-->${markersPointList.length}");
+        if(timer != null && timer.isActive) {
+          timer.cancel();
+        }
+        _startBlinking();
       }
       return res;
     } catch (e) {
@@ -185,25 +216,26 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   LatLng? _parseLatLng(String? lat, String? lng) {
     double? latitude = double.tryParse(lat ?? '');
     double? longitude = double.tryParse(lng ?? '');
-    return (latitude != null && longitude != null) ? LatLng(latitude, longitude) : null;
+    return (latitude != null && longitude != null)
+        ? LatLng(latitude, longitude)
+        : null;
   }
 
   List<LatLng> _getConLatLngList(List<dynamic> dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
-        .map((data) => LatLng(double.parse(data.latitude!), double.parse(data.longitude!)))
+        .map((data) =>
+            LatLng(double.parse(data.latitude!), double.parse(data.longitude!)))
         .toList();
   }
 
   List<LatLng> _getLatLngList(List<dynamic> dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
-        .map((data) => LatLng(double.parse(data.longitude!), double.parse(data.latitude!)))
+        .map((data) =>
+            LatLng(double.parse(data.longitude!), double.parse(data.latitude!)))
         .toList();
   }
-
-
-
 
   _submitBtnEvent(SubmitBtnEvent event, emit) async {
     try {
@@ -242,6 +274,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
 
   _eventCompleted(Emitter<ReportDetailsState> emit) {
     emit(FetchReportDetailsDataState(
+      isBlinkMarker: isBlinkMarker,
       isLoader: isLoader,
       isBtnLoader: isBtnLoader,
       currentActionStatus: currentActionStatus,
@@ -249,7 +282,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       baseUrl: baseUrl,
       userName: userName,
       role: role,
-      incidentLocation:incidentLocation,
+      incidentLocation: incidentLocation,
       consumerAffectMode: consumerAffectModel,
       consumerData: consumerData,
       listOfValve: listOfValve,

@@ -36,6 +36,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
 
     super.initState();
   }
+
   Completer<GoogleMapController> _controller = Completer();
 
   @override
@@ -119,7 +120,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                         children: [
                           _affectWidget(
                               headline: "Valve Affected", label: "V033"),
-                     // headline: "Valve Affected", label: dataState.listOfValve[i].wkt!),
+                          // headline: "Valve Affected", label: dataState.listOfValve[i].wkt!),
                           _affectWidget(
                             headline: "Customer Affected",
                             label: dataState.listOfConsumer[i].bpNumber!,
@@ -180,38 +181,44 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   Widget _googleMap({required FetchReportDetailsDataState dataState}) {
     return Flexible(
         child: Stack(
-          children: [
-            GoogleMap(
-                  zoomControlsEnabled: false,
-                  cameraTargetBounds: CameraTargetBounds.unbounded,
-                  markers: Set<Marker>.of(dataState.markersPointList),
-                  initialCameraPosition:CameraPosition(target: dataState.incidentLocation, zoom: 12),
-                  onMapCreated: (GoogleMapController controller) {
+      children: [
+        GoogleMap(
+          zoomControlsEnabled: false,
+          cameraTargetBounds: CameraTargetBounds.unbounded,
+          markers: dataState.isBlinkMarker ? Set<Marker>.of(dataState.markersPointList) : {},
+          initialCameraPosition:
+              CameraPosition(target: dataState.incidentLocation, zoom: 12),
+          onMapCreated: (GoogleMapController controller) {
             dataState.googleMapController.complete(controller);
-                  },
+          },
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          child: Column(
+            children: [
+              CircleAvatar(
+                backgroundColor: AppColor.primer,
+                child: IconButtonWidget(
+                  iconData: Icons.fullscreen_rounded,
+                  onPressed: () => _showDialog(dataState: dataState),
                 ),
-            Positioned(
-              top: 0,
-              left: 0,
-              child: Column(
-                children: [
-                  IconButtonWidget(
-                    iconData: Icons.fullscreen_rounded,
-
-                    onPressed: () => _showDialog(dataState: dataState),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.009),
-                  IconButtonWidget(
-                    iconData: Icons.layers,
-                   onPressed: (){},
-                   /* onPressed: () => BlocProvider.of<RiserFormBloc>(context)
-                        .add(RiserMapTypeEvent(context: context)),*/
-                  ),
-                ],
               ),
-            ),
-          ],
-        ));
+              SizedBox(height: MediaQuery.of(context).size.height * 0.009),
+              CircleAvatar(
+                backgroundColor: AppColor.primer,
+                child: IconButtonWidget(
+                  iconData: Icons.layers,
+                  onPressed: () {},
+                  /* onPressed: () => BlocProvider.of<RiserFormBloc>(context)
+                          .add(RiserMapTypeEvent(context: context)),*/
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ));
   }
 
   _showDialog({required FetchReportDetailsDataState dataState}) {
@@ -220,33 +227,38 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
         builder: (BuildContext context) {
           return Scaffold(
               body: SafeArea(
-                child: Stack(
-                  children: [
-                    GoogleMap(
-                      initialCameraPosition: CameraPosition(target: dataState.incidentLocation, zoom: 12),
-                      markers: Set<Marker>.of(dataState.markersPointList),
-                      onMapCreated: (GoogleMapController controller) {
-                        if (!_controller.isCompleted) {
-                          _controller.complete(controller);
-                        }
-                      },
-                    ),
-                    Positioned(
-                        left: 15,
-                        top: 60,
-                        child: Column(
-                          children: [
-                            IconButtonWidget(
-                              iconData: Icons.fullscreen_exit_rounded,
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ],
-                        ))
-                  ],
+            child: Stack(
+              children: [
+                GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                      target: dataState.incidentLocation, zoom: 12),
+                  markers: Set<Marker>.of(dataState.markersPointList),
+                  onMapCreated: (GoogleMapController controller) {
+                    if (!_controller.isCompleted) {
+                      _controller.complete(controller);
+                    }
+                  },
                 ),
-              ));
+                Positioned(
+                    left: 15,
+                    top: 60,
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: AppColor.primer,
+                          child: IconButtonWidget(
+                            iconData: Icons.fullscreen_exit_rounded,
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
+                      ],
+                    ))
+              ],
+            ),
+          ));
         });
   }
+
   Widget _affectWidget({required String headline, required String label}) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -262,7 +274,6 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
       ],
     );
   }
-
 
   Widget _nameWidget(
       {required FetchReportDetailsDataState dataState, required int i}) {
@@ -435,4 +446,5 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
       ],
     );
   }
+
 }

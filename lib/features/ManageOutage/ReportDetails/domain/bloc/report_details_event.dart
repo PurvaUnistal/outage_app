@@ -11,6 +11,15 @@ class ReportDetailsLoadEvent extends ReportDetailsEvent {
   List<Object> get props => [context];
 }
 
+class ReportDetailUpdateMarker extends ReportDetailsEvent {
+  final BuildContext context;
+  ReportDetailUpdateMarker({required this.context});
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+}
+
 class SubmitBtnEvent extends ReportDetailsEvent {
   final String actionStatus;
   final String incidentActionId;

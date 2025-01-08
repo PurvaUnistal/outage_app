@@ -31,6 +31,9 @@ class _ReportAlertViewState extends State<ReportAlertView> {
     super.initState();
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
     return BackgroundInfoWidget(

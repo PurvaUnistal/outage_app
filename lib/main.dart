@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:igl_outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:igl_outage_app/features/Login/domain/bloc/login_bloc.dart';
@@ -64,11 +65,76 @@ class _MyAppState extends State<MyApp> {
               seedColor: AppColor.primer,
             ),
           ),
+     //    home: BlinkingMarkerMap(),
              initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,
         ));
   }
 }
 
+class BlinkingMarkerMap extends StatefulWidget {
+  @override
+  _BlinkingMarkerMapState createState() => _BlinkingMarkerMapState();
+}
 
+class _BlinkingMarkerMapState extends State<BlinkingMarkerMap> {
+  late GoogleMapController _mapController;
+  Set<Marker> _markers = {};
+  late Timer _timer;
+  bool _isVisible = true;
+
+  final LatLng _markerPosition = LatLng(37.7749, -122.4194); // Example position
+
+  @override
+  void initState() {
+    super.initState();
+    _startBlinkingMarker();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startBlinkingMarker() {
+    _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
+      setState(() {
+        _isVisible = !_isVisible;
+
+        // Update the marker
+        if (_isVisible) {
+          _markers.add(
+            Marker(
+              markerId: MarkerId('blinking_marker'),
+              position: _markerPosition,
+              infoWindow: InfoWindow(title: 'Blinking Marker'),
+            ),
+          );
+        } else {
+          _markers.removeWhere((marker) => marker.markerId.value == 'blinking_marker');
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Blinking Marker'),
+      ),
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: _markerPosition,
+          zoom: 14,
+        ),
+        markers: _markers,
+        onMapCreated: (controller) {
+          _mapController = controller;
+        },
+      ),
+    );
+  }
+}
 

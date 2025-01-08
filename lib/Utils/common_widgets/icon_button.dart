@@ -11,14 +11,12 @@ class IconButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-        backgroundColor: AppColor.primer,
-        child: IconButton(
-            onPressed: onPressed,
-            icon: Icon(
-              iconData,
-              size: 23.0,
-              color: AppColor.white,
-            )));
+    return IconButton(
+        onPressed: onPressed,
+        icon: Icon(
+          iconData,
+          size: 23.0,
+          color: AppColor.white,
+        ));
   }
 }
