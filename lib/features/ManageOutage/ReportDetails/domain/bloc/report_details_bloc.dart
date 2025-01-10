@@ -7,7 +7,6 @@ import 'package:igl_outage_app/Utils/Utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/res/app_asset.dart';
-import 'package:igl_outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_event.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_state.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
@@ -22,17 +21,17 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     on<ReportDetailsLoadEvent>(_pageLoad);
     on<SubmitBtnEvent>(_submitBtnEvent);
   }
-// kya kiya h loade
+
   _startBlinking() {
-    timer =  Timer.periodic(Duration(milliseconds: 1000), (timer) async {
-      if(this.isBlinkMarker) {
+    timer = Timer.periodic(Duration(milliseconds: 1000), (timer) async {
+      if (this.isBlinkMarker) {
         this.isBlinkMarker = false;
       } else {
         this.isBlinkMarker = true;
       }
       emit(ReportDetailsPageLoadState());
       emit(FetchReportDetailsDataState(
-        isBlinkMarker:this.isBlinkMarker,
+        isBlinkMarker: this.isBlinkMarker,
         isLoader: isLoader,
         isBtnLoader: isBtnLoader,
         currentActionStatus: currentActionStatus,
@@ -166,8 +165,6 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     required String incidentId,
   }) async {
     try {
-      final Uint8List? iconBytes =
-          await ReportAlertHelper.getBytesFromAsset("assets/gis/icons.gif", 80);
       var res = await ReportDetailsHelper.getValveConsumerAffectApi(
         context: context,
         incidentId: incidentId,
@@ -181,37 +178,67 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
           consumerData.longitude,
         )!;
         Set<Marker> tempMarker = {};
-
         var incidentMarker = await NavigateAlertHelper.createMarker(
           latlngList: [incidentLocation],
           context: context,
           markerIcon: BitmapDescriptor.defaultMarker,
         );
         tempMarker.addAll(incidentMarker);
-        if (consumerData.consumer != null && consumerData.consumer.isNotEmpty) {
-          var consumerLatLngs = _getConLatLngList(consumerData.consumer);
-          var consumerMarkers = await NavigateAlertHelper.createMarker(
-            latlngList: consumerLatLngs,
-            context: context,
-            markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
-          );
-          tempMarker.addAll(consumerMarkers);
-        }
-        if (consumerData.valve != null && consumerData.valve.isNotEmpty) {
-          listOfValvePoint = _getLatLngList(consumerData.valve[0]);
-        }
+        print("------------------------");
         markersPointList.addAll(tempMarker);
         print("markersPointList-->${markersPointList.length}");
-        if(timer != null && timer.isActive) {
-          timer.cancel();
+        if (consumerData.consumer?.isNotEmpty == true) {
+          listOfConsumer = consumerData.consumer;
+          listOfConsumerPoint = _getConLatLngList(consumerData.consumer!);
+          await _handleConsumerMarkers(context: context);
         }
-        _startBlinking();
+        if (consumerData.valve?.isNotEmpty == true) {
+          listOfValve = consumerData.valve[0];
+          listOfValvePoint = _getLatLngList(consumerData.valve![0]);
+          await _handleValveMarkers(context: context);
+        }
       }
       return res;
     } catch (e) {
       print("Error in _fetchValveConsumerAffectApi: $e");
     }
   }
+
+  Future<void> _handleConsumerMarkers({required BuildContext context}) async {
+    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.consumer, 80);
+    final consumerMarkers = await NavigateAlertHelper.createMarker(
+      latlngList: listOfConsumerPoint,
+      context: context,
+      markerIcon:  BitmapDescriptor.fromBytes(iconBytes!),
+    );
+    markersPointList.addAll(consumerMarkers);
+    print("sdfghjkl;llkkkkkkkkkkkkkkk");
+    _restartBlinking();
+  }
+
+  Future<void> _handleValveMarkers({required BuildContext context}) async {
+    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.valve, 80);
+    final valveMarkers = await NavigateAlertHelper.createMarker(
+      latlngList: listOfValvePoint,
+      context: context,
+     // markerIcon:  BitmapDescriptor.fromBytes(iconBytes!),
+      markerIcon: BitmapDescriptor.defaultMarker,
+    );
+    markersPointList.addAll(valveMarkers);
+ //   _restartBlinking();
+  }
+
+
+
+
+  void _restartBlinking() {
+    if (timer.isActive == true) {
+      timer.cancel();
+    }
+    _startBlinking();
+  }
+
+
 
   LatLng? _parseLatLng(String? lat, String? lng) {
     double? latitude = double.tryParse(lat ?? '');
