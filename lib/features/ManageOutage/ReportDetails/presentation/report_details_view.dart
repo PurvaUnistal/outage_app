@@ -131,10 +131,16 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     return _affectWidget(
       title:  "Valve Affected",
       children: dataState.listOfValve
-          .map((e) => Column(
+          .map((e) => e.valveId!.isEmpty ? Text("No Data", style: TextStyle(
+        fontSize: 12,
+        fontFamily: 'Cutive',
+      )) : Column(
             children: [
               Divider(),
-              Text(e.valveId ?? ""),
+              Text(e.valveId ?? "", style: TextStyle(
+                fontSize: 12,
+                fontFamily: 'Cutive',
+              ),),
             ],
           ))
           .toList(),
@@ -144,10 +150,16 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   Widget _listOfConsumer({required FetchReportDetailsDataState dataState}) {
     return _affectWidget(
       title:  "Customer Affected",
-      children: dataState.listOfConsumer.map((e) => Column(
+      children: dataState.listOfConsumer.map((e) => e.bpNumber!.isEmpty ? Text("No Data", style: TextStyle(
+        fontSize: 12,
+        fontFamily: 'Cutive',
+      )) : Column(
         children: [
           Divider(),
-          Text(e.bpNumber ?? ""),
+          Text(e.bpNumber ?? "", style: TextStyle(
+            fontSize: 12,
+            fontFamily: 'Cutive',
+          )),
         ],
       )).toList(),
     );
