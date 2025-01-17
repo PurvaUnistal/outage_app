@@ -1,9 +1,8 @@
-
 import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:igl_outage_app/Utils/common_widgets/Routes/routes_name.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:igl_outage_app/features/Splash/presentation/CustomDialogWidget.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:igl_outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:igl_outage_app/Utils/common_widgets/connectivity_helper.dart';
@@ -79,8 +78,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               await SharedPref.setString(key: PrefsValue.areas,value: res.user!.areas!);
               List<Accessright> accessrightList = await res.user!.accessright!;
               await SharedPref.setString(key: PrefsValue.accessRight,value: Accessright.jsonFromAccessrightList(accessrightList));
-              PackageInfo packageInfo = await PackageInfo.fromPlatform();
-              String appVersion = packageInfo.version;
+              String appVersion = await ForceUpgradeDialog.getCurrentAppVersion();
               await SharedPref.setString(key: PrefsValue.appVersion,value: appVersion);
                 Navigator.pushReplacementNamed(
                   event.context,

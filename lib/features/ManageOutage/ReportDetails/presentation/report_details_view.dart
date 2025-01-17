@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,6 +14,7 @@ import 'package:igl_outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_bloc.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_event.dart';
 import 'package:igl_outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_state.dart';
+import 'widget/GoogleMapWidget.dart';
 
 class ReportDetailsView extends StatefulWidget {
   final String incidentId;
@@ -37,7 +37,6 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     super.initState();
   }
 
-  Completer<GoogleMapController> _controller = Completer();
 
   @override
   Widget build(BuildContext context) {
@@ -66,12 +65,12 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
 
   Widget _itemBuilder({required FetchReportDetailsDataState dataState}) {
     return Scaffold(
-      appBar: AppBar(
+      /* appBar: AppBar(
         toolbarHeight: 0,
         backgroundColor: Colors.white,
        // brightness: Brightness.light,
-      ),
-    /*  appBar: AppBarWidget(
+      ),*/
+      appBar: AppBarWidget(
         title: "Report",
         boolLeading: true,
         actions: [
@@ -92,224 +91,159 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
             ],
           ),
         ],
-      ),*/
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              _googleMap(dataState: dataState),
-
-              _listOfConsumerAffect(dataState: dataState),
-              _listOfIncident(dataState: dataState),
-
-            ],
-          ),
+        child: Column(
+          children: [
+            _googleMap(dataState: dataState),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  _listOfAffect(dataState: dataState),
+                  _listOfIncident(dataState: dataState),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _listOfConsumerAffect(
-      {required FetchReportDetailsDataState dataState}) {
+  Widget _listOfAffect({required FetchReportDetailsDataState dataState}) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height / 5,
+      height: MediaQuery.of(context).size.height / 8,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
-            child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemCount: dataState.listOfValve.length,
-                itemBuilder: (BuildContext context, int i) {
-                  return _affectWidget(
-                    headline: "Valve Affected",
-                    label: dataState.listOfValve[i].valveId ?? "no",
-                  );
-                }),
+          _listOfValve(dataState: dataState),
+          VerticalDivider(
+            color: AppColor.primer,
           ),
-          Flexible(
-            child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemCount: 2,
-                itemBuilder: (BuildContext context, int i) {
-                  return SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    child: Card(
-                        child: _affectWidget(
-                          headline: "Customer Affected",
-                          // label: dataState.listOfConsumer[i].bpNumber!,
-                          label: "asdfghj",
-                        )),
-                  );
-                }),
-          ),
+          _listOfConsumer(dataState: dataState),
         ],
       ),
     );
   }
 
+  Widget _listOfValve({required FetchReportDetailsDataState dataState}) {
+    return _affectWidget(
+      title:  "Valve Affected",
+      children: dataState.listOfValve
+          .map((e) => Column(
+            children: [
+              Divider(),
+              Text(e.valveId ?? ""),
+            ],
+          ))
+          .toList(),
+    );
+  }
+
+  Widget _listOfConsumer({required FetchReportDetailsDataState dataState}) {
+    return _affectWidget(
+      title:  "Customer Affected",
+      children: dataState.listOfConsumer.map((e) => Column(
+        children: [
+          Divider(),
+          Text(e.bpNumber ?? ""),
+        ],
+      )).toList(),
+    );
+  }
+
   Widget _listOfIncident({required FetchReportDetailsDataState dataState}) {
     int incidentTypeActionSize = dataState.listOfIncidentTypeAction.length;
-    print("========>${ MediaQuery.of(context).size.height / 4}");
+    print("========>${MediaQuery.of(context).size.height / 2}");
     return
-     /* incidentTypeActionSize == 0
+        /* incidentTypeActionSize == 0
         ? Center(
             child: Text(
             "No records found",
             style: Styles.labels,
           ))
         :*/
-    Align(
+        Align(
       alignment: Alignment.bottomCenter,
-          child: SizedBox(
-              height: MediaQuery.of(context).size.height / 2.5,
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: incidentTypeActionSize,
-                  itemBuilder: (BuildContext context, int i) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3.0),
-                      child: Container(
-                        padding:  const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: AppColor.primer),
-                              borderRadius: BorderRadius.all(Radius.circular(8))),
-                          child: Column(
-                            children: [
-                              _nameWidget(dataState: dataState, i: i),
-                              _dividerWidget(dataState: dataState, i: i),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _actionWidget(
-                                      dataState: dataState,
-                                      i: i,
-                                      listSize: incidentTypeActionSize),
-                                  _statusWidget(dataState: dataState, i: i),
-                                ],
-                              ),
-                            ],
-                          )),
-                    );
-                  }),
-            ),
-        );
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height / 2,
+        child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: incidentTypeActionSize,
+            itemBuilder: (BuildContext context, int i) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3.0),
+                child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppColor.primer),
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    child: Column(
+                      children: [
+                        _nameWidget(dataState: dataState, i: i),
+                        _dividerWidget(dataState: dataState, i: i),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _actionWidget(
+                                dataState: dataState,
+                                i: i,
+                                listSize: incidentTypeActionSize),
+                            _statusWidget(dataState: dataState, i: i),
+                          ],
+                        ),
+                      ],
+                    )),
+              );
+            }),
+      ),
+    );
   }
 
-  _vertical(){
+  _vertical() {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.0009,
     );
   }
 
   Widget _googleMap({required FetchReportDetailsDataState dataState}) {
+    var h = MediaQuery.of(context).size.height;
     return Container(
-        height: MediaQuery.of(context).size.height * 0.2,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            border: Border.all(color: AppColor.primer, width: 1)),
+        height: h * 0.2,
         child: Stack(
-      children: [
-        GoogleMap(
-          zoomControlsEnabled: false,
-          cameraTargetBounds: CameraTargetBounds.unbounded,
-          markers: dataState.isBlinkMarker ? Set<Marker>.of(dataState.markersPointList) : {},
-          initialCameraPosition:
-              CameraPosition(target: dataState.incidentLocation, zoom: 14),
-          onMapCreated: (GoogleMapController controller) {
-            dataState.googleMapController.complete(controller);
-          },
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          child: Column(
-            children: [
-              CircleAvatar(
-                backgroundColor: AppColor.primer,
-                child: IconButtonWidget(
-                  iconData: Icons.fullscreen_rounded,
-                  onPressed: () => _showDialog(dataState: dataState),
-                ),
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.009),
-              CircleAvatar(
-                backgroundColor: AppColor.primer,
-                child: IconButtonWidget(
-                  iconData: Icons.layers,
-                  onPressed: () {},
-                  /* onPressed: () => BlocProvider.of<RiserFormBloc>(context)
-                          .add(RiserMapTypeEvent(context: context)),*/
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ));
-  }
-
-  _showDialog({required FetchReportDetailsDataState dataState}) {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Scaffold(
-              body: SafeArea(
-            child: Stack(
-              children: [
-                GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                      target: dataState.incidentLocation, zoom: 12),
-                  markers: Set<Marker>.of(dataState.markersPointList),
-                  onMapCreated: (GoogleMapController controller) {
-                    if (!_controller.isCompleted) {
-                      _controller.complete(controller);
-                    }
-                  },
-                ),
-                Positioned(
-                    left: 15,
-                    top: 60,
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: AppColor.primer,
-                          child: IconButtonWidget(
-                            iconData: Icons.fullscreen_exit_rounded,
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ),
-                      ],
-                    ))
-              ],
-            ),
-          ));
-        });
-  }
-
-  Widget _affectWidget({required String headline, required String label}) {
-    return Card(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          clipBehavior: Clip.none,
           children: [
-            Text( headline,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12, color: AppColor.primer)),
-          Divider(),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: AppColor.black),
-          )
+            GoogleMap(
+              zoomControlsEnabled: false,
+              cameraTargetBounds: CameraTargetBounds.unbounded,
+              markers: dataState.markersPointList,
+              initialCameraPosition:
+                  CameraPosition(target: dataState.incidentLocation, zoom: 14),
+              onMapCreated: (GoogleMapController controller) {
+                dataState.googleMapController.complete(controller);
+              },
+            ),
+            Positioned(
+              top: 0,
+              right:0,
+              child:  CircleAvatar(
+                  backgroundColor: AppColor.primer,
+                  child: IconButton(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FullGoogleMapWidget(mContext: context,)),
+                        );
+                      },
+                   icon: Icon( Icons.fullscreen_rounded, color: AppColor.white)),
+              ),
+            ),
           ],
         ));
   }
+
 
   Widget _nameWidget(
       {required FetchReportDetailsDataState dataState, required int i}) {
@@ -483,4 +417,25 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     );
   }
 
+  Widget _affectWidget({required String title, required List<Widget> children }) {
+    return Flexible(
+        fit: FlexFit.loose,
+        child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.1,
+            child: ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              children: [
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: AppColor.primer),
+                ),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: children),
+              ],
+            )));
+  }
 }

@@ -48,8 +48,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (BuildContext context) => HomeBloc()),
           BlocProvider(create: (BuildContext context) => ManageAlertBloc()),
           BlocProvider(create: (BuildContext context) => CreateAlertFormBloc()),
-          BlocProvider(
-              create: (BuildContext context) => MaintenanceAlertBloc()),
+          BlocProvider(create: (BuildContext context) => MaintenanceAlertBloc()),
           BlocProvider(create: (BuildContext context) => NavigateAlertBloc()),
           BlocProvider(create: (BuildContext context) => ReportAlertBloc()),
           BlocProvider(create: (BuildContext context) => ReportDetailsBloc()),
@@ -61,80 +60,9 @@ class _MyAppState extends State<MyApp> {
             hintColor: AppColor.primer,
             visualDensity: VisualDensity.adaptivePlatformDensity,
             useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColor.primer,
-            ),
-          ),
-     //    home: BlinkingMarkerMap(),
+            colorScheme: ColorScheme.fromSeed(seedColor: AppColor.primer)),
              initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,
         ));
   }
 }
-
-class BlinkingMarkerMap extends StatefulWidget {
-  @override
-  _BlinkingMarkerMapState createState() => _BlinkingMarkerMapState();
-}
-
-class _BlinkingMarkerMapState extends State<BlinkingMarkerMap> {
-  late GoogleMapController _mapController;
-  Set<Marker> _markers = {};
-  late Timer _timer;
-  bool _isVisible = true;
-
-  final LatLng _markerPosition = LatLng(37.7749, -122.4194); // Example position
-
-  @override
-  void initState() {
-    super.initState();
-    _startBlinkingMarker();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void _startBlinkingMarker() {
-    _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
-      setState(() {
-        _isVisible = !_isVisible;
-
-        // Update the marker
-        if (_isVisible) {
-          _markers.add(
-            Marker(
-              markerId: MarkerId('blinking_marker'),
-              position: _markerPosition,
-              infoWindow: InfoWindow(title: 'Blinking Marker'),
-            ),
-          );
-        } else {
-          _markers.removeWhere((marker) => marker.markerId.value == 'blinking_marker');
-        }
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Blinking Marker'),
-      ),
-      body: GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: _markerPosition,
-          zoom: 14,
-        ),
-        markers: _markers,
-        onMapCreated: (controller) {
-          _mapController = controller;
-        },
-      ),
-    );
-  }
-}
-

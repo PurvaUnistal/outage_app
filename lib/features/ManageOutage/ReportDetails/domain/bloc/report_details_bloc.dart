@@ -22,16 +22,25 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     on<SubmitBtnEvent>(_submitBtnEvent);
   }
 
+
+  @override
+  Future<void> close() {
+    timer.cancel();
+    return super.close();
+  }
+
   _startBlinking() {
-    timer = Timer.periodic(Duration(milliseconds: 1000), (timer) async {
-      if (this.isBlinkMarker) {
-        this.isBlinkMarker = false;
+    timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      if(isBlinkMarker) {
+        markersPointList.addAll(consumerMarkers);
+        markersPointList.addAll(valveMarkers);
       } else {
-        this.isBlinkMarker = true;
+        markersPointList.removeAll(consumerMarkers);
+        markersPointList.removeAll(valveMarkers);
       }
+      isBlinkMarker = !isBlinkMarker;
       emit(ReportDetailsPageLoadState());
       emit(FetchReportDetailsDataState(
-        isBlinkMarker: this.isBlinkMarker,
         isLoader: isLoader,
         isBtnLoader: isBtnLoader,
         currentActionStatus: currentActionStatus,
@@ -81,6 +90,8 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   List<LatLng> listOfValvePoint = [];
 
   Set<Marker> markersPointList = {};
+  Set<Marker> consumerMarkers = {};
+  Set<Marker> valveMarkers = {};
   Set<Marker> conMarkerPointList = {};
   Set<Marker> valveMarkerPointList = {};
   Set<Polyline> polylinePointList = {};
@@ -184,13 +195,13 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
           markerIcon: BitmapDescriptor.defaultMarker,
         );
         tempMarker.addAll(incidentMarker);
-        print("------------------------");
         markersPointList.addAll(tempMarker);
         print("markersPointList-->${markersPointList.length}");
         if (consumerData.consumer?.isNotEmpty == true) {
           listOfConsumer = consumerData.consumer;
           listOfConsumerPoint = _getConLatLngList(consumerData.consumer!);
           await _handleConsumerMarkers(context: context);
+          _restartBlinking();
         }
         if (consumerData.valve?.isNotEmpty == true) {
           listOfValve = consumerData.valve[0];
@@ -206,26 +217,22 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
 
   Future<void> _handleConsumerMarkers({required BuildContext context}) async {
     final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.consumer, 80);
-    final consumerMarkers = await NavigateAlertHelper.createMarker(
+    consumerMarkers = await NavigateAlertHelper.createMarker(
       latlngList: listOfConsumerPoint,
       context: context,
-      markerIcon:  BitmapDescriptor.fromBytes(iconBytes!),
+      markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
     );
     markersPointList.addAll(consumerMarkers);
-    print("sdfghjkl;llkkkkkkkkkkkkkkk");
-    _restartBlinking();
   }
 
   Future<void> _handleValveMarkers({required BuildContext context}) async {
     final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.valve, 80);
-    final valveMarkers = await NavigateAlertHelper.createMarker(
+    valveMarkers = await NavigateAlertHelper.createMarker(
       latlngList: listOfValvePoint,
       context: context,
-     // markerIcon:  BitmapDescriptor.fromBytes(iconBytes!),
-      markerIcon: BitmapDescriptor.defaultMarker,
+      markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
     );
     markersPointList.addAll(valveMarkers);
- //   _restartBlinking();
   }
 
 
@@ -237,8 +244,6 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     }
     _startBlinking();
   }
-
-
 
   LatLng? _parseLatLng(String? lat, String? lng) {
     double? latitude = double.tryParse(lat ?? '');
@@ -301,7 +306,6 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
 
   _eventCompleted(Emitter<ReportDetailsState> emit) {
     emit(FetchReportDetailsDataState(
-      isBlinkMarker: isBlinkMarker,
       isLoader: isLoader,
       isBtnLoader: isBtnLoader,
       currentActionStatus: currentActionStatus,

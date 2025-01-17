@@ -40,7 +40,6 @@ class FetchReportDetailsDataState extends ReportDetailsState {
   final List<IncidentActionData> listOfIncidentAction;
   final IncidentTypeActionModel incidentTypeActionModel;
   final List<IncidentTypeAction> listOfIncidentTypeAction;
-  final bool isBlinkMarker;
 
   FetchReportDetailsDataState({
     required this.isLoader,
@@ -62,7 +61,6 @@ class FetchReportDetailsDataState extends ReportDetailsState {
     required this.listOfIncidentAction,
     required this.incidentTypeActionModel,
     required this.listOfIncidentTypeAction,
-    required this.isBlinkMarker
   });
   @override
   List<Object> get props => [

@@ -91,7 +91,6 @@ class _ReportAlertViewState extends State<ReportAlertView> {
       mapType: dataState.currentMapType,
       compassEnabled: true,
       myLocationEnabled: true,
-   //   liteModeEnabled: true,
       circles: dataState.circles,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
@@ -99,11 +98,6 @@ class _ReportAlertViewState extends State<ReportAlertView> {
       onMapCreated: (GoogleMapController controller) {
         dataState.googleMapController.complete(controller);
       },
-   //   onCameraMove: ,
-   //   minMaxZoomPreference: MinMaxZoomPreference(14.0, 23.0),
-   /*   onCameraIdle: () async {
-        BlocProvider.of<ReportAlertBloc>(context).add(OnCameraMoveEvent(context: context, ));
-      },*/
       onTap: (latLng) {
         dataState.polylinePointList.isNotEmpty ?
         BlocProvider.of<ReportAlertBloc>(context).add(
