@@ -334,7 +334,11 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
                     ),
                   );
                 });
-            if (res != null) {}
+            if (res != null) {
+              BlocProvider.of<CreateAlertFormBloc>(context)
+                  .add(SelectAudioEvent(audioPath: res.toString()));
+              print("res.toString()---${res.toString()}");
+            }
           },
           icon: Icon(
             Icons.mic,

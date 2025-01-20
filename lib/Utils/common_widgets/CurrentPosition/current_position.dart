@@ -4,6 +4,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CurrentLocation {
+
+
   static Future<Position?> getCurrentLocation() async {
     await Geolocator.requestPermission();
     await Permission.locationAlways.request();

@@ -29,6 +29,7 @@ class CreateAlertFormBloc
     on<SelectTfGisValueEvent>(_selectTfGisValue);
     on<CaptureCameraPhotoEvent>(_captureCameraPhoto);
     on<CaptureGalleryPhotoEvent>(_captureGalleryPhoto);
+    on<SelectAudioEvent>(_selectAudio);
     on<SubmitAddIncidentBtnEvent>(_submitBtn);
   }
 
@@ -243,11 +244,11 @@ class CreateAlertFormBloc
     _eventCompleted(emit);
   }
 
-  /*_selectAudio(SelectAudioEvent event, emit) {
+  _selectAudio(SelectAudioEvent event, emit) {
     audioRecordFile =  File(event.audioPath);
     _eventCompleted(emit);
   }
-*/
+
   _submitBtn(SubmitAddIncidentBtnEvent event, emit) async {
     try {
       var validationCheck = await CreateAlertFormHelper.validationSubmit(
