@@ -23,6 +23,7 @@ import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/mode
 import 'package:igl_outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
 import 'package:igl_outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 
+import 'widget/AudioPlayer.dart';
 import 'widget/voice_record_widget.dart';
 
 class CreateAlertFormView extends StatefulWidget {
@@ -316,22 +317,8 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
                 context: !context.mounted ? context : context,
                 builder: (BuildContext context) {
                   return Container(
-                    height: size * 0.70,
-                    padding: const EdgeInsets.only(top: 6.0),
-                    margin: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(25),
-                        topRight: Radius.circular(25),
-                      ),
-                      color: Colors.white,
-                    ),
-                    child: SafeArea(
-                      top: false,
-                      child: VoiceRecordWidget(),
-                    ),
+                    height: size * 0.60,
+                    child: VoideRecord(),
                   );
                 });
             if (res != null) {

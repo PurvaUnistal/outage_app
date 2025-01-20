@@ -279,7 +279,7 @@ class CreateAlertFormBloc
           markerLat: markerLatitudeController.text.trim().toString(),
           markerLong: markerLongitudeController.text.trim().toString(),
           description: descriptionController.text.trim().toString(),
-          incidentVoice: "",
+          incidentVoice: audioRecordFile.path.toString(),
         );
         if (res != null) {
           isBtnLoader = false;

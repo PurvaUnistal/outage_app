@@ -2,7 +2,7 @@
 
 class AppString {
   static double  zoom = 15;
-  static String version = "Version : Outage-1.07.01.25";
+  static String version = "Version : Outage-1.20.01.25";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";
