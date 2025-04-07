@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+import 'package:outage_app/Utils/commonClass/common_style.dart';
+import 'package:outage_app/Utils/commonClass/environment_config.dart';
+import '../res/app_string.dart';
+import '../res/app_styles.dart';
+
+class BackgroundInfoWidget extends StatelessWidget {
+  final Widget child;
+
+  const BackgroundInfoWidget({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          child,
+          Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                  decoration: BoxDecoration(gradient: CommonStyle.gradients),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                          child: Text(
+                        AppString.companyName,
+                        textAlign: TextAlign.start,
+                        style: Styles.rel,
+                      )),
+                      Flexible(
+                          child: Text(
+                        AppString.version,
+                        textAlign: TextAlign.start,
+                        style: Styles.rel,
+                      )),
+                    ],
+                  )))
+        ],
+      ),
+    );
+  }
+}
