@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
-import 'features/ReportOutage/ReportOutageAlert/helper/decodePolyline.dart';
+import 'decodePolyline.dart';
 
 class DynamicPolylineMap extends StatefulWidget {
   @override
@@ -44,17 +44,14 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
   List<LatLng> allLatLongPoint = [];
   Set<Polyline> polylinePointList = {};
   Set<Polyline> pipePolylinePointList = {};
-  Set<Polyline> finalPolylines = {};
-  Set<Polyline> _polyline = {};
+  List<Polyline> finalPolylines = [];
   final StreamController<Set<Polyline>> _polylineStreamController =
       StreamController<Set<Polyline>>();
 
   Stream<Set<Polyline>> get polylineStream => _polylineStreamController.stream;
 
   void updatePolylines(Set<Polyline> polylines) {
-    setState(() {
-      this._polyline = polylines;
-    });
+    _polylineStreamController.add(polylines);
   }
 
   Completer<GoogleMapController> googleMapController = Completer();
@@ -69,9 +66,6 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
       pipelineModel = res;
       listOfPipeline = pipelineModel.data!;
       finalPolylines.clear();
-      await gotoIntialPostion(loginPosition);
-      updatePolylines(finalPolylines);
-
       for (int i = 0; i < listOfPipeline.length; i++) {
         final data = listOfPipeline[i];
         if (data.geomencode != null && data.geomencode!.isNotEmpty) {
@@ -88,22 +82,17 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
               width: 4,
             );
             finalPolylines.add(polyline);
-            // abhi dos
+            if (i % 10 == 0) {
+            //  updatePolylines(List.from(finalPolylines));
+              await Future.delayed(Duration(milliseconds: 50));
+            }
           } catch (e) {
             print("Error decoding polyline at index $i: $e");
           }
         }
       }
-
-      _filterVisiblePolylines();
+      await _filterVisiblePolylines();
     }
-  }
-
-  Future<void> gotoIntialPostion(LatLng location) async {
-      CameraPosition position = CameraPosition(
-        target: location);
-    final GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(position));
   }
 
   bool isPointInBounds(LatLng point, LatLngBounds bounds) {
@@ -116,7 +105,6 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
   }
 
   Future<void> _filterVisiblePolylines() async {
-    print("length ${finalPolylines.length}");
     final controller = await googleMapController.future;
     final bounds = await controller.getVisibleRegion();
     final visible = finalPolylines.where((polyline) {
@@ -129,18 +117,27 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Current Location in Google Maps")),
-        body: GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: loginPosition,
-              zoom: 12,
-            ),
-            onMapCreated: (GoogleMapController controller) {
-              googleMapController.complete(controller);
-            },
-            onCameraIdle: () async {
-              _filterVisiblePolylines();
-            },
-            polylines: _polyline,
-            minMaxZoomPreference: MinMaxZoomPreference(15, 18)));
+        body: StreamBuilder<Set<Polyline>>(
+          stream: polylineStream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: CircularProgressIndicator());
+            }
+            final polylines = snapshot.data!.toSet();
+            return GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: loginPosition,
+                  zoom: 12,
+                ),
+                onMapCreated: (GoogleMapController controller) {
+                  googleMapController.complete(controller);
+                },
+                onCameraIdle: () async {
+                  _filterVisiblePolylines();
+                },
+                polylines: polylines,
+                minMaxZoomPreference: MinMaxZoomPreference(12, 18));
+          },
+        ));
   }
 }

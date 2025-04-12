@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:outage_app/MapWithStream.dart';
-import 'package:outage_app/Utils/commonClass/app_config.dart';
-import 'package:outage_app/Utils/commonClass/bloc_multi_provider.dart';
-import 'package:outage_app/Utils/commonClass/enums.dart';
-import 'package:outage_app/Utils/commonClass/singleton.dart';
-import 'Utils/commonClass/environment_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/bloc_multi_provider.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/singleton.dart';
 import 'Utils/common_widgets/Routes/routes.dart';
 import 'Utils/common_widgets/Routes/routes_name.dart';
 
@@ -37,7 +37,7 @@ class _RootAppState extends State<RootApp> {
               colorScheme: ColorScheme.fromSeed(seedColor: EnvironmentConfig.of(context)!.primaryTheme,)),
           initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.generateRoute,
-        //  home:DynamicPolylineMap()
+
         ));
   }
 }

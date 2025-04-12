@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;

@@ -205,9 +205,9 @@ class SelectCheckBoxConsumerGisEvent extends ReportAlertEvent {
   List<Object> get props => [context, checkBoxConsumer];
 }
 
-class OnCameraMoveEvent extends ReportAlertEvent {
+class OnCameraIdleEvent extends ReportAlertEvent {
   final BuildContext context;
-  OnCameraMoveEvent({required this.context,});
+  OnCameraIdleEvent({required this.context,});
   @override
   // TODO: implement props
   List<Object> get props => [context,];

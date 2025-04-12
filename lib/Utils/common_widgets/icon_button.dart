@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 
 import 'res/app_color.dart';
+import 'res/environment_config.dart';
 
 class IconButtonWidget extends StatelessWidget {
   final VoidCallback onPressed;
@@ -16,7 +16,7 @@ class IconButtonWidget extends StatelessWidget {
         onPressed: onPressed,
         icon: Icon(
           iconData,
-          color: EnvironmentConfig.of(context!)!.primaryTheme,
+          color: EnvironmentConfig.of(context)!.primaryTheme,
         ));
   }
 }

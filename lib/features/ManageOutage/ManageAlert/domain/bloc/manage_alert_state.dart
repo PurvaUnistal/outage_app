@@ -18,8 +18,6 @@ class ManageAlertPageLoadState extends ManageAlertState {
 class FetchManageAlertDataState extends ManageAlertState {
   final bool isLoader;
   final bool tabIndexLoader;
-  final String scheme;
-  final String userName;
   final String role;
   final String baseUrl;
   final int tabIndex;
@@ -33,9 +31,7 @@ class FetchManageAlertDataState extends ManageAlertState {
   FetchManageAlertDataState({
     required this.isLoader,
     required this.tabIndexLoader,
-    required this.scheme,
     required this.baseUrl,
-    required this.userName,
     required this.role,
     required this.tabIndex,
     required this.searchPriorityController,
@@ -49,8 +45,6 @@ class FetchManageAlertDataState extends ManageAlertState {
   List<Object> get props => [
     isLoader,
     tabIndexLoader,
-    scheme,
-    userName,
     role,
     baseUrl,
     tabIndex,

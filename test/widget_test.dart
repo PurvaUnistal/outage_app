@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:outage_app/Utils/commonClass/enums.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/root.dart';
 
 void main() {

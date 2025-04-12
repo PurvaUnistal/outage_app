@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class VoiceRecordWidget extends StatefulWidget {

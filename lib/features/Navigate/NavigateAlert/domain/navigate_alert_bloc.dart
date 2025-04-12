@@ -11,6 +11,7 @@ import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
@@ -82,9 +83,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   bool checkBoxConsumer = false;
   bool isGasConsumerLoader = false;
 
-  String scheme = '';
+
   String role = '';
-  String userName = '';
   String baseUrl = '';
   String loginLat = '';
   String loginLong = '';
@@ -255,17 +255,18 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     googleMapController = Completer();
 
     currentMapType = MapType.normal;
-    scheme = await SharedPref.getString(key: PrefsValue.schema);
-    role = await SharedPref.getString(key: PrefsValue.userRole);
-    userName = await SharedPref.getString(key: PrefsValue.userName);
+    role = await AppConfig.instanceInit()?.loginData.user?.role! ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-    loginLat = await SharedPref.getString(key: PrefsValue.loginLat);
-    loginLong = await SharedPref.getString(key: PrefsValue.loginLong);
-    loginPosition = LatLng(
-        double.parse(loginLat.toString()), double.parse(loginLong.toString()));
-     await ReportAlertHelper.clearCache();
+    loginLat = await AppConfig.instanceInit()?.loginData.user?.gaLatitude! ?? "";;
+    loginLong = await AppConfig.instanceInit()?.loginData.user?.gaLongitude! ?? "";
+    loginPosition = LatLng(double.parse(loginLat.toString()), double.parse(loginLong.toString()));
     await _currentPointMarker();
-    await  _fetchGasPipelineGisApi(context: event.context);
+    Future.wait(<Future>[
+     ReportAlertHelper.clearCache(),
+     _currentPointMarker(),
+      _fetchGasPipelineGisApi(context: event.context),
+    ]);
+
     _eventCompleted(emit);
   }
 
@@ -413,6 +414,50 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     required BuildContext context,
   }) async {
     await _clearMarkerPolyline();
+
+    var res = await ReportAlertHelper.getPipelineApi(
+      context: context,
+      latitude: loginPosition.latitude.toString(),
+      longitude: loginPosition.longitude.toString(),
+    );
+
+    if (res != null) {
+      pipelineModel = res;
+
+      if (pipelineModel.data != null) {
+        listOfPipeline = pipelineModel.data!;
+
+        List<Future<List<LatLng>>> decodeFutures = listOfPipeline.map((pipelineData) {
+          return DecodePolyline.decodePolyline(pipelineData.geomencode!);
+        }).cast<Future<List<LatLng>>>().toList();
+
+// Step 2: Wait for all futures to complete
+        List<List<LatLng>> decodedPolylines = await Future.wait(decodeFutures);
+
+
+        for (int i = 0; i < decodedPolylines.length; i++) {
+          final colors = ReportAlertHelper.getPolylineColor(
+            int.tryParse(listOfPipeline[i].nominaldia!) ?? 0,
+          );
+
+          var listOfPolyline = await ReportAlertHelper.createPolyLine(
+            color: colors,
+            latlngList: decodedPolylines[i],
+            context: context,
+          );
+
+          pipePolylinePointList.addAll(listOfPolyline);
+        }
+
+        polylinePointList = pipePolylinePointList;
+      }
+    }
+  }
+
+  /*_fetchGasPipelineGisApi({
+    required BuildContext context,
+  }) async {
+    await _clearMarkerPolyline();
     var res = await ReportAlertHelper.getPipelineApi(
       context: context,
       latitude: loginPosition.latitude.toString(),
@@ -422,7 +467,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       pipelineModel = res;
       if (pipelineModel.data != null) {
         listOfPipeline = pipelineModel.data!;
-        for (int i = 0; i <= 3000 && i < listOfPipeline.length; i++) {
+        *//*      for (int i = 0; i <= 3000 && i < listOfPipeline.length; i++) {
           final colors = ReportAlertHelper.getPolylineColor(
               int.tryParse(listOfPipeline[i].nominaldia!) ?? 0);
           allLatLongPoint = await DecodePolyline.decodePolyline(
@@ -431,13 +476,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
               color: colors, latlngList: allLatLongPoint, context: context);
           pipePolylinePointList.addAll(listOfPolyline);
           polylinePointList = pipePolylinePointList;
-          /* currentPosition =
+          *//**//* currentPosition =
               LatLng(allLatLongPoint[0].latitude, allLatLongPoint[0].longitude);
-          cameraPosition = CameraPosition(target: currentPosition, zoom: 12);*/
-        }
+          cameraPosition = CameraPosition(target: currentPosition, zoom: 12);*//**//*
+        }*//*
       }
     }
-  }
+  }*/
 
   Future<void> _fetchPipelineNetworkApi({
     required BuildContext context,
@@ -574,7 +619,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       print("Current Position: $currentPosition");
       cameraPosition = CameraPosition(target: currentPosition, zoom: 14);
     }
-    print("Current Positionzzzzzzzzzzz: $currentPosition");
   }
 
   _selectCheckBoxTFGis(SelectCheckBoxTFGisEvent event, emit) async {
@@ -583,7 +627,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkBoxTf == true) {
       isGasTfLoader = true;
       _eventCompleted(emit);
-      await SharedPref.remove(key: PrefsValue.assetId);
       await _fetchTFGisApi(context: event.context);
     }
     isGasTfLoader = false;
@@ -596,7 +639,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkBoxValve == true) {
       isGasValveLoader = true;
       _eventCompleted(emit);
-      await SharedPref.remove(key: PrefsValue.assetId);
       await _fetchGasValueGisApi(context: event.context);
     }
     isGasValveLoader = false;
@@ -610,7 +652,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkBoxRegulator == true) {
       isGasRegulatorLoader = true;
       _eventCompleted(emit);
-      await SharedPref.remove(key: PrefsValue.assetId);
       await _fetchGasRegulatorGisApi(context: event.context);
     }
     isGasRegulatorLoader = false;
@@ -636,8 +677,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       isGasElbowLoader = true;
       _eventCompleted(emit);
       await _fetchGasElbowGisApi(context: event.context);
-      await SharedPref.setString(
-          key: PrefsValue.assetId, value: tfGisModel.assetId ?? "");
     }
     isGasElbowLoader = false;
     _eventCompleted(emit);
@@ -706,9 +745,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     controller.text = gisId;
     Set<Marker> tempMarker = {};
     if (gisId.isNotEmpty) {
-      await SharedPref.setString(key: PrefsValue.assetId, value: assetId);
-      await SharedPref.setString(
-          key: PrefsValue.assetTypeId, value: assetTypeId);
       filteredList.addAll(dataList.where((data) {
         if (gasValveGISController.text.isNotEmpty) {
           return data.valveId.toString() == gisId;
@@ -912,12 +948,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   _onResetFilterEvent(ResetFilterEvent event, emit) async {
     _clearTextField();
     _clearMarkerPolyline();
-    await SharedPref.remove(
-      key: PrefsValue.assetId,
-    );
-    await SharedPref.remove(
-      key: PrefsValue.assetTypeId,
-    );
     GoogleMapController controller = await googleMapController.future;
     currentPosition = LatLng(loginPosition.latitude, loginPosition.longitude);
     controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -1074,9 +1104,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       isGasEndCapLoader: isGasEndCapLoader,
       checkBoxConsumer: checkBoxConsumer,
       isGasConsumerLoader: isGasConsumerLoader,
-      scheme: scheme,
       baseUrl: baseUrl,
-      userName: userName,
       nameofLocation: nameofLocation,
       role: role,
       cameraPosition: cameraPosition,

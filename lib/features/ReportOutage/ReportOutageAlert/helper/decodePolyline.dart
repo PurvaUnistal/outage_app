@@ -1,6 +1,8 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DecodePolyline{
+
+
   static List<LatLng> decodePolyline(String encoded) {
     List<LatLng> poly = [];
     int index = 0, len = encoded.length;
@@ -30,5 +32,14 @@ class DecodePolyline{
     }
 
     return poly;
+  }
+
+ static bool isPointInBounds(LatLng point, LatLngBounds bounds) {
+    final southwest = bounds.southwest;
+    final northeast = bounds.northeast;
+    return (point.latitude >= southwest.latitude &&
+        point.latitude <= northeast.latitude) &&
+        (point.longitude >= southwest.longitude &&
+            point.longitude <= northeast.longitude);
   }
 }

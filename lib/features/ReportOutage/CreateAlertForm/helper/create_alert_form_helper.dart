@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/Utils.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
 import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetLocationSourceModel.dart';
 import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetModuleTypeModel.dart';
@@ -20,9 +19,7 @@ import '../domain/model/GetIncidentIndicationModel.dart';
 class CreateAlertFormHelper {
   static Future<GetModuleTypeModel?> getOutageModuleApi(
       {required BuildContext context}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
     };
@@ -40,9 +37,7 @@ class CreateAlertFormHelper {
 
   static Future<GetIncidentTypeModel?> getIncidentTypeApi(
       {required BuildContext context, required String moduleId}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "module_id": moduleId,
@@ -61,9 +56,7 @@ class CreateAlertFormHelper {
 
   static Future<GetPriorityTypeModel?> getIncidentPriorityApi(
       {required BuildContext context, required String moduleId}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "module_id": moduleId,
@@ -94,9 +87,7 @@ class CreateAlertFormHelper {
 
   static Future<GetPriorityTypeModel?> getInformationSourceApi(
       {required BuildContext context}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
     };
@@ -114,9 +105,7 @@ class CreateAlertFormHelper {
 
   static Future<GetIncidentIndicationModel?> getIncidentIndicationApi(
       {required BuildContext context}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
     };
@@ -147,9 +136,7 @@ class CreateAlertFormHelper {
 
   static Future<GetAssetModel?> getAssetLocationSourceApi(
       {required BuildContext context}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
     };
@@ -169,9 +156,7 @@ class CreateAlertFormHelper {
       {required BuildContext context,
       required String locationSource,
       required String search}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "location_source": locationSource,
@@ -195,9 +180,7 @@ class CreateAlertFormHelper {
     required BuildContext context,
     required String areaId,
   }) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "area_id": areaId,
@@ -273,8 +256,8 @@ class CreateAlertFormHelper {
     required String incidentVoice,
     required File photo,
   }) async {
-    String userId = await SharedPref.getString(key: PrefsValue.userId);
-    String schema = await SharedPref.getString(key: PrefsValue.schema);
+    String userId = await AppConfig.instanceInit()?.loginData.user?.id ?? "";
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> body = {
       "schema": schema,
       "user_id": userId,

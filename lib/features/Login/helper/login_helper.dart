@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/Utils.dart';
-import 'package:outage_app/Utils/commonClass/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
 import 'package:outage_app/service/Apis.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 
 import 'res/app_color.dart';
+import 'res/environment_config.dart';
 
 class GPSSettingPermissionPopWidget extends StatelessWidget {
   const GPSSettingPermissionPopWidget({super.key});

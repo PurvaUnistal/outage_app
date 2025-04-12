@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_server_dio.dart';
 import '../domain/model/ViewIncidentModel.dart';
@@ -10,9 +9,7 @@ class ManageAlertHelper{
 
   static Future<ViewIncidentModel?> getViewIncidentApi(
       {required BuildContext context}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema! ?? "";
     Map<String, String> para = {
       "schema": schema,
     };

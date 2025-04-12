@@ -17,37 +17,31 @@ class HomePageLoadState extends HomeState {
 
 class FetchHomeDataState extends HomeState {
   final bool isLoader;
-  final String scheme;
-  final String userName;
   final String role;
   final String baseUrl;
+  List<Accessright> listOFAccessRight;
   final List<String> paths;
   final List<String> iconText;
   final List<Widget> navigatorView;
-  final List<Accessright> listOFAccessRight;
 
 
   FetchHomeDataState({
     required this.isLoader,
-    required this.scheme,
     required this.baseUrl,
-    required this.userName,
     required this.role,
+    required this.listOFAccessRight,
     required this.paths,
     required this.iconText,
     required this.navigatorView,
-    required this.listOFAccessRight,
   });
   @override
   List<Object> get props => [
     isLoader,
-    scheme,
-    userName,
     role,
     baseUrl,
+    listOFAccessRight,
     paths,
     iconText,
     navigatorView,
-    listOFAccessRight,
   ];
 }

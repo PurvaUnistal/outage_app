@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
-import 'package:outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
@@ -26,15 +26,21 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundInfoWidget(
-      child: BlocBuilder<MaintenanceAlertBloc, MaintenanceAlertState>(
-        builder: (context, state) {
-          if (state is FetchMaintenanceAlertDataState) {
-            return  _itemBuilder(dataState: state);
-          } else {
-            return const Center(child: SpinLoader());
-          }
-        },
+    return Scaffold(
+      appBar: AppBarWidget(
+        title: AppString.maintenanceAlert,
+        boolLeading: true,
+      ),
+      body: BackgroundInfoWidget(
+        child: BlocBuilder<MaintenanceAlertBloc, MaintenanceAlertState>(
+          builder: (context, state) {
+            if (state is FetchMaintenanceAlertDataState) {
+              return  _itemBuilder(dataState: state);
+            } else {
+              return const Center(child: SpinLoader());
+            }
+          },
+        ),
       ),
     );
   }
@@ -47,35 +53,11 @@ class _MaintenanceAlertViewState extends State<MaintenanceAlertView> {
   }
 
   Widget _itemBuilder({required FetchMaintenanceAlertDataState dataState}) {
-    return Scaffold(
-      appBar: AppBarWidget(
-        title: AppString.maintenanceAlert,
-        boolLeading: true,
-        actions: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                dataState.userName,
-                textAlign: TextAlign.start,
-                style: Styles.rel,
-              ),
-              Text(
-                dataState.scheme,
-                textAlign: TextAlign.start,
-                style: Styles.rel,
-              )
-            ],
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 15),
-        child: Center(
-          child: Text("No data founds", style: Styles.labels,),
-        )
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 15),
+      child: Center(
+        child: Text("No data founds", style: Styles.labels,),
+      )
     );
   }
 }

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:outage_app/Utils/commonClass/app_config.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
-import 'package:outage_app/Utils/commonClass/enums.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
-import 'package:outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/icon_button.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/text_form_widget.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_bloc.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_event.dart';
@@ -31,17 +31,20 @@ class _LoginViewState extends State<PhoneLoginView> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
-        child: BackgroundInfoWidget(
-          child: BlocBuilder<LoginBloc, LoginState>(
-            builder: (context, state) {
-              if (state is LoginFetchDataState) {
-                return _buildPhoneLayout(dataState: state);
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
+        child: Scaffold(
+          body: BackgroundInfoWidget(
+            child: BlocBuilder<LoginBloc, LoginState>(
+              builder: (context, state) {
+                if (state is LoginFetchDataState) {
+                  return _buildPhoneLayout(dataState: state);
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
           ),
-        ));
+        )
+    );
   }
 
   Widget _buildPhoneLayout({required LoginFetchDataState dataState}) {

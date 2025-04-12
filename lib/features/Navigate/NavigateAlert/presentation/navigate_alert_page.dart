@@ -2,15 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
-import 'package:outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/text_form_widget.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
@@ -35,15 +34,21 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundInfoWidget(
-      child: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
-        builder: (context, state) {
-          if (state is FetchNavigateAlertDataState) {
-            return _itemBuilder(dataState: state);
-          } else {
-            return const Center(child: SpinLoader());
-          }
-        },
+    return Scaffold(
+      appBar: AppBarWidget(
+        title: AppString.navigateAlert,
+        boolLeading: true,
+      ),
+      body: BackgroundInfoWidget(
+        child: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
+          builder: (context, state) {
+            if (state is FetchNavigateAlertDataState) {
+              return _itemBuilder(dataState: state);
+            } else {
+              return const Center(child: SpinLoader());
+            }
+          },
+        ),
       ),
     );
   }
@@ -59,61 +64,36 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
   }
 
   Widget _itemBuilder({required FetchNavigateAlertDataState dataState}) {
-    return Scaffold(
-        appBar: _appBarWidget(dataState: dataState),
-        body: Stack(children: <Widget>[
-          _googleMapWidget(dataState: dataState),
-          dataState.isPipelineLoader == false
-              ? Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [  CommonStyle.vertical(context: context),
-                   /*   _startLocationWidget(dataState: dataState),
-                      CommonStyle.vertical(context: context),
-                      _destinationLocationWidget(dataState: dataState),
-                      CommonStyle.vertical(context: context),*/
-                      _mapTypeButtonWidget(dataState: dataState),
-                      SizedBox(height: 16.0),
-                      _legendButtonWidget(dataState: dataState),
-                      SizedBox(height: 16.0),
-                      _currentLocationButtonWidget(dataState: dataState),
-                      SizedBox(height: 16.0),
-                      _filterButtonWidget(dataState: dataState),
-                    ],
-                  ),
-                ),
-              )
-              : WaveLoaderWidget(),
-        ]));
+    return Stack(children: <Widget>[
+       _googleMapWidget(dataState: dataState),
+       dataState.isPipelineLoader == false
+           ? Align(
+             alignment: Alignment.topRight,
+             child: Padding(
+               padding: const EdgeInsets.symmetric(horizontal: 8.0),
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.end,
+                 children: [  CommonStyle.vertical(context: context),
+                /*   _startLocationWidget(dataState: dataState),
+                   CommonStyle.vertical(context: context),
+                   _destinationLocationWidget(dataState: dataState),
+                   CommonStyle.vertical(context: context),*/
+                   _mapTypeButtonWidget(dataState: dataState),
+                   SizedBox(height: 16.0),
+                   _legendButtonWidget(dataState: dataState),
+                   SizedBox(height: 16.0),
+                   _currentLocationButtonWidget(dataState: dataState),
+                   SizedBox(height: 16.0),
+                   _filterButtonWidget(dataState: dataState),
+                 ],
+               ),
+             ),
+           )
+           : WaveLoaderWidget(),
+     ]);
   }
 
-  _appBarWidget({required FetchNavigateAlertDataState dataState}) {
-    return AppBarWidget(
-      title: AppString.navigateAlert,
-      boolLeading: true,
-      actions: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              dataState.userName,
-              textAlign: TextAlign.start,
-              style: Styles.rel,
-            ),
-            Text(
-              dataState.scheme,
-              textAlign: TextAlign.start,
-              style: Styles.rel,
-            )
-          ],
-        ),
-      ],
-    );
-  }
+
 
   Widget _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
    /* return GoogleMap(

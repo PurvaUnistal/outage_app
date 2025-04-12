@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:outage_app/Utils/Utils.dart';
-import 'package:outage_app/Utils/commonClass/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:outage_app/Utils/common_widgets/GetImage/get_image_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Routes/routes_name.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_event.dart';
 import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_state.dart';
 import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/model/GetAssetModel.dart';
@@ -39,9 +39,8 @@ class CreateAlertFormBloc
   bool isLoader = false;
   bool isBtnLoader = false;
 
-  String scheme = '';
+
   String role = '';
-  String userName = '';
   String baseUrl = '';
   String assetId = '';
   String locationSource = '';
@@ -125,12 +124,10 @@ class CreateAlertFormBloc
     assetTypeIdController.text =
         (await AppConfig.instanceInit()?.assetsTypeId) ?? "";
     markerLatitudeController.text =
-        await SharedPref.getString(key: PrefsValue.markerLat);
+        await AppConfig.instanceInit()?.markerLat ?? "";
     markerLongitudeController.text =
-        await SharedPref.getString(key: PrefsValue.markerLong);
-    scheme = await SharedPref.getString(key: PrefsValue.schema);
-    role = await SharedPref.getString(key: PrefsValue.userRole);
-    userName = await SharedPref.getString(key: PrefsValue.userName);
+        await AppConfig.instanceInit()?.markerLong ?? "";
+    role = await AppConfig.instanceInit()?.loginData.user?.role ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
 
     await Future.wait(<Future>[
@@ -326,9 +323,7 @@ class CreateAlertFormBloc
       audioRecordFile: audioRecordFile,
       isLoader: isLoader,
       isBtnLoader: isBtnLoader,
-      scheme: scheme,
       baseUrl: baseUrl,
-      userName: userName,
       role: role,
       incidentTypeModel: incidentTypeModel,
       incidentTypeValue: incidentTypeValue,

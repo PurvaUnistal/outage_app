@@ -7,9 +7,9 @@ import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:outage_app/Utils/Utils.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/common_session_dialog_box.dart';
 import 'package:outage_app/Utils/common_widgets/connectivity_helper.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/service/Apis.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -80,7 +80,7 @@ class ApiHelper {
     required BuildContext context
   }) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    String token = pref.getString(PrefsValue.token) ?? "";
+    String token = AppConfig.instanceInit()?.loginData.token??"";
     try {
       if(await ConnectivityHelper.allConnectivityCheck(context: context) == false){
         return null;

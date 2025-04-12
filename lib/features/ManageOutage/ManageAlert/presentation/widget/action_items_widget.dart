@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/ManageOutage/ManageAlert/domain/model/ViewIncidentModel.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/presentation/report_details_view.dart';
 
@@ -30,13 +29,9 @@ class ActionItemsWidget extends StatelessWidget {
       color: AppColor.white,
       child: ListTile(
         onTap: () async {
-          await SharedPref.remove(key: PrefsValue.incidentTypeId);
-          await SharedPref.remove(key: PrefsValue.incidentId);
-          await SharedPref.setString(
-              key: PrefsValue.incidentTypeId,
-              value: viewIncidentData.incidentTypeId!);
-          await SharedPref.setString(
-              key: PrefsValue.incidentId, value: viewIncidentData.incid!);
+         AppConfig.instanceInit()?.setIncidentId(newIncidentId: viewIncidentData.incid!);
+         AppConfig.instanceInit()?.setIncidentTypeId(newIncidentTypeId: viewIncidentData.incidentTypeId!);
+
           Navigator.push(
               context,
               MaterialPageRoute(

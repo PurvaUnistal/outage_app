@@ -22,8 +22,6 @@ class ReportDetailsPageLoadState extends ReportDetailsState {
 class FetchReportDetailsDataState extends ReportDetailsState {
   final bool isLoader;
   final bool isBtnLoader;
-  final String scheme;
-  final String userName;
   final String role;
   final String currentActionStatus;
   final String baseUrl;
@@ -43,10 +41,8 @@ class FetchReportDetailsDataState extends ReportDetailsState {
   FetchReportDetailsDataState({
     required this.isLoader,
     required this.isBtnLoader,
-    required this.scheme,
     required this.currentActionStatus,
     required this.baseUrl,
-    required this.userName,
     required this.role,
     required this.incidentLocation,
     required this.consumerAffectMode,
@@ -65,9 +61,7 @@ class FetchReportDetailsDataState extends ReportDetailsState {
   List<Object> get props => [
     isLoader,
     isBtnLoader,
-    scheme,
     currentActionStatus,
-    userName,
     role,
     baseUrl,
     incidentLocation,

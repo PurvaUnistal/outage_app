@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 import 'res/app_color.dart';
 import 'res/app_styles.dart';
 import 'package:substring_highlight/substring_highlight.dart';
+
+import 'res/common_style.dart';
+import 'res/environment_config.dart';
 
 class AutoCompleteTextFieldWidget extends StatelessWidget {
   final List<String> suggestions;

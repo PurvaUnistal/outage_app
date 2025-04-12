@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_event.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_state.dart';

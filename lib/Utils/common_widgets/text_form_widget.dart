@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+
+import 'res/common_style.dart';
+import 'res/environment_config.dart';
 
 class TextFieldWidget extends StatelessWidget {
   final TextEditingController? controller;

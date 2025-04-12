@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
+
+import 'res/common_style.dart';
 
 class RowWidget extends StatelessWidget {
   final Widget widget1;

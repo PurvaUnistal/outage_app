@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
-import 'package:outage_app/Utils/commonClass/enums.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/features/ManageOutage/ManageAlert/domain/model/ViewIncidentModel.dart';
 import 'package:outage_app/features/ManageOutage/ManageAlert/helper/manage_alert_helper.dart';
 import 'manage_alert_event.dart';
@@ -19,9 +20,7 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
 
   bool isLoader = false;
   bool tabIndexLoader = false;
-  String scheme = '';
   String role = '';
-  String userName = '';
   String baseUrl = '';
   int tabIndex = 0;
 
@@ -35,7 +34,7 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
   TextEditingController searchPriorityController = TextEditingController();
 
   _pageLoad(ManageAlertLoadEvent event, emit) async {
-    emit(ManageAlertInitialState());
+    emit(ManageAlertPageLoadState());
     isLoader = false;
     tabIndexLoader = false;
     tabIndex = 0;
@@ -45,9 +44,7 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
     listOfViewIncident = [];
     listOfFilterViewIncident = [];
     searchPriorityController.text = "";
-    scheme = await SharedPref.getString(key: PrefsValue.schema);
-    role = await SharedPref.getString(key: PrefsValue.userRole);
-    userName = await SharedPref.getString(key: PrefsValue.userName);
+    role = await AppConfig.instanceInit()?.loginData.user?.role! ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
     await _fetchViewIncidentApi(context: event.context);
     _eventCompleted(emit);
@@ -64,27 +61,32 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
       if (viewIncidentModel.data != null) {
         listOfViewIncident = viewIncidentModel.data!;
         listOfFilterViewIncident = listOfViewIncident;
-        await _filterList();
+        _filterList();
       }
       return res;
     }
   }
 
-  _filterList(){
+   _filterList() {
+    ActionStatus? status;
+
     if (tabIndex == 0) {
-      listOfFilterViewIncident = listOfFilterViewIncident
-          .where((e) => e.actionStatus == ActionStatus.newAction)
-          .toList();
+      status = ActionStatus.newAction;
     } else if (tabIndex == 1) {
-      listOfFilterViewIncident = listOfFilterViewIncident
-          .where((e) => e.actionStatus == ActionStatus.inProgress)
-          .toList();
+      status = ActionStatus.inProgress;
     } else if (tabIndex == 2) {
-      listOfFilterViewIncident = listOfFilterViewIncident
-          .where((e) => e.actionStatus == ActionStatus.completed)
+      status = ActionStatus.completed;
+    }
+
+    if (status != null) {
+      listOfFilterViewIncident = listOfViewIncident
+          .where((e) => e.actionStatus == status)
           .toList();
+    } else {
+      listOfFilterViewIncident = listOfViewIncident;
     }
   }
+
 
   _selectTabChanged(SelectTabChangedEvent event, emit) async {
     searchPriorityController.text = "";
@@ -128,9 +130,7 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
     emit(FetchManageAlertDataState(
       isLoader: isLoader,
       tabIndexLoader: tabIndexLoader,
-      scheme: scheme,
       baseUrl: baseUrl,
-      userName: userName,
       role: role,
       tabIndex: tabIndex,
       searchPriorityController: searchPriorityController,

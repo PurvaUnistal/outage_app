@@ -4,7 +4,7 @@ import 'package:audioplayers/audioplayers.dart' as ap;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 
 class AudioPlayer extends StatefulWidget {
   /// Path from where to play recorded audio

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_helper.dart';
 
@@ -11,7 +12,7 @@ import '../domain/model/GetChargeAreaModel.dart';
 
 class CreateAlertFormHttpHelper{
   static Future<List<GetChargeAreaModel>?> getChargeAreaListApi({required BuildContext context}) async {
-    String schema = await SharedPref.getString(key: PrefsValue.schema,);
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
     };
@@ -26,7 +27,7 @@ class CreateAlertFormHttpHelper{
   }
 
   static Future<List<GetAreaModel>?> getAllAreaApi({required BuildContext context, required String gid}) async {
-    String schema = await SharedPref.getString(key: PrefsValue.schema,);
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "gid": gid,

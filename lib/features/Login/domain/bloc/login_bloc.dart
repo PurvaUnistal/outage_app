@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +6,7 @@ import 'package:outage_app/Utils/common_widgets/Routes/routes_name.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/connectivity_helper.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_event.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_state.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
@@ -66,7 +68,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             if(res.status == 200 ){
               await SharedPref.setString(key: PrefsValue.passwordVal,value: emailController.text);
               await SharedPref.setString(key: PrefsValue.emailVal,value: passwordController.text);
-              await SharedPref.setString(key: PrefsValue.userId,value: res.user!.id!);
+              String userJson = jsonEncode(res.toJson());
+              await SharedPref.setString(
+                  key: PrefsValue.userInfo, value: userJson);
+              final appConfig = AppConfig.instanceInit();
+              if (appConfig != null) {
+                await appConfig.setLoginData(newLoginData: loginModel);
+              }
+              PackageInfo packageInfo = await PackageInfo.fromPlatform();
+              await SharedPref.setString(key: PrefsValue.buildNumber,value: packageInfo.buildNumber);
+             /* await SharedPref.setString(key: PrefsValue.userId,value: res.user!.id!);
               await SharedPref.setString(key: PrefsValue.token,value: res.token!);
               await SharedPref.setString(key: PrefsValue.schema,value: res.user!.schema!);
               await SharedPref.setString(key: PrefsValue.userName,value: res.user!.name!);
@@ -79,7 +90,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               List<Accessright> accessrightList = await res.user!.accessright ?? [];
               await SharedPref.setString(key: PrefsValue.accessRight,value: Accessright.jsonFromAccessrightList(accessrightList));
               PackageInfo packageInfo = await PackageInfo.fromPlatform();
-              await SharedPref.setString(key: PrefsValue.appVersion,value: packageInfo.buildNumber);
+              await SharedPref.setString(key: PrefsValue.buildNumber,value: packageInfo.buildNumber);*/
                 Navigator.pushReplacementNamed(
                   event.context,
                   RoutesName.outageApp,

@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentActionModel.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentActionProgressModel.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
@@ -13,9 +12,7 @@ class ReportDetailsHelper{
 
   static Future<IncidentActionModel?> getIncidentActionApi(
       {required BuildContext context, required String incidentTypeId}) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "incident_type_id": incidentTypeId,
@@ -38,9 +35,7 @@ class ReportDetailsHelper{
         required String incidentTypeId,
         required String incidentId,
   }) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "incident_type_id": incidentTypeId,
@@ -63,9 +58,7 @@ class ReportDetailsHelper{
     required BuildContext context,
     required String incidentId,
   }) async {
-    String schema = await SharedPref.getString(
-      key: PrefsValue.schema,
-    );
+    String schema =await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> para = {
       "schema": schema,
       "incidentId": incidentId,
@@ -91,8 +84,8 @@ class ReportDetailsHelper{
     required String status,
     required String row,
   }) async {
-    String userId = await SharedPref.getString(key: PrefsValue.userId);
-    String schema = await SharedPref.getString(key: PrefsValue.schema);
+    String userId = await AppConfig.instanceInit()?.loginData.user?.id ?? "";
+    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     Map<String, String> body = {
       "schema": schema,
       "user_id": userId,

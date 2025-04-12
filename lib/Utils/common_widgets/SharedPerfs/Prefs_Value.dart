@@ -2,7 +2,10 @@ class PrefsValue {
   static String isUserLogIn = "IsUserLogIn";
   static String emailVal = "Email";
   static String passwordVal = "Password";
-  static String token = "token";
+  static String userInfo = "userInfo";
+  static String buildNumber = "buildNumber";
+  static String baseUrl = "baseUrl";
+  /*
   static String schema = "schema";
   static String userRole = "User Role";
   static String userName = "User Name";
@@ -23,6 +26,6 @@ class PrefsValue {
   static String assetId = "assetId";
   static String assetTypeId = "assetTypeId";
   static String incidentTypeId = "incidentTypeId";
-  static String incidentId = "incidentId";
+  static String incidentId = "incidentId";*/
 
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
+import 'package:outage_app/features/Login/presentation/page/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionDialogUtils {
@@ -38,17 +39,12 @@ class SessionDialogUtils {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool(PrefsValue.isUserLogIn, false);
-      prefs.setString(PrefsValue.userName, '');
-      prefs.setString(PrefsValue.passwordVal, '');
-      prefs.setString(PrefsValue.userId, '');
-      prefs.setString(PrefsValue.token, '');
-      prefs.setString(PrefsValue.schema, '');
-      prefs.setString(PrefsValue.userName, '');
-     /* Navigator.pushAndRemoveUntil(
+      prefs.clear();
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => LoginView()),
+        MaterialPageRoute(builder: (context) => LoginPage()),
             (Route<dynamic> route) => false,
-      );*/
+      );
     } catch (e) {
       print(e.toString());
     }

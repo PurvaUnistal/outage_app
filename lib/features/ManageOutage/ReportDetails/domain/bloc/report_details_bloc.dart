@@ -7,6 +7,7 @@ import 'package:outage_app/Utils/Utils.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_event.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_state.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
@@ -44,9 +45,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         isLoader: isLoader,
         isBtnLoader: isBtnLoader,
         currentActionStatus: currentActionStatus,
-        scheme: scheme,
         baseUrl: baseUrl,
-        userName: userName,
         role: role,
         incidentLocation: incidentLocation,
         consumerAffectMode: consumerAffectModel,
@@ -67,9 +66,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   bool isLoader = false;
   bool isBtnLoader = false;
   String currentActionStatus = "";
-  String scheme = '';
   String role = '';
-  String userName = '';
   String baseUrl = '';
   String incidentTypeId = '';
   String incidentId = '';
@@ -126,12 +123,10 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     valveMarkerPointList = {};
     polylinePointList = {};
 
-    incidentTypeId = await SharedPref.getString(key: PrefsValue.incidentTypeId);
-    incidentId = await SharedPref.getString(key: PrefsValue.incidentId);
+    incidentTypeId = await AppConfig.instanceInit()?.incidentTypeId ?? "";
+    incidentId = await AppConfig.instanceInit()?.incidentId ?? "";
     print("incidentTypeId-->${incidentTypeId}");
-    scheme = await SharedPref.getString(key: PrefsValue.schema);
-    role = await SharedPref.getString(key: PrefsValue.userRole);
-    userName = await SharedPref.getString(key: PrefsValue.userName);
+    role = await AppConfig.instanceInit()?.loginData.user?.role ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
     await _fetchIncidentTypeActionApi(
         context: event.context,
@@ -309,9 +304,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       isLoader: isLoader,
       isBtnLoader: isBtnLoader,
       currentActionStatus: currentActionStatus,
-      scheme: scheme,
       baseUrl: baseUrl,
-      userName: userName,
       role: role,
       incidentLocation: incidentLocation,
       consumerAffectMode: consumerAffectModel,

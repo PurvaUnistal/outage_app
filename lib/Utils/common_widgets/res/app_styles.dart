@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
-import 'package:outage_app/Utils/commonClass/singleton.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
+
+import 'singleton.dart';
 
 class Styles {
   static BuildContext? context = Singleton.instanceInit()?.context;

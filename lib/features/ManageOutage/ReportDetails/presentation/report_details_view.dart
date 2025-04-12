@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/ManageOutage/ManageAlert/presentation/widget/button_border_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
-import 'package:outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
@@ -40,15 +40,21 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundInfoWidget(
-      child: BlocBuilder<ReportDetailsBloc, ReportDetailsState>(
-        builder: (context, state) {
-          if (state is FetchReportDetailsDataState) {
-            return _itemBuilder(dataState: state);
-          } else {
-            return const Center(child: SpinLoader());
-          }
-        },
+    return  Scaffold(
+      appBar: AppBarWidget(
+        title: "Report",
+        boolLeading: true,
+      ),
+      body: BackgroundInfoWidget(
+        child: BlocBuilder<ReportDetailsBloc, ReportDetailsState>(
+          builder: (context, state) {
+            if (state is FetchReportDetailsDataState) {
+              return _itemBuilder(dataState: state);
+            } else {
+              return const Center(child: SpinLoader());
+            }
+          },
+        ),
       ),
     );
   }
@@ -64,49 +70,20 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   }
 
   Widget _itemBuilder({required FetchReportDetailsDataState dataState}) {
-    return Scaffold(
-      /* appBar: AppBar(
-        toolbarHeight: 0,
-        backgroundColor: Colors.white,
-       // brightness: Brightness.light,
-      ),*/
-      appBar: AppBarWidget(
-        title: "Report",
-        boolLeading: true,
-        actions: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                dataState.userName,
-                textAlign: TextAlign.start,
-                style: Styles.rel,
-              ),
-              Text(
-                dataState.scheme,
-                textAlign: TextAlign.start,
-                style: Styles.rel,
-              )
-            ],
+    return SafeArea(
+      child: Column(
+        children: [
+          _googleMap(dataState: dataState),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                _listOfAffect(dataState: dataState),
+                _listOfIncident(dataState: dataState),
+              ],
+            ),
           ),
         ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _googleMap(dataState: dataState),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  _listOfAffect(dataState: dataState),
-                  _listOfIncident(dataState: dataState),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

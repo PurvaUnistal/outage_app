@@ -4,9 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/Utils/commonClass/app_config.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
@@ -18,11 +16,12 @@ import 'package:path_provider/path_provider.dart';
 import '../presentation/widget/alert_dialog_widget.dart';
 
 class ReportAlertHelper {
-
   static Future<void> clearCache() async {
     try {
-      Directory pathIGL1 = Directory("/data/user/0/${AppConfig.instanceInit()?.packageName}/file_picker/");
-      Directory pathIGL2 = Directory("/data/user/0/${AppConfig.instanceInit()?.packageName}/cache/diskcache/");
+      Directory pathIGL1 = Directory(
+          "/data/user/0/${AppConfig.instanceInit()?.packageName}/file_picker/");
+      Directory pathIGL2 = Directory(
+          "/data/user/0/${AppConfig.instanceInit()?.packageName}/cache/diskcache/");
 
       if (await pathIGL1.exists()) {
         await pathIGL1.delete(recursive: true);
@@ -44,8 +43,9 @@ class ReportAlertHelper {
   static Future<GetPipelineGisModel?> getPipelineGisApi(
       {required BuildContext context}) async {
     try {
-      String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-      String areas = await SharedPref.getString(key: PrefsValue.areas);
+      String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+      String areas =
+          await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
       Map<String, String> para = {
         "ga_id": gaId,
         "areas": areas,
@@ -64,8 +64,9 @@ class ReportAlertHelper {
   static Future<GetGasValueGISModel?> getFittingGisApi(
       {required BuildContext context}) async {
     try {
-      String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-      String areas = await SharedPref.getString(key: PrefsValue.areas);
+      String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+      String areas =
+          await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
       Map<String, String> para = {
         "ga_id": gaId,
         "areas": areas,
@@ -85,8 +86,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getTFGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "ga_id": gaId,
@@ -107,8 +108,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getGasValueGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "ga_id": gaId,
@@ -129,8 +130,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getRegulatorGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "ga_id": gaId,
@@ -151,8 +152,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getTeeGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "type": "Tee",
@@ -175,8 +176,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getElbowGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "type": "Elbow",
@@ -199,8 +200,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getCouplerGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "type": "Coupler",
@@ -223,8 +224,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getReducerGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "type": "Reducer",
@@ -247,8 +248,8 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getEndCapGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     try {
       Map<String, String> para = {
         "type": "End Cap",
@@ -271,9 +272,10 @@ class ReportAlertHelper {
 
   static Future<GetGasGisModel?> getConsumerGisApi(
       {required BuildContext context}) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
-    String schema = await SharedPref.getString(key: PrefsValue.schema);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
+    String schema =
+        await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
     try {
       Map<String, String> para = {
         "schema": schema,
@@ -298,8 +300,8 @@ class ReportAlertHelper {
     required String latitude,
     required String longitude,
   }) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     Map<String, String> para = {
       "ga_id": gaId,
       "areas": areas,
@@ -328,8 +330,8 @@ class ReportAlertHelper {
     required String latitude,
     required String longitude,
   }) async {
-    String gaId = await SharedPref.getString(key: PrefsValue.gaId);
-    String areas = await SharedPref.getString(key: PrefsValue.areas);
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
     Map<String, String> para = {
       "ga_id": gaId,
       "areas": areas,
@@ -355,8 +357,6 @@ class ReportAlertHelper {
     required List<LatLng> latlngList,
     required BuildContext context,
     required BitmapDescriptor markerIcon,
-    required String assetId,
-    required String assetTypeId,
   }) async {
     Set<Marker> markersPointList = {};
     try {
@@ -371,14 +371,9 @@ class ReportAlertHelper {
           ),
           position: LatLng(latLngData.latitude, latLngData.longitude),
           onTap: () async {
-            AppConfig.instanceInit()?.setAssets(assets: assetId);
-            AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: assetTypeId);
-            await SharedPref.setString(
-                key: PrefsValue.markerLat,
-                value: latLngData.latitude.toString());
-            await SharedPref.setString(
-                key: PrefsValue.markerLong,
-                value: latLngData.longitude.toString());
+            AppConfig.instanceInit()?.setMarkerPoint(
+                newPointMarkerLat: latLngData.latitude.toString(),
+                newPointMarkerLong: latLngData.longitude.toString());
             showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,

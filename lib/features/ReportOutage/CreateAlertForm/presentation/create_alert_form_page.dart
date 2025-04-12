@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
-import 'package:outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/dropdown_widget.dart';
 import 'package:outage_app/Utils/common_widgets/image_pop_widget.dart';
 import 'package:outage_app/Utils/common_widgets/image_widget.dart';
@@ -15,6 +13,8 @@ import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/row_widget.dart';
 import 'package:outage_app/Utils/common_widgets/text_form_widget.dart';
 import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
@@ -41,15 +41,22 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundInfoWidget(
-      child: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
-        builder: (context, state) {
-          if (state is FetchCreateAlertFormDataState) {
-            return _itemBuilder(dataState: state);
-          } else {
-            return const Center(child: SpinLoader());
-          }
-        },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBarWidget(
+          title: AppString.createAlertForm,
+          boolLeading: true,
+        ),
+        body: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
+          builder: (context, state) {
+            if (state is FetchCreateAlertFormDataState) {
+              return _itemBuilder(dataState: state);
+            } else {
+              return const Center(child: SpinLoader());
+            }
+          },
+        ),
       ),
     );
   }
@@ -65,69 +72,42 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
   }
 
   Widget _itemBuilder({required FetchCreateAlertFormDataState dataState}) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBarWidget(
-          title: AppString.createAlertForm,
-          boolLeading: true,
-          actions: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  dataState.userName,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                ),
-                Text(
-                  dataState.scheme,
-                  textAlign: TextAlign.start,
-                  style: Styles.rel,
-                )
-              ],
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
+      child: ListView(
+        children: [
+          CommonStyle.vertical(context: context),
+          RowWidget(
+              widget1: _currentLatController(dataState: dataState),
+              widget2: _currentLongController(dataState: dataState)),
+          CommonStyle.vertical(context: context),
+          /*  _tfValveIdController(dataState: dataState),
+          CommonStyle.vertical(context: context),*/
+          _incidentTypeDropdown(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          _incidentIndicationDropdown(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          if (dataState.assetTypeIdController.text.isNotEmpty) ...[
+            _assetIdController(dataState: dataState),
+            CommonStyle.vertical(context: context),
+            _assetTypeIdController(dataState: dataState),
+            CommonStyle.vertical(context: context),
           ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
-          child: ListView(
-            children: [
-              CommonStyle.vertical(context: context),
-              RowWidget(
-                  widget1: _currentLatController(dataState: dataState),
-                  widget2: _currentLongController(dataState: dataState)),
-              CommonStyle.vertical(context: context),
-              /*  _tfValveIdController(dataState: dataState),
-              CommonStyle.vertical(context: context),*/
-              _incidentTypeDropdown(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              _incidentIndicationDropdown(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              if (dataState.assetTypeIdController.text.isNotEmpty) ...[
-                _assetIdController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-                _assetTypeIdController(dataState: dataState),
-                CommonStyle.vertical(context: context),
-              ],
-              _landmarkController(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              _addressController(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              _descriptionController(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              /*_remarksController(dataState: dataState),
-              CommonStyle.vertical(context: context),*/
-              _image(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              CommonStyle.vertical(context: context),
-              _button(dataState: dataState),
-              CommonStyle.vertical(context: context),
-              CommonStyle.vertical(context: context),
-            ],
-          ),
-        ),
+          _landmarkController(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          _addressController(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          _descriptionController(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          /*_remarksController(dataState: dataState),
+          CommonStyle.vertical(context: context),*/
+          _image(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          CommonStyle.vertical(context: context),
+          _button(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          CommonStyle.vertical(context: context),
+        ],
       ),
     );
   }

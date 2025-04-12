@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 import 'enlarge_widget.dart';
 import 'res/app_color.dart';
+import 'res/environment_config.dart';
 
 class ImageWidget extends StatelessWidget {
   final File imgFile;

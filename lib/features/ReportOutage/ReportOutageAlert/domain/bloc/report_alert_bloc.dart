@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/Utils.dart';
-import 'package:outage_app/Utils/commonClass/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
@@ -61,7 +61,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     on<SelectCheckBoxConsumerGisEvent>(_selectCheckBoxConsumerGis);
     on<SelectConsumerGISValueEvent>(_selectConsumerGISValue);
 
-    on<OnCameraMoveEvent>(_onCameraMoveEvent);
+    on<OnCameraIdleEvent>(_onCameraIdleEvent);
     on<ResetFilterEvent>(_onResetFilterEvent);
   }
 
@@ -164,6 +164,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   PipelineData pipelineData = PipelineData();
   List<PipelineData> listOfPipeline = [];
 
+  Set<Polyline> finalPolylines = {};
+
   LatLng currentPosition = LatLng(0, 0);
   LatLng loginPosition = LatLng(0, 0);
 
@@ -193,6 +195,24 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   _pageLoad(ReportAlertLoadEvent event, emit) async {
     emit(ReportAlertPageLoadState());
     isLoader = false;
+    _initializeAllModels();
+    ReportAlertHelper.clearCache();
+    await _selectGISValue(
+      assetId: "",
+      assetTypeId: "",
+      dataList: [],
+      controller: TextEditingController(),
+      context: event.context,
+      assetPath: "",
+      filteredList: [],
+    );
+
+    await _currentPointMarker();
+    await _fetchGasPipelineGisApi(context: event.context,emit: emit);
+    _eventCompleted(emit);
+  }
+
+  Future<void> _initializeAllModels() async {
     isPipelineLoader = false;
 
     await _clearTextField();
@@ -265,18 +285,12 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     googleMapController = Completer();
 
     currentMapType = MapType.normal;
-    scheme = await SharedPref.getString(key: PrefsValue.schema);
-    role = await SharedPref.getString(key: PrefsValue.userRole);
-    userName = await SharedPref.getString(key: PrefsValue.userName);
+    role = await AppConfig.instanceInit()?.loginData.user?.role??"";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-    loginLat = await SharedPref.getString(key: PrefsValue.loginLat);
-    loginLong = await SharedPref.getString(key: PrefsValue.loginLong);
+    loginLat = await AppConfig.instanceInit()?.loginData.user?.gaLatitude??"";
+    loginLong = await AppConfig.instanceInit()?.loginData.user?.gaLongitude??"";
     loginPosition = LatLng(
         double.parse(loginLat.toString()), double.parse(loginLong.toString()));
-    await _startCacheClearTimer();
-    await _currentPointMarker();
-    await _fetchGasPipelineGisApi(context: event.context);
-    _eventCompleted(emit);
   }
 
    _startCacheClearTimer() {
@@ -284,6 +298,60 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       log("Clearing Cache...");
       await ReportAlertHelper.clearCache();
     });
+  }
+
+  _fetchGasPipelineGisApi({required BuildContext context,emit}) async {
+    var res = await ReportAlertHelper.getPipelineApi(
+      context: context,
+      latitude: loginPosition.latitude.toString(),
+      longitude: loginPosition.longitude.toString(),
+    );
+    if (res != null && res.data != null) {
+      pipelineModel = res;
+      listOfPipeline = pipelineModel.data!;
+      finalPolylines.clear();
+      _eventCompleted(emit);
+      await gotoInitialPosition(loginPosition);
+      for (int i = 0; i < listOfPipeline.length; i++) {
+        final data = listOfPipeline[i];
+        if (data.geomencode != null && data.geomencode!.isNotEmpty) {
+          try {
+            List<LatLng> points =
+            await DecodePolyline.decodePolyline(data.geomencode!);
+            final color = ReportAlertHelper.getPolylineColor(
+              int.tryParse(data.nominaldia ?? '0') ?? 0,
+            );
+            Polyline polyline = Polyline(
+              polylineId: PolylineId("polyline_$i"),
+              points: points,
+              color: color,
+              width: 4,
+            );
+            finalPolylines.add(polyline);
+          } catch (e) {
+            print("Error decoding polyline at index $i: $e");
+          }
+        }
+      }
+      _filterVisiblePolyline();
+      _eventCompleted(emit);
+    }
+  }
+
+  Future<void> _filterVisiblePolyline() async {
+    final controller = await googleMapController.future;
+    final bounds = await controller.getVisibleRegion();
+    pipePolylinePointList = finalPolylines.where((polyline) {
+      return polyline.points.any((point) => DecodePolyline.isPointInBounds(point, bounds));
+    }).toSet();
+    _updateMarkerPolyline();
+  }
+
+  Future<void> gotoInitialPosition(LatLng location) async {
+    CameraPosition position = CameraPosition(
+        target: location);
+    final GoogleMapController controller = await googleMapController.future;
+    await controller.animateCamera(CameraUpdate.newCameraPosition(position));
   }
 
   _fetchTFGisApi({
@@ -435,12 +503,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   _onResetFilterEvent(ResetFilterEvent event, emit) async {
     _clearTextField();
     _clearMarkerPolyline();
-    await SharedPref.remove(
-      key: PrefsValue.assetId,
-    );
-    await SharedPref.remove(
-      key: PrefsValue.assetTypeId,
-    );
     GoogleMapController controller = await googleMapController.future;
     currentPosition = LatLng(loginPosition.latitude, loginPosition.longitude);
     controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -449,68 +511,11 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     _eventCompleted(emit);
   }
 
-  _onCameraMoveEvent(OnCameraMoveEvent event, emit) async {
-    /* polylinePointList = {};
-    markersPointList = {};
-    if (allLatLongPoint.isEmpty || !googleMapController.isCompleted) {
-      return;
-    }
-    if (checkBoxTf || checkBoxValve || checkBoxRegulator || checkBoxConsumer) {
-      return;
-    }
-    try {
-      var controller = await googleMapController.future;
-      LatLngBounds bounds = await controller.getVisibleRegion();
-      print("allLatLongPoint--->${allLatLongPoint.length}");
-      var _visiblePolylinePoints =
-          allLatLongPoint.where(bounds.contains).toList();
-      if (_visiblePolylinePoints.isEmpty) return;
-      var listOfPolyline = await ReportAlertHelper.createPolyLine(
-          color: Colors.blue.shade800,
-          latlngList: _visiblePolylinePoints,
-          context: event.context);
-      var listOfMarker = await ReportAlertHelper.createMarker(
-          markerIcon: BitmapDescriptor.defaultMarker,
-          latlngList: _visiblePolylinePoints,
-          context: event.context);
-      polylinePointList.addAll(listOfPolyline);
-      markersPointList.addAll(listOfMarker);
-    } catch (e) {
-      // Log or handle error
-      print("Error in _onCameraMoveEvent: $e");
-    }
-    _eventCompleted(emit);*/
+  _onCameraIdleEvent(OnCameraIdleEvent event, emit) async {
+    _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchGasPipelineGisApi({
-    required BuildContext context,
-  }) async {
-    await _clearMarkerPolyline();
-    var res = await ReportAlertHelper.getPipelineApi(
-      context: context,
-      latitude: loginPosition.latitude.toString(),
-      longitude: loginPosition.longitude.toString(),
-    );
-    if (res != null) {
-      pipelineModel = res;
-      if (pipelineModel.data != null) {
-        listOfPipeline = pipelineModel.data!;
-        for (int i = 0; i <= 3000 && i < listOfPipeline.length; i++) {
-          final colors = ReportAlertHelper.getPolylineColor(
-              int.tryParse(listOfPipeline[i].nominaldia!) ?? 0);
-          allLatLongPoint = await DecodePolyline.decodePolyline(
-              listOfPipeline[i].geomencode!);
-          var listOfPolyline = await ReportAlertHelper.createPolyLine(
-              color: colors, latlngList: allLatLongPoint, context: context);
-          pipePolylinePointList.addAll(listOfPolyline);
-          polylinePointList = pipePolylinePointList;
-          /* currentPosition =
-              LatLng(allLatLongPoint[0].latitude, allLatLongPoint[0].longitude);
-          cameraPosition = CameraPosition(target: currentPosition, zoom: 12);*/
-        }
-      }
-    }
-  }
 
   Future<void> _fetchPipelineNetworkApi({
     required BuildContext context,
@@ -547,7 +552,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
               filterPolyline.addAll(polylines);
             }
           }
-          polylinePointList.addAll(filterPolyline);
+          _updateMarkerPolyline();
         } else {
           Utils.errorSnackBar(
               msg: "No pipeline data available.", context: context);
@@ -657,10 +662,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     Position? currentPoint = await CurrentLocation.getCurrentLocation();
     if (currentPoint != null) {
       currentPosition = LatLng(currentPoint.latitude, currentPoint.longitude);
-      print("Current Position: $currentPosition");
       cameraPosition = CameraPosition(target: currentPosition, zoom: 14);
     }
-    print("Current Positionzzzzzzzzzzz: $currentPosition");
   }
 
   _selectCheckBoxTFGis(SelectCheckBoxTFGisEvent event, emit) async {
@@ -669,7 +672,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     if (checkBoxTf == true) {
       isGasTfLoader = true;
       _eventCompleted(emit);
-      await SharedPref.remove(key: PrefsValue.assetId);
       await _fetchTFGisApi(context: event.context);
     }
     isGasTfLoader = false;
@@ -682,7 +684,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     if (checkBoxValve == true) {
       isGasValveLoader = true;
       _eventCompleted(emit);
-      await SharedPref.remove(key: PrefsValue.assetId);
       await _fetchGasValueGisApi(context: event.context);
     }
     isGasValveLoader = false;
@@ -696,7 +697,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     if (checkBoxRegulator == true) {
       isGasRegulatorLoader = true;
       _eventCompleted(emit);
-      await SharedPref.remove(key: PrefsValue.assetId);
       await _fetchGasRegulatorGisApi(context: event.context);
     }
     isGasRegulatorLoader = false;
@@ -722,8 +722,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       isGasElbowLoader = true;
       _eventCompleted(emit);
       await _fetchGasElbowGisApi(context: event.context);
-      await SharedPref.setString(
-          key: PrefsValue.assetId, value: tfGisModel.assetId ?? "");
     }
     isGasElbowLoader = false;
     _eventCompleted(emit);
@@ -801,17 +799,16 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         }
       }).toList());
       if (filteredList.isNotEmpty) {
-        final Uint8List? iconBytes =
-            await ReportAlertHelper.getBytesFromAsset(assetPath, 80);
+        final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(assetPath, 80);
         LatLng location = LatLng(
           double.parse(filteredList[0].latitude!),
           double.parse(filteredList[0].longitude!),
         );
+        AppConfig.instanceInit()?.setAssets(assets: assetId);
+        AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: assetTypeId);
         var markers = await ReportAlertHelper.createMarker(
           latlngList: [location],
           context: context,
-          assetId: assetId,
-          assetTypeId: assetTypeId,
           markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
         );
         await _fetchPipelineNetworkApi(
@@ -997,8 +994,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         final end = polyData.points[i + 1];
         if (NearestPolylinePoint.isPointNearLine(
             event.latLngOnTap, start, end, 2)) {
-          AppConfig.instanceInit()?.setAssets(assets: '');
-          AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: '');
           tempMarker.add(
             Marker(
               markerId: MarkerId('Pipeline'),
@@ -1022,10 +1017,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
 
   Future<void> _handleMarkerTap(
       {required BuildContext context, required LatLng closestPoint}) async {
-    await SharedPref.setString(
-        key: PrefsValue.markerLat, value: closestPoint.latitude.toString());
-    await SharedPref.setString(
-        key: PrefsValue.markerLong, value: closestPoint.longitude.toString());
+     AppConfig.instanceInit()?.setMarkerPoint(
+        newPointMarkerLat: closestPoint.latitude.toString(),
+        newPointMarkerLong: closestPoint.longitude.toString());
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -1101,9 +1095,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   }
 
   _clearMarkerPolyline() {
-    filterPolyline = {};
     polylinePointList = {};
+    filterPolyline = {};
     polylinePointList = {...pipePolylinePointList};
+  }
+
+  _updateMarkerPolyline() {
+    polylinePointList = {...pipePolylinePointList, ...filterPolyline};
   }
 
   _eventCompleted(Emitter<ReportAlertState> emit) {

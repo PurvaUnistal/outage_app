@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_event.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_state.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
@@ -16,10 +17,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   bool isLoader =  false;
-  String scheme = '';
-  String role = '';
-  String userName = '';
   String baseUrl = '';
+  String role = '';
   String accessRightData = '';
   List<Accessright> listOFAccessRight = [];
   List<String> paths = [];
@@ -32,12 +31,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
      paths = [];
      iconText = [];
      navigatorView = [];
-    scheme = await SharedPref.getString(key: PrefsValue.schema);
-    role = await SharedPref.getString(key: PrefsValue.userRole);
-    userName = await SharedPref.getString(key: PrefsValue.userName);
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-    var json = await SharedPref.getString(key: PrefsValue.accessRight);
-    listOFAccessRight = await Accessright.accessrightListFromJson(json);
+    role = await AppConfig.instanceInit()?.loginData.user?.role! ?? "";
+    listOFAccessRight =  await AppConfig.instanceInit()?.loginData.user!.accessright! ?? [];
     listOFAccessRight.sort((a,b) => a.menuCode!.compareTo(b.menuCode!));
     await _tabAccess();
     _eventCompleted(emit);
@@ -69,14 +65,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   _eventCompleted(Emitter<HomeState> emit) {
     emit(FetchHomeDataState(
         isLoader: isLoader,
-        scheme: scheme,
+
         baseUrl: baseUrl,
-        userName: userName,
-        role: role,
       listOFAccessRight: listOFAccessRight,
        iconText: iconText,
       navigatorView: navigatorView,
       paths: paths,
+      role: role,
     ));
   }
 }

@@ -1,9 +1,9 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'button_widget.dart';
 import 'res/app_styles.dart';
+import 'res/common_style.dart';
 
 class DropDownSearchWidget extends StatelessWidget {
   final List<dynamic> items;

@@ -1,4 +1,5 @@
-import 'package:outage_app/Utils/commonClass/enums.dart';
+
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 
 class ViewIncidentModel {
   int? success;

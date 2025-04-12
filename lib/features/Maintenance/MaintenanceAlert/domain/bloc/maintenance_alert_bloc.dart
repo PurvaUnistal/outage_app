@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import '../../../../../Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'maintenance_alert_event.dart';
@@ -10,17 +11,13 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   }
 
   bool isLoader =  false;
-  String scheme = '';
   String role = '';
-  String userName = '';
   String baseUrl = '';
 
   _pageLoad(MaintenanceAlertLoadEvent event, emit) async {
     emit(MaintenanceAlertInitialState());
     isLoader =  false;
-    scheme = await SharedPref.getString(key: PrefsValue.schema);
-    role = await SharedPref.getString(key: PrefsValue.userRole);
-    userName = await SharedPref.getString(key: PrefsValue.userName);
+    role = await AppConfig.instanceInit()?.loginData.user?.role! ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
     _eventCompleted(emit);
   }
@@ -28,9 +25,7 @@ class MaintenanceAlertBloc extends Bloc<MaintenanceAlertEvent, MaintenanceAlertS
   _eventCompleted(Emitter<MaintenanceAlertState> emit) {
     emit(FetchMaintenanceAlertDataState(
       isLoader: isLoader,
-      scheme: scheme,
       baseUrl: baseUrl,
-      userName: userName,
       role: role,
     ));
   }

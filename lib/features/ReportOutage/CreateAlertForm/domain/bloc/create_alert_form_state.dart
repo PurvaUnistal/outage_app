@@ -23,8 +23,6 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
   final File audioRecordFile;
   final bool isLoader;
   final bool isBtnLoader;
-  final String scheme;
-  final String userName;
   final String role;
   final String baseUrl;
 
@@ -61,9 +59,7 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
     required this.audioRecordFile,
     required this.isLoader,
     required this.isBtnLoader,
-    required this.scheme,
     required this.baseUrl,
-    required this.userName,
     required this.role,
     required this.incidentTypeModel,
     required this.incidentTypeValue,
@@ -96,8 +92,6 @@ class FetchCreateAlertFormDataState extends CreateAlertFormState {
         audioRecordFile,
         isLoader,
         isBtnLoader,
-        scheme,
-        userName,
         role,
         baseUrl,
         incidentTypeModel,

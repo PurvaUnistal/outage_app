@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:record/record.dart';
 
 import 'platform/audio_recorder_platform.dart';

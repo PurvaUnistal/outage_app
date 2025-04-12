@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/app_config.dart';
-import 'package:outage_app/Utils/commonClass/enums.dart';
+import 'package:outage_app/MapWithStream.dart';
 import 'package:outage_app/Utils/common_widgets/Routes/routes_name.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
+import 'package:outage_app/features/Login/domain/model/login_model.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashView extends StatefulWidget {
@@ -20,6 +23,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   @override
   void initState() {
     // TODO: implement initState
+    _getData();
     toLogin();
     super.initState();
   }
@@ -41,35 +45,52 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   );
 
   Future<void> toLogin() async {
-    String email = await SharedPref.getString(key: PrefsValue.emailVal);
-    String password = await SharedPref.getString(key: PrefsValue.passwordVal);
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    AppConfig.instanceInit()?.setPackageName(packageName: packageInfo.packageName);
+    final email = await SharedPref.getString(key: PrefsValue.emailVal);
+    final password = await SharedPref.getString(key: PrefsValue.passwordVal);
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final newVersion  = await packageInfo.buildNumber;
     AppConfig.instanceInit()?.setAppVersion(appVersion: packageInfo.buildNumber);
-    String newVersion =  packageInfo.buildNumber;
-    String oldVersion = await SharedPref.getString(key: PrefsValue.appVersion);
-    print("packageName--${packageInfo.packageName}");
-    print("newVersion--${newVersion}");
-    print("oldVersion--${oldVersion}");
+    final oldVersion = await SharedPref.getString(key: PrefsValue.buildNumber);
     Timer(
-      const Duration(seconds: 3),
-      () async {
-        if (oldVersion == newVersion) {
-          if (email.isNotEmpty || password.isNotEmpty) {
-            Navigator.pushReplacementNamed(
-              context,
-              RoutesName.outageApp,
-            );
-          }
-        } else {
+        const Duration(seconds: 3),
+    () async {
+      if (oldVersion == newVersion) {
+        if (email.isNotEmpty || password.isNotEmpty) {
+       //   Navigator.push(context, (MaterialPageRoute(builder: (context) => DynamicPolylineMap(),)));
           Navigator.pushReplacementNamed(
             context,
-            RoutesName.login,
+            RoutesName.outageApp,
           );
         }
-      },
-    );
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          RoutesName.login,
+        );
+      }
+    });
   }
+
+  Future<LoginModel?> _getData() async {
+    try {
+      String? userJson = await SharedPref.getString(key: PrefsValue.userInfo ?? "");
+      if (userJson != '') {
+        Map<String, dynamic> userMap = jsonDecode(userJson!);
+        LoginModel loginModel = LoginModel.fromJson(userMap);
+        final appConfig = AppConfig.instanceInit();
+        if (appConfig != null) {
+          await appConfig.setLoginData(newLoginData: loginModel);
+        }
+        return loginModel;
+      }
+    } catch (e) {
+      debugPrint("Error in _getData: $e");
+    }
+    return null;
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {

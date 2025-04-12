@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/Utils/commonClass/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
-import 'package:outage_app/Utils/common_widgets/WidgetStyles/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_bloc.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_state.dart';
 

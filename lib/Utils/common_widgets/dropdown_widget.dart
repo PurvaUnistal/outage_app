@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/commonClass/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+
+import 'res/common_style.dart';
 
 class DropdownWidget<T> extends StatelessWidget {
   final T? dropdownValue;

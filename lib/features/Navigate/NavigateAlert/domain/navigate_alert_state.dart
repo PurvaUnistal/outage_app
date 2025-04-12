@@ -39,8 +39,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final bool isGasEndCapLoader;
   final bool checkBoxConsumer;
   final bool isGasConsumerLoader;
-  final String scheme;
-  final String userName;
   final String nameofLocation;
   final String role;
   final String baseUrl;
@@ -104,9 +102,8 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.checkBoxConsumer,
     required this.isGasConsumerLoader,
 
-    required this.scheme,
+
     required this.baseUrl,
-    required this.userName,
     required this.nameofLocation,
     required this.role,
     required this.cameraPosition,
@@ -165,8 +162,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     isGasEndCapLoader,
     checkBoxConsumer,
     isGasConsumerLoader,
-    scheme,
-    userName,
     nameofLocation,
     role,
     cameraPosition,
