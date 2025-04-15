@@ -14,9 +14,11 @@ class ReportDetailsHelper{
   static Future<IncidentActionModel?> getIncidentActionApi(
       {required BuildContext context, required String incidentTypeId}) async {
     String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
     Map<String, String> para = {
       "schema": schema,
       "incident_type_id": incidentTypeId,
+      "district_id": gaId,
     };
     String json = Uri(queryParameters: para).query;
     try {

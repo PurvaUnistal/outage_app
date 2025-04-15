@@ -318,13 +318,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           try {
             List<LatLng> points =
             await DecodePolyline.decodePolyline(data.geomencode!);
-            final color = ReportAlertHelper.getPolylineColor(
+           /* final color = ReportAlertHelper.getPolylineColor(
               int.tryParse(data.nominaldia ?? '0') ?? 0,
-            );
+            );*/
             Polyline polyline = Polyline(
               polylineId: PolylineId("polyline_$i"),
               points: points,
-              color: color,
+              color: Colors.green,
               width: 4,
             );
             finalPolylines.add(polyline);

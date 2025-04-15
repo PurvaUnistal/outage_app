@@ -28,15 +28,8 @@ class ApiHelper {
     } on DioException catch (error) {
       debugPrint("Dio Error --> ${error.message}");
       final statusCode = error.response?.statusCode;
-      final errorMessage = error.response?.data?.toString() ?? "Unknown Error";
-      if (statusCode == 400) {
-        await Utils.errorSnackBar(
-            msg: errorMessage.replaceAll("{", "").replaceAll("}", ""),
-            context: context);
-        return error.response!.data;
-      } else {
-        await _handleError(statusCode, errorMessage, context);
-      }
+      Response? errorMessage = error.response;
+      return await _handleError(statusCode :statusCode, errorMessage: errorMessage,context: context);
     } catch (e) {
       log("Catch Error --> $e");
       await Utils.errorSnackBar(msg: "Something Went Wrong", context: context);
@@ -74,15 +67,8 @@ class ApiHelper {
     } on DioException catch (error) {
       debugPrint("Dio Error --> ${error.message}");
       final statusCode = error.response?.statusCode;
-      final errorMessage = error.response?.data?.toString() ?? "Unknown Error";
-      if (statusCode == 400) {
-        await Utils.errorSnackBar(
-            msg: errorMessage.replaceAll("{", "").replaceAll("}", ""),
-            context: context);
-        return error.response!.data;
-      } else {
-        await _handleError(statusCode, errorMessage, context);
-      }
+      Response? errorMessage = error.response;
+      return await _handleError(statusCode :statusCode, errorMessage: errorMessage,context: context);
     } catch (e) {
       log("Multipart Error --> $e");
       await Utils.errorSnackBar(msg: "Something Went Wrong", context: context);
@@ -135,15 +121,8 @@ class ApiHelper {
     } on DioException catch (error) {
       debugPrint("Dio Error --> ${error.message}");
       final statusCode = error.response?.statusCode;
-      final errorMessage = error.response?.data?.toString() ?? "Unknown Error";
-      if (statusCode == 400) {
-        await Utils.errorSnackBar(
-            msg: errorMessage.replaceAll("{", "").replaceAll("}", ""),
-            context: context);
-        return error.response!.data;
-      } else {
-        await _handleError(statusCode, errorMessage, context);
-      }
+      Response? errorMessage = error.response;
+      return await _handleError(statusCode :statusCode, errorMessage: errorMessage,context: context);
     } catch (e) {
       debugPrint("Multipart Error --> $e");
       await Utils.errorSnackBar(msg: "Something Went Wrong", context: context);
@@ -152,23 +131,27 @@ class ApiHelper {
   }
 
   static Future<void> _handleError(
-      int? statusCode, String errorMessage, BuildContext context) async {
-    switch (statusCode) {
-      case 400:
-      case 404:
-      case 415:
-      case 500:
-        await Utils.errorSnackBar(
-            msg: errorMessage.replaceAll("{", "").replaceAll("}", ""),
-            context: context);
-        break;
-      default:
-        await Utils.errorSnackBar(
-            msg: "Unexpected Error: $errorMessage", context: context);
-        break;
+      {int? statusCode, Response? errorMessage, required BuildContext context}) async {
+    if(statusCode == 400){
+      return  await Utils.errorSnackBar(
+          msg: errorMessage!.data.replaceAll("{", "").replaceAll("}", ""),
+          context: context);
+    }else if(statusCode == 401){
+      log("errorStatus(401)-->${errorMessage.toString()}");
+      return await Utils.errorSnackBar(msg: errorMessage!.data.toString(), context: context);
+    }else if(statusCode == 404){
+      log("errorStatus(404)-->${errorMessage.toString()}");
+      return await Utils.errorSnackBar(msg: errorMessage!.data.toString(), context: context);
+    }else if(statusCode == 415){
+      return await Utils.errorSnackBar(msg: errorMessage!.data.toString(), context: context);
+    } else if(statusCode == 500){
+      return await Utils.errorSnackBar(msg: errorMessage!.statusMessage.toString(), context: context);
+    } else{
+      return await Utils.errorSnackBar(msg: errorMessage!.data.toString(), context: context);
     }
   }
 }
+
 
 class ImageRequestObject {
   String? key;

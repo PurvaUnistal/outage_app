@@ -201,12 +201,13 @@ class SelectCheckBoxConsumerGisEvent extends NavigateAlertEvent {
   List<Object> get props => [context, checkBoxConsumer];
 }
 
-class OnCameraMoveEvent extends NavigateAlertEvent {
+
+class NavigateAlertOnCameraIdleEvent extends NavigateAlertEvent {
   final BuildContext context;
-  OnCameraMoveEvent({required this.context});
+  NavigateAlertOnCameraIdleEvent({required this.context,});
   @override
   // TODO: implement props
-  List<Object> get props => [context];
+  List<Object> get props => [context,];
 }
 
 class ResetFilterEvent extends NavigateAlertEvent {

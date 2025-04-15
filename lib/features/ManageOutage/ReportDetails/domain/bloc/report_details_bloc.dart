@@ -221,7 +221,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   }
 
   Future<void> _handleConsumerMarkers({required BuildContext context, required List<LatLng> listOfConsumer}) async {
-    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.consumerBlink, 30);
+    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.consumerBlink, 80);
     consumerMarkers = await NavigateAlertHelper.createMarker(
       latlngList: listOfConsumer,
       context: context,
