@@ -3,7 +3,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 class AppString {
   static double zoom = 15;
   static String version =
-      "Version : Outage-${AppConfig.instanceInit()?.appVersion}-10/04/2025";
+      "Version :${AppConfig.instanceInit()?.appVersion}-Outage-14/04/2025";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";

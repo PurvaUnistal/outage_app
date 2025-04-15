@@ -127,7 +127,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         dataState.googleMapController.complete(controller);
       },
       onTap: (latLng) async {
-        print("=========================>${latLng}");
+
         GoogleMapController controller = await dataState.googleMapController.future;
         controller.animateCamera(
           CameraUpdate.newCameraPosition(

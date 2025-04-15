@@ -107,7 +107,6 @@ class _ReportAlertViewState extends State<ReportAlertView> {
         ));
       },
       onTap: (latLng) async {
-        print("=========================>${latLng}");
         GoogleMapController controller =
             await dataState.googleMapController.future;
         controller.animateCamera(

@@ -10,9 +10,8 @@ class NavigateAlertHelper{
     Set<Marker> markersPointList = {};
     try {
       for (var latLngData in latlngList) {
-        markersPointList.clear();
         markersPointList.add(Marker(
-          markerId: MarkerId("${latLngData.latitude},${latLngData.longitude}"),
+          markerId: MarkerId("${latLngData.latitude.toString()}"),
           infoWindow: InfoWindow(
             title: "${latLngData.latitude.toString()}, "
                 "${latLngData.longitude.toString()}",

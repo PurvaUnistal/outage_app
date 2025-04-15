@@ -48,7 +48,7 @@ android {
     productFlavors {
         prodAGCL {
             dimension "app"
-            applicationIdSuffix ".igloutage.app"
+            applicationIdSuffix ".agcloutage.app"
             resValue "string", "app_name", "AGCL Outage"
             manifestPlaceholders = [
                     appIcon: "@mipmap/agcl",
@@ -86,7 +86,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -120,8 +120,8 @@ flutter {
     source = "../.."
 }
 dependencies {
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
     implementation("com.google.android.play:app-update:2.1.0")
     implementation("com.google.android.play:app-update-ktx:2.1.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.11.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
 }

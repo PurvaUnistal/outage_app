@@ -20,6 +20,8 @@ import '../model/IncidentActionModel.dart';
 class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   ReportDetailsBloc() : super(ReportDetailsInitialState()) {
     on<ReportDetailsLoadEvent>(_pageLoad);
+    on<ReportDetailBlinkValveMarker>(_blinkValveMarker);
+    on<ReportDetailBlinkConsumerMarker>(_blinkConsumerMarker);
     on<SubmitBtnEvent>(_submitBtnEvent);
   }
 
@@ -136,6 +138,12 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       context: event.context,
       incidentId: incidentId,
     );
+     GoogleMapController controller = await googleMapController.future;
+          controller.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(target: incidentLocation, zoom: 18),
+            ),
+          );
     _eventCompleted(emit);
   }
 
@@ -175,55 +183,57 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         context: context,
         incidentId: incidentId,
       );
-      if (res == null) throw Exception("No data returned");
-      consumerAffectModel = res;
-      if (consumerAffectModel.data != null) {
-        consumerData = consumerAffectModel.data!;
-        incidentLocation = _parseLatLng(
-          consumerData.latitude,
-          consumerData.longitude,
-        )!;
-        Set<Marker> tempMarker = {};
-        var incidentMarker = await NavigateAlertHelper.createMarker(
-          latlngList: [incidentLocation],
-          context: context,
-          markerIcon: BitmapDescriptor.defaultMarker,
-        );
-        tempMarker.addAll(incidentMarker);
-        markersPointList.addAll(tempMarker);
-        print("markersPointList-->${markersPointList.length}");
-        if (consumerData.consumer?.isNotEmpty == true) {
-          listOfConsumer = consumerData.consumer;
-          listOfConsumerPoint = _getConLatLngList(consumerData.consumer!);
-          await _handleConsumerMarkers(context: context);
+      if(res != null){
+        consumerAffectModel = res;
+        if (consumerAffectModel.data != null) {
+          consumerData = consumerAffectModel.data!;
+          incidentLocation = ReportDetailsHelper.parseLatLng(
+            consumerData.latitude,
+            consumerData.longitude,
+          )!;
+          Set<Marker> tempMarker = {};
+          var incidentMarker = await NavigateAlertHelper.createMarker(
+            latlngList: [incidentLocation],
+            context: context,
+            markerIcon: BitmapDescriptor.defaultMarker,
+          );
+          tempMarker.addAll(incidentMarker);
+          markersPointList.addAll(tempMarker);
+          print("markersPointList-->${markersPointList.length}");
+          if (consumerData.consumer?.isNotEmpty) {
+            listOfConsumer = consumerData.consumer;
+            listOfConsumerPoint = _getConLatLngList(listOfConsumer);
+            await _handleConsumerMarkers(context: context,listOfConsumer: listOfConsumerPoint);
+          }
+          if (consumerData.valve?.isNotEmpty) {
+              listOfValve = consumerData.valve;
+              listOfValvePoint = _getLatLngList(listOfValve);
+              await _handleValveMarkers(context: context,listOfValve: listOfValvePoint);
+          }
           _restartBlinking();
         }
-        if (consumerData.valve?.isNotEmpty == true) {
-          listOfValve = consumerData.valve[0];
-          listOfValvePoint = _getLatLngList(consumerData.valve![0]);
-          await _handleValveMarkers(context: context);
-        }
+        return res;
       }
-      return res;
+
     } catch (e) {
       print("Error in _fetchValveConsumerAffectApi: $e");
     }
   }
 
-  Future<void> _handleConsumerMarkers({required BuildContext context}) async {
-    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.consumer, 80);
+  Future<void> _handleConsumerMarkers({required BuildContext context, required List<LatLng> listOfConsumer}) async {
+    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.consumerBlink, 30);
     consumerMarkers = await NavigateAlertHelper.createMarker(
-      latlngList: listOfConsumerPoint,
+      latlngList: listOfConsumer,
       context: context,
       markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
     );
     markersPointList.addAll(consumerMarkers);
   }
 
-  Future<void> _handleValveMarkers({required BuildContext context}) async {
-    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.valve, 80);
+  Future<void> _handleValveMarkers({required BuildContext context, required List<LatLng> listOfValve}) async {
+    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.valveBlink, 30);
     valveMarkers = await NavigateAlertHelper.createMarker(
-      latlngList: listOfValvePoint,
+      latlngList: listOfValve,
       context: context,
       markerIcon: BitmapDescriptor.bytes(iconBytes!),
     );
@@ -240,15 +250,8 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     _startBlinking();
   }
 
-  LatLng? _parseLatLng(String? lat, String? lng) {
-    double? latitude = double.tryParse(lat ?? '');
-    double? longitude = double.tryParse(lng ?? '');
-    return (latitude != null && longitude != null)
-        ? LatLng(latitude, longitude)
-        : null;
-  }
 
-  List<LatLng> _getConLatLngList(List<dynamic> dataList) {
+  List<LatLng> _getConLatLngList(List<ConsumerBPList> dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
         .map((data) =>
@@ -256,12 +259,34 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         .toList();
   }
 
-  List<LatLng> _getLatLngList(List<dynamic> dataList) {
+  List<LatLng> _getLatLngList(List<ValveData>  dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
         .map((data) =>
             LatLng(double.parse(data.longitude!), double.parse(data.latitude!)))
         .toList();
+  }
+
+  _blinkValveMarker(ReportDetailBlinkValveMarker event,  emit) async {
+    LatLng latLng = LatLng(double.parse(event.valveData.longitude!), double.parse(event.valveData.latitude!));
+    GoogleMapController controller = await googleMapController.future;
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: latLng, zoom: 18),
+      ),
+    );
+    _eventCompleted(emit);
+  }
+
+  _blinkConsumerMarker(ReportDetailBlinkConsumerMarker event,  emit) async {
+    LatLng latLng = LatLng(double.parse(event.consumerBPList.latitude!), double.parse(event.consumerBPList.longitude!));
+    GoogleMapController controller = await googleMapController.future;
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: latLng, zoom: 18),
+      ),
+    );
+    _eventCompleted(emit);
   }
 
   _submitBtnEvent(SubmitBtnEvent event, emit) async {
@@ -320,4 +345,5 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       listOfIncidentTypeAction: listOfIncidentTypeAction,
     ));
   }
+
 }

@@ -11,11 +11,7 @@ class ConsumerAffectModel {
   final bool? error;
   final ConsumerData? data;
 
-  ConsumerAffectModel({
-    this.success,
-    this.error,
-    this.data,
-  });
+  ConsumerAffectModel({this.success, this.error, this.data});
 
   factory ConsumerAffectModel.fromJson(Map<String, dynamic> json) =>
       ConsumerAffectModel(
@@ -25,10 +21,10 @@ class ConsumerAffectModel {
       );
 
   Map<String, dynamic> toJson() => {
-        "success": success,
-        "error": error,
-        "data": data!.toJson(),
-      };
+    "success": success,
+    "error": error,
+    "data": data!.toJson(),
+  };
 }
 
 class ConsumerData {
@@ -47,32 +43,35 @@ class ConsumerData {
   });
 
   factory ConsumerData.fromJson(Map<String, dynamic> json) => ConsumerData(
-        incidentId: json["incidentId"] ?? "",
+    incidentId: json["incidentId"] ?? "",
     latitude: json["incidentlat"] ?? "",
     longitude: json["incidentlong"] ?? "",
 
-        valve: json["valve"] == null
+    valve:
+        json["valve"] == null
             ? null
             : json['valve'] is String
-                ? json['valve']
-                : List<List<ValveData>>.from(json["valve"].map((x) =>
-                    List<ValveData>.from(x.map((x) => ValveData.fromJson(x))))),
-        consumer: json["Consumer"] == null
+            ? json['valve']
+            : List<ValveData>.from(
+              json["valve"].map((x) => ValveData.fromJson(x)),
+            ),
+    consumer:
+        json["Consumer"] == null
             ? null
             : json['Consumer'] is String
-                ? json['Consumer']
-                : List<ConsumerBPList>.from(
-                    json["Consumer"].map((x) => ConsumerBPList.fromJson(x))),
-      );
+            ? json['Consumer']
+            : List<ConsumerBPList>.from(
+              json["Consumer"].map((x) => ConsumerBPList.fromJson(x)),
+            ),
+  );
 
   Map<String, dynamic> toJson() => {
-        "incidentId": incidentId,
-        "incidentlat": latitude,
-        "incidentlong": longitude,
-        "valve": List<dynamic>.from(
-            valve!.map((x) => List<dynamic>.from(x.map((x) => x.toJson())))),
-        "Consumer": List<dynamic>.from(consumer!.map((x) => x.toJson())),
-      };
+    "incidentId": incidentId,
+    "incidentlat": latitude,
+    "incidentlong": longitude,
+    "valve": List<dynamic>.from(valve!.map((x) => x.toJson())),
+    "Consumer": List<dynamic>.from(consumer!.map((x) => x.toJson())),
+  };
 }
 
 class ConsumerBPList {
@@ -93,22 +92,22 @@ class ConsumerBPList {
   });
 
   factory ConsumerBPList.fromJson(Map<String, dynamic> json) => ConsumerBPList(
-        wkt: json["wkt"] ?? "",
-        gid: json["gid"] ?? "",
-        bpNumber: json["bp_number"] ?? "",
+    wkt: json["wkt"] ?? "",
+    gid: json["gid"] ?? "",
+    bpNumber: json["bp_number"] ?? "",
     latitude: json["new_old_latitude"] ?? "",
     longitude: json["new_old_longitude"] ?? "",
-        tfNumber: json["tf_number"] ?? "",
-      );
+    tfNumber: json["tf_number"] ?? "",
+  );
 
   Map<String, dynamic> toJson() => {
-        "wkt": wkt,
-        "gid": gid,
-        "bp_number": bpNumber,
-        "new_old_latitude": latitude,
-        "new_old_longitude": longitude,
-        "tf_number": tfNumber,
-      };
+    "wkt": wkt,
+    "gid": gid,
+    "bp_number": bpNumber,
+    "new_old_latitude": latitude,
+    "new_old_longitude": longitude,
+    "tf_number": tfNumber,
+  };
 }
 
 class ValveData {
@@ -118,27 +117,21 @@ class ValveData {
   final String? latitude;
   final String? longitude;
 
-  ValveData({
-    this.gid,
-    this.wkt,
-    this.valveId,
-    this.latitude,
-    this.longitude,
-  });
+  ValveData({this.gid, this.wkt, this.valveId, this.latitude, this.longitude});
 
   factory ValveData.fromJson(Map<String, dynamic> json) => ValveData(
-        gid: json["gid"] ?? "",
-        wkt: json["wkt"] ?? "",
-        valveId: json["valve_id"] ?? "",
-        latitude: json["latitude"] ?? "",
-        longitude: json["longitude"] ?? "",
-      );
+    gid: json["gid"] ?? "",
+    wkt: json["wkt"] ?? "",
+    valveId: json["valve_id"] ?? "",
+    latitude: json["latitude"] ?? "",
+    longitude: json["longitude"] ?? "",
+  );
 
   Map<String, dynamic> toJson() => {
-        "gid": gid,
-        "wkt": wkt,
-        "valve_id": valveId,
-        "latitude": latitude,
-        "longitude": longitude,
-      };
+    "gid": gid,
+    "wkt": wkt,
+    "valve_id": valveId,
+    "latitude": latitude,
+    "longitude": longitude,
+  };
 }

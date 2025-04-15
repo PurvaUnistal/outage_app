@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentActionModel.dart';
 import 'package:outage_app/features/ManageOutage/ReportDetails/domain/model/IncidentActionProgressModel.dart';
@@ -107,6 +108,22 @@ class ReportDetailsHelper{
       log("IncidentActionModel-->${e.toString()}");
     }
     return null;
+  }
+
+ static LatLng? parseLatLng(String? lat, String? lng) {
+    double? latitude = double.tryParse(lat ?? '');
+    double? longitude = double.tryParse(lng ?? '');
+    return (latitude != null && longitude != null)
+        ? LatLng(latitude, longitude)
+        : null;
+  }
+
+  static List<LatLng> getLatLngList(List<dynamic> dataList) {
+    return dataList
+        .where((data) => data.latitude != null && data.longitude != null)
+        .map((data) =>
+        LatLng(double.parse(data.latitude!), double.parse(data.longitude!)))
+        .toList();
   }
 
 }
