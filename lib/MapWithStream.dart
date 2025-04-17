@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/PipelineModel.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
-import 'features/ReportOutage/ReportOutageAlert/helper/decodePolyline.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
+import 'features/Report/ReportOutageAlert/helper/decodePolyline.dart';
 
 class DynamicPolylineMap extends StatefulWidget {
   @override

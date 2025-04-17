@@ -16,56 +16,62 @@ class BackgroundInfoWidget extends StatelessWidget {
       children: [
         child,
         Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-                decoration: BoxDecoration(color: EnvironmentConfig.of(context)!.primaryTheme,),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                        child: Text(
-                      AppString.companyName,
-                      textAlign: TextAlign.start,
-                      style: Styles.rel,
-                    )),
-                    Flexible(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              AppString.version,
-                              textAlign: TextAlign.start,
-                              style: Styles.rel,
-                            ),
-                            AppConfig.instanceInit()?.loginData.user == null
-                                ? SizedBox.shrink()
-                                : Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  AppConfig.instanceInit()
-                                      ?.loginData
-                                      .user!
-                                      .name! ??
-                                      "",
-                                  textAlign: TextAlign.start,
-                                  style: Styles.rel,
-                                ),
-                                Text(
-                                  " (${AppConfig.instanceInit()?.loginData.user!.schema! ?? ""})",
-                                  textAlign: TextAlign.start,
-                                  style: Styles.rel,
-                                ),
-                              ],
-                            ),
-                          ],
-                        )),
-                  ],
-                )))
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: EnvironmentConfig.of(context)!.primaryTheme,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    AppString.companyName,
+                    textAlign: TextAlign.start,
+                    style: Styles.rel,
+                  ),
+                ),
+                Flexible(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      AppConfig.instanceInit()?.loginData.user == null
+                          ? SizedBox.shrink()
+                          : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                AppConfig.instanceInit()
+                                        ?.loginData
+                                        .user!
+                                        .name! ??
+                                    "",
+                                textAlign: TextAlign.start,
+                                style: Styles.rel,
+                              ),
+                              Text(
+                                " (${AppConfig.instanceInit()?.loginData.user!.schema! ?? ""})",
+                                textAlign: TextAlign.start,
+                                style: Styles.rel,
+                              ),
+                            ],
+                          ),
+                      Text(
+                        AppString.version,
+                        textAlign: TextAlign.start,
+                        style: Styles.rel,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

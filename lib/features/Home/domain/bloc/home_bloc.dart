@@ -7,9 +7,9 @@ import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_event.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_state.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
-import 'package:outage_app/features/ManageOutage/ManageAlert/presentation/page/manage_alert_page.dart';
+import 'package:outage_app/features/Manage/ManageAlert/presentation/page/manage_alert_page.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/presentation/navigate_alert_page.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/presentation/report_alert_page.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/presentation/report_alert_page.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitialState()) {

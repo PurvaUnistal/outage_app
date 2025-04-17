@@ -18,14 +18,14 @@ import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/helper/navigate_alert_helper.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/presentation/widget/navigate_pop_widget.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasGISModel.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GisConfig.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/PipelineModel.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/helper/decodePolyline.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GisConfig.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/helper/decodePolyline.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 
 class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   NavigateAlertBloc() : super(NavigateAlertInitialState()) {
@@ -164,12 +164,12 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   List<PipelineData> listOfPipeline = [];
 
   LatLng currentPosition = LatLng(0, 0);
-  LatLng loginPosition = LatLng(0, 0);
-
+  List<LatLng> points = [];
   List<LatLng> allLatLongPoint = [];
 
   Set<Marker> markersPointList = {};
   Set<Marker> filterMarkerList = {};
+  Set<Marker> tempMarker = {};
 
   Set<Polyline> polylinePointList = {};
   Set<Polyline> pipePolylinePointList = {};
@@ -178,10 +178,19 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   MapType currentMapType = MapType.normal;
   Completer<GoogleMapController> googleMapController = Completer();
-  CameraPosition cameraPosition = CameraPosition(
+
+  CameraPosition position = CameraPosition(
     target: LatLng(0, 0),
     zoom: AppString.zoom,
   );
+
+  Timer? _timer;
+  @override
+  close() {
+    _timer?.cancel();
+    return super.close();
+  }
+
 
   _pageLoad(NavigateAlertLoadEvent event, emit) async {
     emit(NavigateAlertInitialState());
@@ -203,7 +212,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
-  Future<void> _initializeAllModels() async {
+  _initializeAllModels() async {
     isPipelineLoader = false;
 
     await _clearTextField();
@@ -263,25 +272,21 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     listOfPipeline = [];
 
     currentPosition = LatLng(0, 0);
-    loginPosition = LatLng(0, 0);
 
     markersPointList = {};
     filterMarkerList = {};
+    tempMarker = {};
 
     filterPolyline = {};
     polylinePointList = {};
     pipePolylinePointList = {};
-
+    points = [];
     allLatLongPoint = [];
     googleMapController = Completer();
 
     currentMapType = MapType.normal;
     role = await AppConfig.instanceInit()?.loginData.user?.role??"";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-    loginLat = await AppConfig.instanceInit()?.loginData.user?.gaLatitude??"";
-    loginLong = await AppConfig.instanceInit()?.loginData.user?.gaLongitude??"";
-    loginPosition = LatLng(
-        double.parse(loginLat.toString()), double.parse(loginLong.toString()));
   }
 
   _startCacheClearTimer() {
@@ -294,20 +299,19 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   _fetchGasPipelineGisApi({required BuildContext context,emit}) async {
     var res = await ReportAlertHelper.getPipelineApi(
       context: context,
-      latitude: loginPosition.latitude.toString(),
-      longitude: loginPosition.longitude.toString(),
+      latitude: AppConfig.instanceInit()!.userInfo.gaLatitude.toString(),
+      longitude: AppConfig.instanceInit()!.userInfo.gaLongitude.toString(),
     );
     if (res != null && res.data != null) {
       pipelineModel = res;
       listOfPipeline = pipelineModel.data!;
       finalPolylines.clear();
       _eventCompleted(emit);
-      await gotoInitialPosition(loginPosition);
       for (int i = 0; i < listOfPipeline.length; i++) {
         final data = listOfPipeline[i];
         if (data.geomencode != null && data.geomencode!.isNotEmpty) {
           try {
-            List<LatLng> points =
+            points =
             await DecodePolyline.decodePolyline(data.geomencode!);
             /* final color = ReportAlertHelper.getPolylineColor(
               int.tryParse(data.nominaldia ?? '0') ?? 0,
@@ -324,12 +328,14 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           }
         }
       }
+
+      await gotoInitialPosition(points[0]);
       _filterVisiblePolyline();
       _eventCompleted(emit);
     }
   }
 
-  Future<void> _filterVisiblePolyline() async {
+  _filterVisiblePolyline() async {
     final controller = await googleMapController.future;
     final bounds = await controller.getVisibleRegion();
     pipePolylinePointList = finalPolylines.where((polyline) {
@@ -337,22 +343,21 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     }).toSet();
     _updateMarkerPolyline();
   }
+
   _updateMarkerPolyline() {
     polylinePointList = {...pipePolylinePointList, ...filterPolyline};
   }
 
+  _onCameraIdleEvent(NavigateAlertOnCameraIdleEvent event,  emit) async {
+    await ReportAlertHelper.clearCache();
+    _filterVisiblePolyline();
+    _eventCompleted(emit);
+  }
 
-  Future<void> gotoInitialPosition(LatLng location) async {
-    CameraPosition position = CameraPosition(
-        target: location);
+  gotoInitialPosition(LatLng location) async {
+    position = CameraPosition(target: location);
     final GoogleMapController controller = await googleMapController.future;
     await controller.animateCamera(CameraUpdate.newCameraPosition(position));
-  }
-  Timer? _timer;
-  @override
-  Future<void> close() {
-    _timer?.cancel();
-    return super.close();
   }
 
   _fetchTFGisApi({
@@ -406,19 +411,15 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   Future<dynamic> _fetchGasTeeGisApi({required BuildContext context}) async {
     var res = await ReportAlertHelper.getTeeGisApi(context: context);
-
     if (res != null) {
       gasTeeGISModel = res;
       listOfGasTeeGIS = gasTeeGISModel.data ?? [];
-
       if (listOfGasTeeGIS.isNotEmpty) {
         listOfGasTeeGISId = listOfGasTeeGIS.map((e) => e.id!).toList();
       }
-
       return res;
     }
-
-    return null; // Explicitly return null if no data is fetched
+    return null;
   }
 
   Future<dynamic> _fetchGasElbowGisApi({required BuildContext context}) async {
@@ -497,7 +498,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
 
 
-  Future<void> _fetchPipelineNetworkApi({
+  _fetchPipelineNetworkApi({
     required BuildContext context,
     required String latitude,
     required String longitude,
@@ -632,7 +633,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (currentPoint != null) {
       currentPosition = LatLng(currentPoint.latitude, currentPoint.longitude);
       print("Current Position: $currentPosition");
-      cameraPosition = CameraPosition(target: currentPosition, zoom: 14);
+      position = CameraPosition(target: currentPosition, zoom: 14);
     }
   }
 
@@ -745,7 +746,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
-  Future<void> _selectGISValue({
+  _selectGISValue({
     required String assetId,
     required String assetTypeId,
     required List dataList,
@@ -759,7 +760,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     assetTypeId == '';
     _clearMarkerPolyline();
     controller.text = assetTypeId;
-    Set<Marker> tempMarker = {};
     if (controller.text.isNotEmpty) {
       filteredList.addAll(dataList.where((data) {
         if (gasValveGISController.text.isNotEmpty) {
@@ -787,8 +787,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           longitude: location.longitude.toString(),
         );
         tempMarker.addAll(markers);
-        currentPosition = LatLng(location.latitude, location.longitude);
-        cameraPosition = CameraPosition(target: currentPosition, zoom: 16);
         markersPointList = tempMarker;
         if (tempMarker.isNotEmpty) {
           GoogleMapController controller = await googleMapController.future;
@@ -809,7 +807,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     }
   }
 
-  Future<void> _selectTFGisValue(SelectTFGisEvent event, emit) async {
+  _selectTFGisValue(SelectTFGisEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
     await _selectGISValue(
@@ -825,7 +823,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
-  Future<void> _selectValveGISValue(
+  _selectValveGISValue(
       SelectValveGISValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
@@ -842,7 +840,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
-  Future<void> _selectRegulatorGISValue(
+  _selectRegulatorGISValue(
       SelectRegulatorGISValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
@@ -939,7 +937,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
-  Future<void> _selectConsumerGISValue(
+  _selectConsumerGISValue(
       SelectConsumerGISValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
@@ -957,20 +955,14 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _onResetFilterEvent(ResetFilterEvent event, emit) async {
+    tempMarker = {};
+    await gotoInitialPosition(points[0]);
     _clearTextField();
     _clearMarkerPolyline();
-    GoogleMapController controller = await googleMapController.future;
-    currentPosition = LatLng(loginPosition.latitude, loginPosition.longitude);
-    controller.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: currentPosition, zoom: 14)));
     Navigator.pop(event.context, true);
     _eventCompleted(emit);
   }
 
-  _onCameraIdleEvent(NavigateAlertOnCameraIdleEvent event,  emit) {
-    _filterVisiblePolyline();
-    _eventCompleted(emit);
-  }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
     final Uint8List pinIcon =
@@ -1092,12 +1084,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       baseUrl: baseUrl,
       nameofLocation: nameofLocation,
       role: role,
-      cameraPosition: cameraPosition,
+      position: position,
       googleMapController: googleMapController,
       currentMapType: currentMapType,
       markersPointList: Set.of(markersPointList),
       currentPosition: currentPosition,
-      loginPosition: loginPosition,
       polylinePointList: Set.of(polylinePointList),
       pipelineNetworkModel: pipelineNetworkModel,
       pipelineNetworkData: pipelineNetworkData,

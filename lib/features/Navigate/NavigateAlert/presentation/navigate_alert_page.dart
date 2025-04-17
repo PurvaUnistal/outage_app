@@ -8,14 +8,14 @@ import 'package:outage_app/Utils/common_widgets/Background/background_info_widge
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/text_form_widget.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/presentation/widget/legend_widget.dart';
-import '../../../../Utils/common_widgets/res/app_string.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/presentation/widget/legend_widget.dart';
 
 class NavigateAlertView extends StatefulWidget {
   const NavigateAlertView({super.key});
@@ -101,7 +101,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
       mapType: dataState.currentMapType,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
-      initialCameraPosition: dataState.cameraPosition,
+      initialCameraPosition: dataState.position,
       onMapCreated: (GoogleMapController controller) {
         dataState.googleMapController.complete(controller);
       },
@@ -112,7 +112,6 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         ));
       },
       onTap: (latLng) async {
-
         GoogleMapController controller = await dataState.googleMapController.future;
         controller.animateCamera(
           CameraUpdate.newCameraPosition(

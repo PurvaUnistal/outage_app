@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_bloc.dart';
 import 'package:outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_bloc.dart';
-import 'package:outage_app/features/ManageOutage/ManageAlert/domain/bloc/manage_alert_bloc.dart';
-import 'package:outage_app/features/ManageOutage/ReportDetails/domain/bloc/report_details_bloc.dart';
+import 'package:outage_app/features/Manage/ManageAlert/domain/bloc/manage_alert_bloc.dart';
+import 'package:outage_app/features/Manage/ReportDetails/domain/bloc/report_details_bloc.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
-import 'package:outage_app/features/ReportOutage/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
+import 'package:outage_app/features/Report/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
 
 MultiBlocProvider multiBlocProvider({required Widget child}) {
   return MultiBlocProvider(providers: [

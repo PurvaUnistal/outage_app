@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/helper/report_alert_helper.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 import 'package:outage_app/root.dart';
 import 'package:path_provider/path_provider.dart';
 

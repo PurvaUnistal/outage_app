@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/features/ReportOutage/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 
 abstract class NavigateAlertState extends Equatable {}
 
@@ -42,7 +42,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final String nameofLocation;
   final String role;
   final String baseUrl;
-  final CameraPosition cameraPosition;
+  final CameraPosition position;
   final Completer<GoogleMapController> googleMapController;
 
   final TextEditingController tfGisController;
@@ -70,7 +70,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final MapType currentMapType;
   final Set<Marker> markersPointList;
   final LatLng currentPosition;
-  final LatLng loginPosition;
   final Set<Polyline> polylinePointList;
 
 
@@ -106,7 +105,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.baseUrl,
     required this.nameofLocation,
     required this.role,
-    required this.cameraPosition,
+    required this.position,
     required this.googleMapController,
     required this.tfGisController,
     required this.gasValveGISController,
@@ -123,7 +122,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.currentMapType,
     required this.markersPointList,
     required this.currentPosition,
-    required this.loginPosition,
     required this.polylinePointList,
 
     required this.pipelineNetworkModel,
@@ -164,7 +162,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     isGasConsumerLoader,
     nameofLocation,
     role,
-    cameraPosition,
+    position,
     googleMapController,
     baseUrl,
     tfGisController,
@@ -182,7 +180,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     currentMapType,
     markersPointList,
     currentPosition,
-    loginPosition,
     polylinePointList,
     pipelineNetworkModel,
     pipelineNetworkData,
