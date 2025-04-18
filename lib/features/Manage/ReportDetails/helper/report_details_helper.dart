@@ -18,7 +18,6 @@ class ReportDetailsHelper{
     Map<String, String> para = {
       "schema": schema,
       "incident_type_id": incidentTypeId,
-      "district_id": gaId,
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -62,9 +61,11 @@ class ReportDetailsHelper{
     required String incidentId,
   }) async {
     String schema =await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String gaId =await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
     Map<String, String> para = {
       "schema": schema,
       "incidentId": incidentId,
+      "district_id": gaId,
     };
     String json = Uri(queryParameters: para).query;
     try {

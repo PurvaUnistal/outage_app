@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:outage_app/MapWithStream.dart';
 import 'package:outage_app/Utils/common_widgets/Routes/routes_name.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
@@ -63,6 +62,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
           );
         }
       } else {
+        await SharedPref.clearAll();
         Navigator.pushReplacementNamed(
           context,
           RoutesName.login,

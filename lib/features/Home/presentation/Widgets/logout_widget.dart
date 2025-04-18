@@ -39,12 +39,13 @@ class LogoutWidget extends StatelessWidget {
                     child: ButtonWidget(
                         text: AppString.logout,
                         onPressed: () async {
+                          await SharedPref.clearAll();
                           Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => const LoginPage()),
                               (route) => false);
-                          await SharedPref.clearAll();
+
                         }),
                   ),
                   SizedBox(

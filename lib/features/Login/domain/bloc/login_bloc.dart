@@ -77,20 +77,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               }
               PackageInfo packageInfo = await PackageInfo.fromPlatform();
               await SharedPref.setString(key: PrefsValue.buildNumber,value: packageInfo.buildNumber);
-             /* await SharedPref.setString(key: PrefsValue.userId,value: res.user!.id!);
-              await SharedPref.setString(key: PrefsValue.token,value: res.token!);
-              await SharedPref.setString(key: PrefsValue.schema,value: res.user!.schema!);
-              await SharedPref.setString(key: PrefsValue.userName,value: res.user!.name!);
-              await SharedPref.setString(key: PrefsValue.userRole,value: res.user!.role!);
-              await SharedPref.setString(key: PrefsValue.pwdChanged,value: res.user!.pwdChanged!);
-              await SharedPref.setString(key: PrefsValue.loginLat,value: res.user!.gaLatitude!);
-              await SharedPref.setString(key: PrefsValue.loginLong,value: res.user!.gaLongitude!);
-              await SharedPref.setString(key: PrefsValue.gaId,value: res.user!.gaId!);
-              await SharedPref.setString(key: PrefsValue.areas,value: res.user!.areas!);
-              List<Accessright> accessrightList = await res.user!.accessright ?? [];
-              await SharedPref.setString(key: PrefsValue.accessRight,value: Accessright.jsonFromAccessrightList(accessrightList));
-              PackageInfo packageInfo = await PackageInfo.fromPlatform();
-              await SharedPref.setString(key: PrefsValue.buildNumber,value: packageInfo.buildNumber);*/
                 Navigator.pushReplacementNamed(
                   event.context,
                   RoutesName.outageApp,
