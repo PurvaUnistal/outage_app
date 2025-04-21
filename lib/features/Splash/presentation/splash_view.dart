@@ -58,7 +58,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
        //   Navigator.push(context, (MaterialPageRoute(builder: (context) => DynamicPolylineMap(),)));
           Navigator.pushReplacementNamed(
             context,
-            RoutesName.outageApp,
+            RoutesName.gisApp,
           );
         }
       } else {

@@ -23,11 +23,11 @@ class AppString {
 
   static String searchPriority = "Search Priority...";
 
-  static const String tpaApp = 'Outage APP';
+  static const String tpaApp = 'GIS APP';
   static const String photo = 'Photo';
-  static const String manageAlert = 'Manage Alert';
-  static const String navigateAlert = 'Navigate Alert';
-  static const String reportAlert = 'Report Alert';
+  static const String manageAlert = 'Manage Incident';
+  static const String navigateAlert = 'Navigate';
+  static const String reportAlert = 'Manage Alert';
   static const String maintenanceAlert = 'Maintenance Alert';
   static const String createAlertForm = 'Create Alert Form';
 

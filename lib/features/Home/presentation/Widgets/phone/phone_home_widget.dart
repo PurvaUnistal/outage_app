@@ -44,7 +44,7 @@ class _PhoneHomeWidgetState extends State<PhoneHomeWidget> {
 
   _appBarWidget() {
     return AppBarWidget(
-      title: RoutesName.outageApp,
+      title: RoutesName.gisApp,
       boolLeading: false,
       actions: [
         IconButton(

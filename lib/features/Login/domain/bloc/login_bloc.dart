@@ -79,7 +79,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               await SharedPref.setString(key: PrefsValue.buildNumber,value: packageInfo.buildNumber);
                 Navigator.pushReplacementNamed(
                   event.context,
-                  RoutesName.outageApp,
+                  RoutesName.gisApp,
                 );
 
             }

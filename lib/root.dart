@@ -21,6 +21,8 @@ class _RootAppState extends State<RootApp> {
     super.initState();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     Singleton.instanceInit()?.context = context;

@@ -303,7 +303,7 @@ class CreateAlertFormBloc
           Utils.successSnackBar(msg: res.data!, context: event.context);
           Navigator.pushReplacementNamed(
             event.context,
-            RoutesName.outageApp,
+            RoutesName.gisApp,
           );
         } else {
           isBtnLoader = false;
