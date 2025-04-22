@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -769,7 +768,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         }
       }).toList());
       if (filteredList.isNotEmpty) {
-        final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(assetPath, 80);
+        final BitmapDescriptor iconBytes = await ReportAlertHelper.markerAsset(assetPath);
         LatLng location = LatLng(
           double.parse(filteredList[0].latitude!),
           double.parse(filteredList[0].longitude!),
@@ -779,7 +778,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         var markers = await NavigateAlertHelper.createMarker(
           latlngList: [location],
           context: context,
-          markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
+          markerIcon: iconBytes,
         );
         await _fetchPipelineNetworkApi(
           context: context,
@@ -965,8 +964,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
-    final Uint8List pinIcon =
-        await ReportAlertHelper.getBytesFromAsset(AssetPath.pin, 50);
+    final BitmapDescriptor  pinIcon =
+        await ReportAlertHelper.markerAsset(AssetPath.pin);
     Set<Marker> tempMarker = Set.from(markersPointList);
 
     List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -982,7 +981,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         markerId: MarkerId('Pipeline'),
         position: event.latLngOnTap,
         infoWindow: InfoWindow(title: 'Pickup Point', snippet: nameofLocation),
-        icon: BitmapDescriptor.fromBytes(pinIcon),
+        icon: pinIcon,
       ),
     );
     markersPointList = tempMarker;

@@ -27,7 +27,7 @@ class AppString {
   static const String photo = 'Photo';
   static const String manageAlert = 'Manage Incident';
   static const String navigateAlert = 'Navigate';
-  static const String reportAlert = 'Manage Alert';
+  static const String reportAlert = 'Report Incident';
   static const String maintenanceAlert = 'Maintenance Alert';
   static const String createAlertForm = 'Create Alert Form';
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,7 +13,6 @@ import 'package:outage_app/features/Manage/ReportDetails/domain/model/IncidentTy
 import 'package:outage_app/features/Manage/ReportDetails/domain/model/consumer_affect_model.dart';
 import 'package:outage_app/features/Manage/ReportDetails/helper/report_details_helper.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/helper/navigate_alert_helper.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 import '../model/IncidentActionModel.dart';
 
@@ -222,21 +220,21 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   }
 
   Future<void> _handleConsumerMarkers({required BuildContext context, required List<LatLng> listOfConsumer}) async {
-    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.consumerBlink, 80);
+    final BitmapDescriptor  iconBytes = await ReportAlertHelper.markerAsset(AssetPath.consumerBlink);
     consumerMarkers = await NavigateAlertHelper.createMarker(
       latlngList: listOfConsumer,
       context: context,
-      markerIcon: BitmapDescriptor.fromBytes(iconBytes!),
+      markerIcon: iconBytes,
     );
     markersPointList.addAll(consumerMarkers);
   }
 
   Future<void> _handleValveMarkers({required BuildContext context, required List<LatLng> listOfValve}) async {
-    final Uint8List? iconBytes = await ReportAlertHelper.getBytesFromAsset(AssetPath.valveBlink, 30);
+    final BitmapDescriptor  iconBytes = await ReportAlertHelper.markerAsset(AssetPath.valveBlink);
     valveMarkers = await NavigateAlertHelper.createMarker(
       latlngList: listOfValve,
       context: context,
-      markerIcon: BitmapDescriptor.bytes(iconBytes!),
+      markerIcon: iconBytes,
     );
     markersPointList.addAll(valveMarkers);
   }

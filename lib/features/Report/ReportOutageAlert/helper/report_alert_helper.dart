@@ -414,15 +414,13 @@ class ReportAlertHelper {
     return polylineList;
   }
 
-  static Future<Uint8List> getBytesFromAsset(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetWidth: width);
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+  static Future<BitmapDescriptor> markerAsset(String path) async {
+    return await BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(size: Size(48, 48)),
+      path,
+    );
   }
+
 
   static Color getPolylineColor(int value) {
     if (value < 0 || value > 50) {

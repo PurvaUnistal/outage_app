@@ -55,7 +55,7 @@ class _ReportAlertViewState extends State<ReportAlertView> {
     return (await showDialog(
             context: context,
             builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
-                message: "Do you want to Manage Alert?",
+                message: "Do you want to Report Incident?",
                 okButtonText: "Exit",
                 onPressed: () => Navigator.of(context).pop(true)))) ??
         false;

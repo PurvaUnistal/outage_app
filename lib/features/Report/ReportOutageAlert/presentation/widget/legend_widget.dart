@@ -36,11 +36,11 @@ class LegendPopWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _row(name: AppString.gasTfGis,path: AssetPath.tf, color:Colors.yellow.shade900,context:mContext ),
+                  _row(name: AppString.gasTfGis,path: AssetPath.tf, color:Colors.cyanAccent,context:mContext ),
                   _row(name: AppString.gasValveGIS,path: AssetPath.valve,color: Colors.deepOrange,context:mContext),
                   CommonStyle.widthSpace(context: mContext),
                   _row(name: AppString.gasRegulatorGIS,path: AssetPath.regulator,color: Colors.yellowAccent.shade700,context:mContext),
-                  _row(name: AppString.gasConsumerGIS,path: AssetPath.consumer,color: Colors.green,context:mContext),
+                  _row(name: AppString.gasConsumerGIS,path: AssetPath.consumer,color: Colors.blueAccent,context:mContext),
                   CommonStyle.widthSpace(context: mContext),
                   Divider(color: EnvironmentConfig.of(context)!.secondaryTheme,),
 
