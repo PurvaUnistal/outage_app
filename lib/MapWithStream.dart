@@ -141,6 +141,6 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
               _filterVisiblePolylines();
             },
             polylines: _polyline,
-            minMaxZoomPreference: MinMaxZoomPreference(15, 18)));
+            minMaxZoomPreference: MinMaxZoomPreference(15, null)));
   }
 }

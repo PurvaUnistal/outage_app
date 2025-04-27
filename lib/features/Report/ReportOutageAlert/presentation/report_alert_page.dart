@@ -89,15 +89,19 @@ class _ReportAlertViewState extends State<ReportAlertView> {
   _googleMapWidget({required FetchReportAlertDataState dataState}) {
     return GoogleMap(
       mapType: dataState.currentMapType,
-      compassEnabled: true,
+      compassEnabled: false,
       myLocationEnabled: true,
+      rotateGesturesEnabled: false,
+      zoomControlsEnabled: false,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
       initialCameraPosition: dataState.position,
       onMapCreated: (GoogleMapController controller) {
-        dataState.googleMapController.complete(controller);
-      },
-      minMaxZoomPreference: MinMaxZoomPreference(15, 18),
+        if (! dataState.googleMapController.isCompleted) {
+          dataState.googleMapController.complete(controller);
+        }
+        },
+      minMaxZoomPreference: MinMaxZoomPreference(15, null),
       onCameraIdle: () {
         BlocProvider.of<ReportAlertBloc>(context).add(OnCameraIdleEvent(
           context: context,

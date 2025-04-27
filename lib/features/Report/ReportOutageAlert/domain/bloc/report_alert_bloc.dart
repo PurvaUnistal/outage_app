@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/Utils.dart';
 import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
+import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
@@ -155,7 +156,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   PipelineNetworkData pipelineNetworkData = PipelineNetworkData();
   List<PipelineNetworkData> listOfPipelineNetwork = [];
 
-  PipelineModel pipelineModel = PipelineModel();
+
   PipelineData pipelineData = PipelineData();
   List<PipelineData> listOfPipeline = [];
 
@@ -164,9 +165,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   List<LatLng> allLatLongPoint = [];
 
   Set<Marker> tempMarker = {};
-  Set<Marker> markersPointList = {};
   Set<Marker> filterMarkerList = {};
   Set<Marker> finalMarker = {};
+  Set<Marker> tfMarker = {};
+  Set<Marker> valveMarker = {};
+  Set<Marker> regularMarker = {};
+  Set<Marker> consumerMarker = {};
+  Set<Marker> markersPointList = {};
 
   Set<Polyline> polylinePointList = {};
   Set<Polyline> pipePolylinePointList = {};
@@ -263,18 +268,24 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     pipelineNetworkData = PipelineNetworkData();
     listOfPipelineNetwork = [];
 
-    pipelineModel = PipelineModel();
+
     pipelineData = PipelineData();
     listOfPipeline = [];
-
     currentPosition = LatLng(0, 0);
 
-    markersPointList = {};
+    tempMarker = {};
+    finalMarker = {};
     filterMarkerList = {};
+    tfMarker = {};
+    valveMarker = {};
+    regularMarker = {};
+    consumerMarker = {};
+    markersPointList = {};
 
     filterPolyline = {};
     polylinePointList = {};
     pipePolylinePointList = {};
+
 
     allLatLongPoint = [];
     googleMapController = Completer();
@@ -285,14 +296,19 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   }
 
   _fetchGasPipelineGisApi({required BuildContext context, emit}) async {
-    var res = await ReportAlertHelper.getPipelineApi(
-      context: context,
-      latitude: AppConfig.instanceInit()!.userInfo.gaLatitude.toString(),
-      longitude: AppConfig.instanceInit()!.userInfo.gaLongitude.toString(),
-    );
-    if (res != null && res.data != null) {
-      pipelineModel = res;
-      listOfPipeline = pipelineModel.data!;
+    if (await HiveDataBase.pipelineDataBox!.values.isEmpty) {
+      var res = await ReportAlertHelper.getPipelineApi(
+        context: context,
+        latitude: AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+        longitude: AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+      );
+      if(res != null && res.data != null){
+        listOfPipeline = res.data!;
+      }
+    } else {
+      listOfPipeline = await HiveDataBase.pipelineDataBox!.values.toList();
+    }
+    if (listOfPipeline.isNotEmpty) {
       finalPolyline.clear();
       finalMarker.clear();
       _eventCompleted(emit);
@@ -301,16 +317,16 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         if (data.geomencode != null && data.geomencode!.isNotEmpty) {
           try {
             points = await DecodePolyline.decodePolyline(data.geomencode!);
-            /* final color = ReportAlertHelper.getPolylineColor(
+            final color = ReportAlertHelper.getPolylineColor(
               int.tryParse(data.nominaldia ?? '0') ?? 0,
-            );*/
-            Polyline polyline = Polyline(
-              polylineId: PolylineId("polyline_$i"),
-              points: points,
-              color: Colors.green,
-              width: 4,
             );
-            finalPolyline.add(polyline);
+            Set<Polyline> polyline = ReportAlertHelper.polylinePoint(
+              i: i,
+              color: color,
+              position: points,
+              context: context,
+            );
+            finalPolyline.addAll(polyline);
           } catch (e) {
             print("Error decoding polyline at index $i: $e");
           }
@@ -362,130 +378,170 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     _updateMarkerPolyline();
   }
 
+  _updateMarkerPolyline() {
+    polylinePointList = {...pipePolylinePointList, ...filterPolyline};
+    print("pipePolylinePointList-->${pipePolylinePointList.length}");
+    print("filterPolyline-->${filterPolyline.length}");
+    markersPointList = {...markersPointList, ...filterMarkerList};
+    print("markersPointList-->${markersPointList.length}");
+    print("filterMarkerList-->${filterMarkerList.length}");
+  }
+
   _fetchTFGisApi({required BuildContext context, emit}) async {
-    var res = await ReportAlertHelper.getTFGisApi(context: context);
-    if (res != null) {
-      tfGisModel = res;
-      if (tfGisModel.data != null) {
-        listOfTfGis = tfGisModel.data!;
-        listOfTfGisId = listOfTfGis.map((e) => e.id!).toList();
-        final customIcon = await ReportAlertHelper.markerAsset(AssetPath.tf);
-        for (int i = 0; i < listOfTfGis.length; i++) {
-          final data = listOfTfGis[i];
-          try {
-            LatLng latLngList = LatLng(
-              double.parse(data.latitude!),
-              double.parse(data.longitude!),
-            );
-            Marker marker = Marker(
-              markerId: MarkerId(data.id.toString()),
-              position: latLngList,
-              infoWindow: InfoWindow(title: data.id),
-              icon: customIcon,
-            );
-            finalMarker.add(marker);
-          } catch (e) {
-            print("Error decoding polyline at index $i: $e");
+    if(checkBoxTf == true){
+      var res = await ReportAlertHelper.getTFGisApi(context: context);
+      if (res != null) {
+        tfGisModel = res;
+        if (tfGisModel.data != null) {
+          listOfTfGis = tfGisModel.data!;
+          listOfTfGisId = listOfTfGis.map((e) => e.id!).toList();
+          final customIcon = await ReportAlertHelper.markerAsset(AssetPath.tf);
+          for (int i = 0; i < listOfTfGis.length; i++) {
+            final data = listOfTfGis[i];
+            try {
+              LatLng latLngList = LatLng(
+                double.parse(data.latitude!),
+                double.parse(data.longitude!),
+              );
+              Set<Marker> marker = ReportAlertHelper.markerPoint(
+                assetId: tfGisModel.assetId ?? "",
+                assetsTypeId: data.id ?? "",
+                icon: customIcon,
+                position: latLngList,
+                context: context,
+              );
+              tfMarker.addAll(marker);
+              finalMarker.addAll(tfMarker);
+            } catch (e) {
+              print("Error decoding polyline at index $i: $e");
+            }
           }
+          _filterVisiblePolyline();
+          _eventCompleted(emit);
+          return res;
         }
-        _filterVisiblePolyline();
-        _eventCompleted(emit);
-        return res;
       }
     }
   }
 
   _fetchGasValueGisApi({required BuildContext context, emit}) async {
-    var res = await ReportAlertHelper.getGasValueGisApi(context: context);
-    if (res != null) {
-      gasValueGISModel = res;
-      if (gasValueGISModel.data != null) {
-        listOfGasValueGIS = gasValueGISModel.data!;
-        listOfGasValveGISId = listOfGasValueGIS.map((e) => e.valveId!).toList();
-         BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(AssetPath.valve);
-        for (int i = 0; i < listOfGasValueGIS.length; i++) {
-          final data = listOfGasValueGIS[i];
-          try {
-            LatLng latLngList = LatLng(
-              double.parse(data.latitude!),
-              double.parse(data.longitude!),
-            );
-            Marker marker = Marker(
-              markerId: MarkerId(data.valveId.toString()),
-              position: latLngList,
-              infoWindow: InfoWindow(title: data.valveId),
-              icon:customIcon,
-            );
-            finalMarker.add(marker);
-          } catch (e) {
-            print("Error decoding polyline at index $i: $e");
+    if(checkBoxValve == true){
+      var res = await ReportAlertHelper.getGasValueGisApi(context: context);
+      if (res != null) {
+        gasValueGISModel = res;
+        if (gasValueGISModel.data != null) {
+          listOfGasValueGIS = gasValueGISModel.data!;
+          listOfGasValveGISId = listOfGasValueGIS.map((e) => e.valveId!).toList();
+          BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
+            AssetPath.valve,
+          );
+          for (int i = 0; i < listOfGasValueGIS.length; i++) {
+            final data = listOfGasValueGIS[i];
+            try {
+              LatLng latLngList = LatLng(
+                double.parse(data.latitude!),
+                double.parse(data.longitude!),
+              );
+              Set<Marker> marker = ReportAlertHelper.markerPoint(
+                assetId: gasValueGISModel.assetId ?? "",
+                assetsTypeId: data.valveId ?? "",
+                icon: customIcon,
+                position: latLngList,
+                context: context,
+              );
+              valveMarker.addAll(marker);
+              finalMarker.addAll(valveMarker);
+            } catch (e) {
+              print("Error decoding polyline at index $i: $e");
+            }
           }
+          _filterVisiblePolyline();
+          _eventCompleted(emit);
+          return res;
         }
-        _filterVisiblePolyline();
-        _eventCompleted(emit);
-        return res;
       }
     }
   }
 
-  _fetchGasRegulatorGisApi({required BuildContext context}) async {
-    var res = await ReportAlertHelper.getRegulatorGisApi(context: context);
-    if (res != null) {
-      gasRegulatorGISModel = res;
-      if (gasRegulatorGISModel.data != null) {
-        listOfGasRegulatorGIS = gasRegulatorGISModel.data!;
-        listOfGasRegulatorGISId =
-            listOfGasRegulatorGIS.map((e) => e.id!).toList();
-        List<LatLng> latLngList =
-            listOfGasRegulatorGIS
-                .map(
-                  (e) => LatLng(
-                    double.parse(e.latitude!),
-                    double.parse(e.longitude!),
-                  ),
-                )
-                .toList();
-        var markers = await ReportAlertHelper.createMarker(
-          latlngList: latLngList,
-          context: context,
-          markerIcon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueMagenta,
-          ),
-        );
-        finalMarker.addAll(markers);
-        return res;
+  _fetchGasRegulatorGisApi({required BuildContext context, emit}) async {
+    if(checkBoxRegulator == true){
+      var res = await ReportAlertHelper.getRegulatorGisApi(context: context);
+      if (res != null) {
+        gasRegulatorGISModel = res;
+        if (gasRegulatorGISModel.data != null) {
+          listOfGasRegulatorGIS = gasRegulatorGISModel.data!;
+          listOfGasRegulatorGISId =
+              listOfGasRegulatorGIS.map((e) => e.id!).toList();
+          BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
+            AssetPath.regulator,
+          );
+          for (int i = 0; i < listOfGasRegulatorGIS.length; i++) {
+            final data = listOfGasRegulatorGIS[i];
+            try {
+              LatLng latLngList = LatLng(
+                double.parse(data.latitude!),
+                double.parse(data.longitude!),
+              );
+              Set<Marker> marker = ReportAlertHelper.markerPoint(
+                assetId: gasRegulatorGISModel.assetId ?? "",
+                assetsTypeId: data.id ?? "",
+                icon: customIcon,
+                position: latLngList,
+                context: context,
+              );
+              regularMarker.addAll(marker);
+              finalMarker.addAll(regularMarker);
+            } catch (e) {
+              print("Error decoding polyline at index $i: $e");
+            }
+          }
+          _filterVisiblePolyline();
+          _eventCompleted(emit);
+          return res;
+        }
       }
     }
   }
 
-  _fetchGasConsumerGisApi({required BuildContext context}) async {
-    var res = await ReportAlertHelper.getConsumerGisApi(context: context);
-    if (res != null) {
-      gasConsumerGISModel = res;
-      if (gasConsumerGISModel.data != null) {
-        listOfGasConsumerGIS = gasConsumerGISModel.data!;
-        listOfGasConsumerGISId =
-            listOfGasConsumerGIS.map((e) => e.id!).toList();
-        List<LatLng> latLngList =
-            listOfGasConsumerGIS
-                .map(
-                  (e) => LatLng(
-                    double.parse(e.latitude!),
-                    double.parse(e.longitude!),
-                  ),
-                )
-                .toList();
-        var markers = await ReportAlertHelper.createMarker(
-          latlngList: latLngList,
-          context: context,
-          markerIcon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueCyan,
-          ),
-        );
-        finalMarker.addAll(markers);
-        return res;
+  _fetchGasConsumerGisApi({required BuildContext context, emit}) async {
+    if(checkBoxConsumer==true){
+      var res = await ReportAlertHelper.getConsumerGisApi(context: context);
+      if (res != null) {
+        gasConsumerGISModel = res;
+        if (gasConsumerGISModel.data != null) {
+          listOfGasConsumerGIS = gasConsumerGISModel.data!;
+          listOfGasConsumerGISId =
+              listOfGasConsumerGIS.map((e) => e.id!).toList();
+          BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
+            AssetPath.consumer,
+          );
+          for (int i = 0; i < listOfGasConsumerGIS.length; i++) {
+            final data = listOfGasConsumerGIS[i];
+            try {
+              LatLng latLngList = LatLng(
+                double.parse(data.latitude!),
+                double.parse(data.longitude!),
+              );
+              Set<Marker> marker = ReportAlertHelper.markerPoint(
+                assetId: gasConsumerGISModel.assetId ?? "",
+                assetsTypeId: data.id ?? "",
+                icon: customIcon,
+                position: latLngList,
+                context: context,
+              );
+              consumerMarker.addAll(marker);
+              finalMarker.addAll(consumerMarker);
+            } catch (e) {
+              print("Error decoding polyline at index $i: $e");
+            }
+          }
+          _filterVisiblePolyline();
+          _eventCompleted(emit);
+          return res;
+        }
       }
     }
+
   }
 
   _fetchGasTeeGisApi({required BuildContext context}) async {
@@ -565,23 +621,26 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         if (pipelineNetworkModel.data?.isNotEmpty ?? false) {
           listOfPipelineNetwork = pipelineNetworkModel.data!;
           final gisConfig = await _getActiveGisConfig();
-          for (var pipeline in listOfPipelineNetwork) {
-            if (pipeline.geomencode != null) {
-              List<LatLng> filterLatLngGis =
-                  await DecodePolyline.decodePolyline(pipeline.geomencode!);
-              Polyline polyline = Polyline(
-                polylineId: PolylineId(filterLatLngGis.toString()),
-                points: filterLatLngGis,
-                color: gisConfig!.polylineColor,
-                width: 4,
-              );
-             /* var polyline = await ReportAlertHelper.createPolyLine(
-                color: gisConfig!.polylineColor,
-                latlngList: filterLatLngGis,
-                context: context,
-              );*/
-              gisConfig.polylineList?.add(polyline);
-              filterPolyline.add(polyline);
+          for (int i = 0; i < listOfPipelineNetwork.length; i++) {
+            final data = listOfPipelineNetwork[i];
+            if (data.geomencode != null && data.geomencode!.isNotEmpty) {
+              try {
+                List<LatLng> filterLatLngGis =
+                    await DecodePolyline.decodePolyline(data.geomencode!);
+                final color = ReportAlertHelper.getPolylineColor(
+                  int.tryParse(data.nominaldia ?? '0') ?? 0,
+                );
+                Set<Polyline> polyline = ReportAlertHelper.polylinePoint(
+                  i: i,
+                  color: color,
+                  position: filterLatLngGis,
+                  context: context,
+                );
+                gisConfig?.polylineList?.addAll(polyline);
+                filterPolyline.addAll(polyline);
+              } catch (e) {
+                print("Error decoding polyline at index $i: $e");
+              }
             }
           }
           _updateMarkerPolyline();
@@ -621,6 +680,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     if (currentPoint != null) {
       currentPosition = LatLng(currentPoint.latitude, currentPoint.longitude);
       position = CameraPosition(target: currentPosition, zoom: 14);
+       gotoInitialPosition(currentPosition);
     }
   }
 
@@ -631,6 +691,10 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       isGasTfLoader = true;
       _eventCompleted(emit);
       await _fetchTFGisApi(context: event.context, emit: emit);
+    }else{
+      finalMarker.removeWhere((marker) => tfMarker.contains(marker));
+      tfMarker.clear();            
+      _eventCompleted(emit);
     }
     isGasTfLoader = false;
     _eventCompleted(emit);
@@ -643,6 +707,10 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       isGasValveLoader = true;
       _eventCompleted(emit);
       await _fetchGasValueGisApi(context: event.context, emit: emit);
+    }else{
+      finalMarker.removeWhere((marker) => valveMarker.contains(marker));
+      valveMarker.clear();            
+      _eventCompleted(emit);
     }
     isGasValveLoader = false;
     _eventCompleted(emit);
@@ -657,7 +725,11 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     if (checkBoxRegulator == true) {
       isGasRegulatorLoader = true;
       _eventCompleted(emit);
-      await _fetchGasRegulatorGisApi(context: event.context);
+      await _fetchGasRegulatorGisApi(context: event.context, emit: emit);
+    }else{
+      finalMarker.removeWhere((marker) => regularMarker.contains(marker));
+      regularMarker.clear();            
+      _eventCompleted(emit);
     }
     isGasRegulatorLoader = false;
     _eventCompleted(emit);
@@ -729,7 +801,11 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     if (checkBoxConsumer == true) {
       isGasConsumerLoader = true;
       _eventCompleted(emit);
-      await _fetchGasConsumerGisApi(context: event.context);
+      await _fetchGasConsumerGisApi(context: event.context, emit: emit);
+    }else{
+      finalMarker.removeWhere((marker) => consumerMarker.contains(marker));
+      consumerMarker.clear();            
+      _eventCompleted(emit);
     }
     isGasConsumerLoader = false;
     _eventCompleted(emit);
@@ -739,63 +815,54 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     if (tfGisController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.tf,
-        polylineColor: Colors.cyanAccent,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasValveGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.valve,
-        polylineColor: Colors.deepOrange,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasRegulatorGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.regulator,
-        polylineColor: Colors.yellowAccent.shade700,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasTeeGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.tee,
-        polylineColor: Colors.green,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasElbowGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.elbow,
-        polylineColor: Colors.green,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasCouplerGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.coupler,
-        polylineColor: Colors.green,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasReducerGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.reduce,
-        polylineColor: Colors.green,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasEndCapGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.endcap,
-        polylineColor: Colors.green,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
     } else if (gasConsumerGISController.text.isNotEmpty) {
       return GisConfig(
         assetPath: AssetPath.consumer,
-        polylineColor: Colors.blueAccent,
         markerList: filterMarkerList,
         polylineList: filterPolyline,
       );
@@ -840,19 +907,17 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         }).toList(),
       );
       if (filteredList.isNotEmpty) {
-        final iconBytes = await ReportAlertHelper.markerAsset(
-          assetPath,
-        );
+        final iconBytes = await ReportAlertHelper.markerAsset(assetPath);
         LatLng location = LatLng(
           double.parse(filteredList[0].latitude!),
           double.parse(filteredList[0].longitude!),
         );
-        AppConfig.instanceInit()?.setAssets(assets: assetId);
-        AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: assetTypeId);
-        var markers = await ReportAlertHelper.createMarker(
-          latlngList: [location],
+        Set<Marker> markers = await ReportAlertHelper.markerPoint(
+          position: location,
           context: context,
-          markerIcon: iconBytes,
+          icon: iconBytes,
+          assetId: assetId,
+          assetsTypeId: assetTypeId,
         );
         await _fetchPipelineNetworkApi(
           context: context,
@@ -1045,10 +1110,19 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
                 BitmapDescriptor.hueYellow,
               ),
               onTap: () async {
-                AppConfig.instanceInit()?.setMarkerPoint(
-                  newPointMarkerLat: event.latLngOnTap.latitude.toString(),
-                  newPointMarkerLong: event.latLngOnTap.longitude.toString(),
-                );
+                if(polylinePointList.isNotEmpty){
+                  AppConfig.instanceInit()?.setAssets(assets: "");
+                  AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: "");
+                  AppConfig.instanceInit()?.setMarkerPoint(
+                    newPointMarkerLat: event.latLngOnTap.latitude.toString(),
+                    newPointMarkerLong: event.latLngOnTap.longitude.toString(),
+                  );
+                }else if(markersPointList.isNotEmpty){
+                  AppConfig.instanceInit()?.setMarkerPoint(
+                    newPointMarkerLat: event.latLngOnTap.latitude.toString(),
+                    newPointMarkerLong: event.latLngOnTap.longitude.toString(),
+                  );
+                }
                 showModalBottomSheet(
                   context: event.context,
                   isScrollControlled: true,
@@ -1141,15 +1215,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     markersPointList = {...markersPointList};
   }
 
-  _updateMarkerPolyline() {
-    polylinePointList = {...pipePolylinePointList, ...filterPolyline};
-    print("pipePolylinePointList-->${pipePolylinePointList.length}");
-    print("filterPolyline-->${filterPolyline.length}");
-    markersPointList = {...markersPointList, ...filterMarkerList};
-    print("markersPointList-->${markersPointList.length}");
-    print("filterMarkerList-->${filterMarkerList.length}");
-  }
-
   _eventCompleted(Emitter<ReportAlertState> emit) {
     emit(
       FetchReportAlertDataState(
@@ -1182,9 +1247,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         markersPointList: Set.of(markersPointList),
         currentPosition: currentPosition,
         polylinePointList: Set.of(polylinePointList),
-        pipelineNetworkModel: pipelineNetworkModel,
-        pipelineNetworkData: pipelineNetworkData,
-        listOfPipelineNetwork: listOfPipelineNetwork,
+
         tfGisController: tfGisController,
         gasValveGISController: gasValveGISController,
         gasRegulatorGISController: gasRegulatorGISController,

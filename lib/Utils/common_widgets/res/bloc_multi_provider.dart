@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_bloc.dart';
 import 'package:outage_app/features/Maintenance/MaintenanceAlert/domain/bloc/maintenance_alert_bloc.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_bloc.dart';
 import 'package:outage_app/features/Manage/ManageAlert/domain/bloc/manage_alert_bloc.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/bloc/report_details_bloc.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
 import 'package:outage_app/features/Report/CreateAlertForm/domain/bloc/create_alert_form_bloc.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
@@ -18,6 +18,6 @@ MultiBlocProvider multiBlocProvider({required Widget child}) {
     BlocProvider(create: (BuildContext context) => MaintenanceAlertBloc()),
     BlocProvider(create: (BuildContext context) => NavigateAlertBloc()),
     BlocProvider(create: (BuildContext context) => ReportAlertBloc()),
-    BlocProvider(create: (BuildContext context) => ReportDetailsBloc()),
+    BlocProvider(create: (BuildContext context) => IncidentDetailBloc()),
   ], child: child);
 }

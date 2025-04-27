@@ -10,17 +10,20 @@ import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_server_dio.dart';
 
 class LoginHelper {
-  static Future<dynamic> textFieldValidation(
-      {required String email,
-      required String password,
-      required BuildContext context}) async {
+  static Future<dynamic> textFieldValidation({
+    required String email,
+    required String password,
+    required BuildContext context,
+  }) async {
     try {
       if (email.isEmpty) {
         Utils.errorSnackBar(msg: AppString.emailValidation, context: context);
         return false;
       } else if (password.isEmpty) {
         Utils.errorSnackBar(
-            msg: AppString.passwordValidation, context: context);
+          msg: AppString.passwordValidation,
+          context: context,
+        );
         return false;
       }
       return true;
@@ -43,21 +46,27 @@ class LoginHelper {
     return null;
   }
 
-  static Future<LoginModel?> loginData(
-      {required String emailId,
-      required String password,
-      required BuildContext context}) async {
+  static Future<LoginModel?> loginData({
+    required String emailId,
+    required String password,
+    required BuildContext context,
+  }) async {
     var deviceId = await getUniqueDeviceId();
     Map<String, String> para = {
       "email": emailId,
       "password": password,
       "deviceId": deviceId,
     };
-    try {
+   try {
       var res = await ApiHelper.postData(
-          urlEndPoint: Apis.loginUrl, param: para, context: context);
+        urlEndPoint: Apis.loginUrl,
+        param: para,
+        context: context,
+      );
       if (res != null && res["error"] == false) {
-        if (res["user"]["role"] == "outage management" || res["user"]["role"] == "incident") {
+        if (res["user"]["role"] == "outage management" ||
+            res["user"]["role"] == "incident" ||
+            res["user"]["role"] == "Manager") {
           await Utils.successSnackBar(msg: res["messages"], context: context);
           String baseUrl = Apis.loginUrl.replaceAll("api/auth", "");
           AppConfig.instanceInit()?.setBaseURL(baseURL: baseUrl);
@@ -65,22 +74,22 @@ class LoginHelper {
           return LoginModel.fromJson(res);
         } else {
           await Utils.errorSnackBar(
-              msg: "Invalid role ID. Please check your credentials.",
-              context: context);
+            msg: "Invalid role ID. Please check your credentials.",
+            context: context,
+          );
         }
       } else if (res != null && res["error"] == true) {
         await Utils.errorSnackBar(msg: res["messages"], context: context);
         return null;
-      }else{
+      } else {
         await Utils.errorSnackBar(msg: res["messages"], context: context);
         return null;
       }
     } catch (e) {
       log("catchLoginHelper --> ${e.toString()}");
-    //  await Utils.errorSnackBar(msg: e.toString(), context: context);
+      //  await Utils.errorSnackBar(msg: e.toString(), context: context);
       return null;
     }
     return null;
-
   }
 }

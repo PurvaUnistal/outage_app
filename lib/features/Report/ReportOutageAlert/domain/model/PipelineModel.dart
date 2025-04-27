@@ -1,3 +1,7 @@
+import 'package:hive/hive.dart';
+import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
+
+part 'PipelineModel.g.dart';
 class PipelineModel {
   int? success;
   bool? error;
@@ -27,9 +31,15 @@ class PipelineModel {
   }
 }
 
+
+
+@HiveType(typeId: HiveTypeId.pipelineData)
 class PipelineData {
+  @HiveField(0)
   String? gid;
+  @HiveField(1)
   String? nominaldia;
+  @HiveField(2)
   String? geomencode;
 
   PipelineData({this.gid, this.nominaldia, this.geomencode});

@@ -2,19 +2,19 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/IncidentActionModel.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/IncidentActionProgressModel.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/consumer_affect_model.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentActionModel.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentActionProgressModel.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentTypeActionModel.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/consumer_affect_model.dart';
 import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_server_dio.dart';
 
-class ReportDetailsHelper{
+class IncidentDetailHelper{
 
   static Future<IncidentActionModel?> getIncidentActionApi(
       {required BuildContext context, required String incidentTypeId}) async {
     String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
-    String gaId = await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String gaId =  await AppConfig.instanceInit()?.gaId ?? "";
     Map<String, String> para = {
       "schema": schema,
       "incident_type_id": incidentTypeId,
@@ -61,7 +61,7 @@ class ReportDetailsHelper{
     required String incidentId,
   }) async {
     String schema =await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
-    String gaId =await AppConfig.instanceInit()?.loginData.user?.gaId ?? "";
+    String gaId =  await AppConfig.instanceInit()?.gaId ?? "";
     Map<String, String> para = {
       "schema": schema,
       "incidentId": incidentId,

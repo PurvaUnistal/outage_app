@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_bloc.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_event.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_state.dart';
 import 'package:outage_app/features/Manage/ManageAlert/presentation/widget/button_border_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
@@ -11,32 +14,29 @@ import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart'
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/bloc/report_details_bloc.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/bloc/report_details_event.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/bloc/report_details_state.dart';
 import 'widget/GoogleMapWidget.dart';
 
-class ReportDetailsView extends StatefulWidget {
+class IncidentDetailView extends StatefulWidget {
   final String incidentId;
   final String incidentTypeId;
 
-  const ReportDetailsView({
+  const IncidentDetailView({
     super.key,
     required this.incidentId,
     required this.incidentTypeId,
   });
 
   @override
-  State<ReportDetailsView> createState() => _ReportDetailsViewState();
+  State<IncidentDetailView> createState() => _IncidentDetailViewState();
 }
 
-class _ReportDetailsViewState extends State<ReportDetailsView>
+class _IncidentDetailViewState extends State<IncidentDetailView>
     with SingleTickerProviderStateMixin {
   @override
   void initState() {
-    BlocProvider.of<ReportDetailsBloc>(
+    BlocProvider.of<IncidentDetailBloc>(
       context,
-    ).add(ReportDetailsLoadEvent(context: context));
+    ).add(IncidentDetailLoadEvent(context: context));
 
     super.initState();
   }
@@ -46,9 +46,9 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     return Scaffold(
       appBar: AppBarWidget(title: "Report", boolLeading: true),
       body: BackgroundInfoWidget(
-        child: BlocBuilder<ReportDetailsBloc, ReportDetailsState>(
+        child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
           builder: (context, state) {
-            if (state is FetchReportDetailsDataState) {
+            if (state is FetchIncidentDetailDataState) {
               return _itemBuilder(dataState: state);
             } else {
               return const Center(child: SpinLoader());
@@ -72,7 +72,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
         false;
   }
 
-  Widget _itemBuilder({required FetchReportDetailsDataState dataState}) {
+  Widget _itemBuilder({required FetchIncidentDetailDataState dataState}) {
     return Column(
       children: [
         _googleMap(dataState: dataState),
@@ -89,7 +89,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     );
   }
 
-  Widget _listOfAffect({required FetchReportDetailsDataState dataState}) {
+  Widget _listOfAffect({required FetchIncidentDetailDataState dataState}) {
     return SizedBox(
       height:
           dataState.listOfConsumer.isNotEmpty &&
@@ -107,7 +107,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     );
   }
 
-  Widget _listOfValve({required FetchReportDetailsDataState dataState}) {
+  Widget _listOfValve({required FetchIncidentDetailDataState dataState}) {
     return _affectWidget(
       title: "Valve Affected",
       children:
@@ -141,9 +141,9 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                                   EnvironmentConfig.of(context)?.primaryTheme,
                             ),
                             onPressed: () {
-                              BlocProvider.of<ReportDetailsBloc>(
+                              BlocProvider.of<IncidentDetailBloc>(
                                 context,
-                              ).add(ReportDetailBlinkValveMarker(valveData: e));
+                              ).add(IncidentDetailBlinkValveMarker(valveData: e));
                             },
                           ),
                         ],
@@ -156,7 +156,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     );
   }
 
-  Widget _listOfConsumer({required FetchReportDetailsDataState dataState}) {
+  Widget _listOfConsumer({required FetchIncidentDetailDataState dataState}) {
     return _affectWidget(
       title: "Customer Affected",
       children:
@@ -184,8 +184,8 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                             color: EnvironmentConfig.of(context)?.primaryTheme,
                           ),
                           onPressed: () {
-                            BlocProvider.of<ReportDetailsBloc>(context).add(
-                              ReportDetailBlinkConsumerMarker(
+                            BlocProvider.of<IncidentDetailBloc>(context).add(
+                              IncidentDetailBlinkConsumerMarker(
                                 consumerBPList: e,
                               ),
                             );
@@ -200,7 +200,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     );
   }
 
-  Widget _listOfIncident({required FetchReportDetailsDataState dataState}) {
+  Widget _listOfIncident({required FetchIncidentDetailDataState dataState}) {
     int incidentTypeActionSize = dataState.listOfIncidentTypeAction.length;
     return SizedBox(
       height: MediaQuery.of(context).size.height / 1.9,
@@ -243,7 +243,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
     );
   }
 
-  Widget _googleMap({required FetchReportDetailsDataState dataState}) {
+  Widget _googleMap({required FetchIncidentDetailDataState dataState}) {
     var h = MediaQuery.of(context).size.height;
     return Container(
       height: h * 0.2,
@@ -253,12 +253,21 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
           GoogleMap(
             zoomControlsEnabled: false,
             markers: dataState.markersPointList,
+            polylines: dataState.polylinePointList,
             initialCameraPosition: CameraPosition(
               target: dataState.incidentLocation,
               zoom: 16,
             ),
+            minMaxZoomPreference: MinMaxZoomPreference(16, null),
+            onCameraIdle: () {
+              BlocProvider.of<IncidentDetailBloc>(context).add(IncidentDetailOnCameraIdleEvent(
+                context: context,
+              ));
+            },
             onMapCreated: (GoogleMapController controller) {
-              dataState.googleMapController.complete(controller);
+              if (! dataState.googleMapController.isCompleted) {
+                dataState.googleMapController.complete(controller);
+              }
             },
           ),
           Positioned(
@@ -286,7 +295,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   }
 
   Widget _nameWidget({
-    required FetchReportDetailsDataState dataState,
+    required FetchIncidentDetailDataState dataState,
     required int i,
   }) {
     return Text(
@@ -297,7 +306,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   }
 
   Widget _dividerWidget({
-    required FetchReportDetailsDataState dataState,
+    required FetchIncidentDetailDataState dataState,
     required int i,
   }) {
     var dataType = dataState.listOfIncidentTypeAction[i];
@@ -307,7 +316,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   }
 
   Widget _actionWidget({
-    required FetchReportDetailsDataState dataState,
+    required FetchIncidentDetailDataState dataState,
     required int i,
     required int listSize,
   }) {
@@ -328,7 +337,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                         color: Colors.blue.shade800,
                         text: "Start",
                         onTap: () {
-                          BlocProvider.of<ReportDetailsBloc>(context).add(
+                          BlocProvider.of<IncidentDetailBloc>(context).add(
                             SubmitBtnEvent(
                               context: context,
                               incidentActionId: dataType.id.toString(),
@@ -347,7 +356,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                             color: Colors.yellow.shade800,
                             text: "Skip",
                             onTap: () {
-                              BlocProvider.of<ReportDetailsBloc>(context).add(
+                              BlocProvider.of<IncidentDetailBloc>(context).add(
                                 SubmitBtnEvent(
                                   context: context,
                                   incidentActionId: dataType.id.toString(),
@@ -370,7 +379,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                         color: AppColor.blue,
                         text: "Complete",
                         onTap: () {
-                          BlocProvider.of<ReportDetailsBloc>(context).add(
+                          BlocProvider.of<IncidentDetailBloc>(context).add(
                             SubmitBtnEvent(
                               context: context,
                               incidentActionId: dataType.id.toString(),
@@ -389,7 +398,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
                             color: AppColor.black,
                             text: "Abort",
                             onTap: () {
-                              BlocProvider.of<ReportDetailsBloc>(context).add(
+                              BlocProvider.of<IncidentDetailBloc>(context).add(
                                 SubmitBtnEvent(
                                   context: context,
                                   incidentActionId: dataType.id.toString(),
@@ -425,7 +434,7 @@ class _ReportDetailsViewState extends State<ReportDetailsView>
   }
 
   Widget _statusWidget({
-    required FetchReportDetailsDataState dataState,
+    required FetchIncidentDetailDataState dataState,
     required int i,
   }) {
     var dataType = dataState.listOfIncidentTypeAction[i];

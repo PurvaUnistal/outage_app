@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:outage_app/features/Home/presentation/page/ho_ga_home_view.dart';
 import 'package:outage_app/features/Home/presentation/page/home_view.dart';
 import 'package:outage_app/features/Login/presentation/page/login_page.dart';
 import 'package:outage_app/features/Manage/ManageAlert/presentation/page/manage_alert_page.dart';
@@ -17,6 +18,9 @@ class Routes {
       case RoutesName.login:
         return MaterialPageRoute(
             builder: (BuildContext context) => const LoginPage());
+      case RoutesName.hogaHome:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => const HoGaHomePage());
       case RoutesName.gisApp:
         return MaterialPageRoute(
             builder: (BuildContext context) => const HomeView());

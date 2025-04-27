@@ -43,6 +43,25 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     curve: Curves.fastOutSlowIn,
   );
 
+  Future<LoginModel?> _getData() async {
+    try {
+      String? userJson = await SharedPref.getString(key: PrefsValue.userInfo ?? "");
+      if (userJson != '') {
+        Map<String, dynamic> userMap = jsonDecode(userJson!);
+        LoginModel loginModel = LoginModel.fromJson(userMap);
+        final appConfig = AppConfig.instanceInit();
+        if (appConfig != null) {
+          await appConfig.setLoginData(newLoginData: loginModel);
+          await appConfig.setGaId(gaId: loginModel.user!.gaId!);
+        }
+        return loginModel;
+      }
+    } catch (e) {
+      debugPrint("Error in _getData: $e");
+    }
+    return null;
+  }
+
   Future<void> toLogin() async {
     final email = await SharedPref.getString(key: PrefsValue.emailVal);
     final password = await SharedPref.getString(key: PrefsValue.passwordVal);
@@ -55,11 +74,10 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     () async {
       if (oldVersion == newVersion) {
         if (email.isNotEmpty || password.isNotEmpty) {
-       //   Navigator.push(context, (MaterialPageRoute(builder: (context) => DynamicPolylineMap(),)));
-          Navigator.pushReplacementNamed(
-            context,
-            RoutesName.gisApp,
-          );
+            Navigator.pushReplacementNamed(
+              context,
+              RoutesName.gisApp,
+            );
         }
       } else {
         await SharedPref.clearAll();
@@ -70,27 +88,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       }
     });
   }
-
-  Future<LoginModel?> _getData() async {
-    try {
-      String? userJson = await SharedPref.getString(key: PrefsValue.userInfo ?? "");
-      if (userJson != '') {
-        Map<String, dynamic> userMap = jsonDecode(userJson!);
-        LoginModel loginModel = LoginModel.fromJson(userMap);
-        final appConfig = AppConfig.instanceInit();
-        if (appConfig != null) {
-          await appConfig.setLoginData(newLoginData: loginModel);
-        }
-        return loginModel;
-      }
-    } catch (e) {
-      debugPrint("Error in _getData: $e");
-    }
-    return null;
-  }
-
-
-
 
   @override
   Widget build(BuildContext context) {

@@ -8,13 +8,14 @@ class LoginModel {
   User? user;
   String? exptime;
 
-  LoginModel(
-      {this.status,
-        this.error,
-        this.messages,
-        this.token,
-        this.user,
-        this.exptime});
+  LoginModel({
+    this.status,
+    this.error,
+    this.messages,
+    this.token,
+    this.user,
+    this.exptime,
+  });
 
   LoginModel.fromJson(Map<String, dynamic> json) {
     status = json['status'] ?? "";
@@ -58,26 +59,31 @@ class User {
   String? role;
   String? spreadId;
   String? sectionId;
+  String? isHo;
+  dynamic hoga;
 
-  User(
-      {this.id,
-        this.email,
-        this.password,
-        this.moduleId,
-        this.name,
-        this.userStatus,
-        this.pwdChanged,
-        this.gaId,
-        this.gaLatitude,
-        this.gaLongitude,
-        this.modules,
-        this.areas,
-        this.chargeareas,
-        this.schema,
-        this.accessright,
-        this.role,
-        this.spreadId,
-        this.sectionId});
+  User({
+    this.id,
+    this.email,
+    this.password,
+    this.moduleId,
+    this.name,
+    this.userStatus,
+    this.pwdChanged,
+    this.gaId,
+    this.gaLatitude,
+    this.gaLongitude,
+    this.modules,
+    this.areas,
+    this.chargeareas,
+    this.schema,
+    this.accessright,
+    this.role,
+    this.spreadId,
+    this.sectionId,
+    this.isHo,
+    this.hoga,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'] ?? "";
@@ -103,6 +109,13 @@ class User {
     role = json['role'] ?? "";
     spreadId = json['spread_id'] ?? "";
     sectionId = json['section_id'] ?? "";
+    isHo = json['is_ho'];
+    if (json['hoga'] != null && json['hoga'][0] != "") {
+      hoga = <Hoga>[];
+      json['hoga'].forEach((v) {
+        hoga!.add(new Hoga.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -127,6 +140,10 @@ class User {
     data['role'] = this.role;
     data['spread_id'] = this.spreadId;
     data['section_id'] = this.sectionId;
+    data['is_ho'] = this.isHo;
+    if (this.hoga != null) {
+      data['hoga'] = this.hoga!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -140,17 +157,20 @@ class Accessright {
   String? add;
   String? navigate;
 
-  Accessright(
-      {this.menuCode,
-        this.id,
-        this.name,
-        this.submoduleAlias,
-        this.manage,
-        this.add,
-        this.navigate});
+  Accessright({
+    this.menuCode,
+    this.id,
+    this.name,
+    this.submoduleAlias,
+    this.manage,
+    this.add,
+    this.navigate,
+  });
 
   static accessrightListFromJson(String json) {
-    return List<Accessright>.from(jsonDecode(json).map((x) => Accessright.fromJson(x)));
+    return List<Accessright>.from(
+      jsonDecode(json).map((x) => Accessright.fromJson(x)),
+    );
   }
 
   static jsonFromAccessrightList(List<Accessright> list) {
@@ -176,6 +196,28 @@ class Accessright {
     data['manage'] = this.manage;
     data['add'] = this.add;
     data['navigate'] = this.navigate;
+    return data;
+  }
+}
+
+class Hoga {
+  String? id;
+  String? name;
+  String? schema;
+
+  Hoga({this.id, this.name, this.schema});
+
+  Hoga.fromJson(Map<String, dynamic> json) {
+    id = json['id'] ?? "";
+    name = json['name'] ?? "";
+    schema = json['schema'] ?? "";
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['schema'] = this.schema;
     return data;
   }
 }

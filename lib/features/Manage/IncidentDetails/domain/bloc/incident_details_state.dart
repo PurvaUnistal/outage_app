@@ -1,25 +1,24 @@
 import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/consumer_affect_model.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentActionModel.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentTypeActionModel.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/consumer_affect_model.dart';
 
-import '../model/IncidentActionModel.dart';
+abstract class IncidentDetailState extends Equatable {}
 
-abstract class ReportDetailsState extends Equatable {}
-
-class ReportDetailsInitialState extends ReportDetailsState {
+class IncidentDetailInitialState extends IncidentDetailState {
   @override
   List<Object> get props => [];
 }
 
-class ReportDetailsPageLoadState extends ReportDetailsState {
+class IncidentDetailPageLoadState extends IncidentDetailState {
   @override
   List<Object> get props => [];
 }
 
 
-class FetchReportDetailsDataState extends ReportDetailsState {
+class FetchIncidentDetailDataState extends IncidentDetailState {
   final bool isLoader;
   final bool isBtnLoader;
   final String role;
@@ -38,7 +37,7 @@ class FetchReportDetailsDataState extends ReportDetailsState {
   final IncidentTypeActionModel incidentTypeActionModel;
   final List<IncidentTypeAction> listOfIncidentTypeAction;
 
-  FetchReportDetailsDataState({
+  FetchIncidentDetailDataState({
     required this.isLoader,
     required this.isBtnLoader,
     required this.currentActionStatus,
@@ -51,11 +50,11 @@ class FetchReportDetailsDataState extends ReportDetailsState {
     required this.listOfConsumer,
     required this.googleMapController,
     required this.markersPointList,
-    required this.polylinePointList,
     required this.incidentActionModel,
     required this.listOfIncidentAction,
     required this.incidentTypeActionModel,
     required this.listOfIncidentTypeAction,
+    required this.polylinePointList,
   });
   @override
   List<Object> get props => [
@@ -76,5 +75,6 @@ class FetchReportDetailsDataState extends ReportDetailsState {
     listOfIncidentAction,
     incidentTypeActionModel,
     listOfIncidentTypeAction,
+    polylinePointList,
   ];
 }

@@ -5,8 +5,8 @@ import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/presentation/incident_details_view.dart';
 import 'package:outage_app/features/Manage/ManageAlert/domain/model/ViewIncidentModel.dart';
-import 'package:outage_app/features/Manage/ReportDetails/presentation/report_details_view.dart';
 
 class ActionItemsWidget extends StatelessWidget {
   final ViewIncidentData viewIncidentData;
@@ -35,7 +35,7 @@ class ActionItemsWidget extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ReportDetailsView(
+                  builder: (context) => IncidentDetailView(
                         incidentTypeId: viewIncidentData.incidentTypeId!,
                         incidentId: viewIncidentData.incid!,
                       )));

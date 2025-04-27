@@ -14,32 +14,34 @@ class HomePageLoadState extends HomeState {
   List<Object> get props => [];
 }
 
-
 class FetchHomeDataState extends HomeState {
   final bool isLoader;
   final String role;
   final String baseUrl;
-  List<Accessright> listOFAccessRight;
+  final List<Accessright> listOFAccessRight;
+  final List<Hoga> listOfHOG;
   final List<String> paths;
   final List<String> iconText;
   final List<Widget> navigatorView;
-
 
   FetchHomeDataState({
     required this.isLoader,
     required this.baseUrl,
     required this.role,
     required this.listOFAccessRight,
+    required this.listOfHOG,
     required this.paths,
     required this.iconText,
     required this.navigatorView,
   });
+
   @override
   List<Object> get props => [
     isLoader,
     role,
     baseUrl,
     listOFAccessRight,
+    listOfHOG,
     paths,
     iconText,
     navigatorView,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
+import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
@@ -39,6 +41,7 @@ class LogoutWidget extends StatelessWidget {
                     child: ButtonWidget(
                         text: AppString.logout,
                         onPressed: () async {
+                          await clearAndCloseHive();
                           await SharedPref.clearAll();
                           Navigator.pushAndRemoveUntil(
                               context,
@@ -65,5 +68,10 @@ class LogoutWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+ static Future<void> clearAndCloseHive() async {
+    await HiveDataBase.pipelineDataBox?.clear();
+    await HiveDataBase.pipelineDataBox?.close();
   }
 }

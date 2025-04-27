@@ -72,9 +72,7 @@ class FetchReportAlertDataState extends ReportAlertInitialState {
   final Set<Polyline> polylinePointList;
 
 
-  final GetPipelineNetworkModel pipelineNetworkModel;
-  final PipelineNetworkData pipelineNetworkData;
-  final List<PipelineNetworkData> listOfPipelineNetwork;
+
 
 
 
@@ -122,9 +120,6 @@ class FetchReportAlertDataState extends ReportAlertInitialState {
     required this.currentPosition,
     required this.polylinePointList,
 
-    required this.pipelineNetworkModel,
-    required this.pipelineNetworkData,
-    required this.listOfPipelineNetwork,
 
     required this.listOfTfGisId,
     required this.listOfGasValveGISId,
@@ -178,9 +173,6 @@ class FetchReportAlertDataState extends ReportAlertInitialState {
     markersPointList,
     currentPosition,
     polylinePointList,
-    pipelineNetworkModel,
-    pipelineNetworkData,
-    listOfPipelineNetwork,
 
     listOfTfGisId,
     listOfGasValveGISId,

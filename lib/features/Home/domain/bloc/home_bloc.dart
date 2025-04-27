@@ -16,62 +16,79 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeLoadEvent>(_pageLoad);
   }
 
-  bool isLoader =  false;
+  bool isLoader = false;
   String baseUrl = '';
   String role = '';
-  String accessRightData = '';
   List<Accessright> listOFAccessRight = [];
+  List<Hoga> listOfHOGa = [];
   List<String> paths = [];
   List<String> iconText = [];
   List<Widget> navigatorView = [];
 
   _pageLoad(HomeLoadEvent event, emit) async {
     emit(HomeInitialState());
-    isLoader =  false;
-     paths = [];
-     iconText = [];
-     navigatorView = [];
+    isLoader = false;
+    paths = [];
+    iconText = [];
+    navigatorView = [];
+    listOfHOGa = [];
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
+
     role = await AppConfig.instanceInit()?.loginData.user?.role! ?? "";
-    listOFAccessRight =  await AppConfig.instanceInit()?.loginData.user!.accessright! ?? [];
-    listOFAccessRight.sort((a,b) => a.menuCode!.compareTo(b.menuCode!));
+    listOFAccessRight =
+        await AppConfig.instanceInit()?.loginData.user!.accessright ?? [];
+    listOfHOGa = await AppConfig.instanceInit()?.loginData.user!.hoga ?? [];
+    listOFAccessRight.sort((a, b) => a.menuCode!.compareTo(b.menuCode!));
     await _tabAccess();
     _eventCompleted(emit);
   }
 
-  _tabAccess(){
-    for (var data in listOFAccessRight) {
-      if (data.menuCode == "Outage") {
-        if (data.navigate == "1") {
-        paths.add(AssetPath.navigate);
-         iconText.add("Navigate");
-         navigatorView.add(NavigateAlertView());
-        }
-        if (data.add == "1") {
-          paths.add(AssetPath.reportOutage);
-          iconText.add("Report");
-          navigatorView.add(ReportAlertView());
-        }
-        if (data.manage == "1") {
-          paths.add(AssetPath.manage);
-          iconText.add("Manage");
-          navigatorView.add(ManageAlertView());
-        }
-      }else{
-
+  _tabAccess() async {
+    if (await AppConfig.instanceInit()?.loginData.user?.isHo == "1") {
+      paths.add(AssetPath.navigate);
+      iconText.add("Navigate");
+      navigatorView.add(NavigateAlertView());
+      paths.add(AssetPath.reportOutage);
+      iconText.add("Report");
+      navigatorView.add(ReportAlertView());
+      paths.add(AssetPath.manage);
+      iconText.add("Manage");
+      navigatorView.add(ManageAlertView());
+    } else {
+      for (var data in listOFAccessRight) {
+        if (data.menuCode == "Outage") {
+          if (data.navigate == "1") {
+            paths.add(AssetPath.navigate);
+            iconText.add("Navigate");
+            navigatorView.add(NavigateAlertView());
+          }
+          if (data.add == "1") {
+            paths.add(AssetPath.reportOutage);
+            iconText.add("Report");
+            navigatorView.add(ReportAlertView());
+          }
+          if (data.manage == "1") {
+            paths.add(AssetPath.manage);
+            iconText.add("Manage");
+            navigatorView.add(ManageAlertView());
+          }
+        } else {}
       }
     }
   }
-  _eventCompleted(Emitter<HomeState> emit) {
-    emit(FetchHomeDataState(
-        isLoader: isLoader,
 
+  _eventCompleted(Emitter<HomeState> emit) {
+    emit(
+      FetchHomeDataState(
+        isLoader: isLoader,
         baseUrl: baseUrl,
-      listOFAccessRight: listOFAccessRight,
-       iconText: iconText,
-      navigatorView: navigatorView,
-      paths: paths,
-      role: role,
-    ));
+        listOFAccessRight: listOFAccessRight,
+        iconText: iconText,
+        navigatorView: navigatorView,
+        paths: paths,
+        role: role,
+        listOfHOG: listOfHOGa,
+      ),
+    );
   }
 }

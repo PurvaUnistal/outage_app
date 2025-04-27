@@ -8,9 +8,11 @@ class AppConfig {
   Client? client;
   LoginModel loginData = LoginModel();
 
-
   String _baseURL = "";
   String get baseURL => _baseURL;
+
+  String _gaId = "";
+  String get gaId => _gaId;
 
   String _emailId = "";
   String get emailId => _emailId;
@@ -26,9 +28,6 @@ class AppConfig {
 
   String _packageName = "";
   String get packageName => _packageName;
-
-  User _userInfo = User();
-  User get userInfo => _userInfo;
 
   String _assets = "";
   String get assets => _assets;
@@ -77,6 +76,11 @@ class AppConfig {
     this.loginData = newLoginData;
   }
 
+  setGaId({required String gaId}) {
+    _gaId = gaId;
+    print("gaId : $gaId");
+  }
+
   void setToken({required String token}) {
     _password = password;
     print("password : $token");
@@ -90,11 +94,6 @@ class AppConfig {
   void setPackageName({required String packageName}) {
     _packageName = packageName;
     print("packageName : $packageName");
-  }
-
-  void setUserInfo({required User userInfo}) {
-    _userInfo = userInfo;
-    print("setUserInfo : $_userInfo");
   }
 
   void setAssets({required String assets}) {

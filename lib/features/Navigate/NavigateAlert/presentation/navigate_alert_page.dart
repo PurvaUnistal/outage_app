@@ -97,15 +97,18 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
 
   Widget _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
     return GoogleMap(
-      myLocationEnabled: true,
       mapType: dataState.currentMapType,
+      compassEnabled: false,
+      myLocationEnabled: true,
+      rotateGesturesEnabled: false,
+      zoomControlsEnabled: false,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
       initialCameraPosition: dataState.position,
       onMapCreated: (GoogleMapController controller) {
         dataState.googleMapController.complete(controller);
       },
-      minMaxZoomPreference: MinMaxZoomPreference(15, 18),
+      minMaxZoomPreference: MinMaxZoomPreference(15, null),
       onCameraIdle: () {
         BlocProvider.of<NavigateAlertBloc>(context).add(NavigateAlertOnCameraIdleEvent(
           context: context,

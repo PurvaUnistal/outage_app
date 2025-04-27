@@ -133,9 +133,7 @@ class ApiHelper {
   static Future<void> _handleError(
       {int? statusCode, Response? errorMessage, required BuildContext context}) async {
     if(statusCode == 400){
-      return  await Utils.errorSnackBar(
-          msg: errorMessage!.data.replaceAll("{", "").replaceAll("}", ""),
-          context: context);
+      return errorMessage!.data;
     }else if(statusCode == 401){
       log("errorStatus(401)-->${errorMessage.toString()}");
       return await Utils.errorSnackBar(msg: errorMessage!.data.toString(), context: context);

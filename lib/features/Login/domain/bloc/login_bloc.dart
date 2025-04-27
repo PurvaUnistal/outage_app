@@ -20,17 +20,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginSubmitDataEvent>(_setSubmitLoginData);
   }
 
-
   bool isPageLoader = false;
   bool isPassword = false;
-
-
 
   LoginModel loginModel = LoginModel();
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
 
   _pageLoad(LoginPageLoadingEvent event, emit) async {
     emit(LoginInitState());
@@ -42,23 +38,30 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     _eventCompleted(emit);
   }
 
-
   _setHideShowPassword(LoginHideShowPasswordEvent event, emit) {
     isPassword = event.isHideShow;
     _eventCompleted(emit);
   }
 
   _setSubmitLoginData(LoginSubmitDataEvent event, emit) async {
-    if(await ConnectivityHelper.allConnectivityCheck(context: event.context) == false){
+    if (await ConnectivityHelper.allConnectivityCheck(context: event.context) ==
+        false) {
       return;
     }
     var validationCheck = await LoginHelper.textFieldValidation(
-        email: emailController.text.trim(), password: passwordController.text.trim(), context: event.context);
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+      context: event.context,
+    );
     if (validationCheck == true) {
       try {
         isPageLoader = true;
         _eventCompleted(emit);
-        var res = await LoginHelper.loginData(emailId: emailController.text, password: passwordController.text, context: event.context);
+        var res = await LoginHelper.loginData(
+          emailId: emailController.text,
+          password: passwordController.text,
+          context: event.context,
+        );
         if (res != null) {
           isPageLoader = false;
           _eventCompleted(emit);
@@ -69,19 +72,26 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               await SharedPref.setString(key: PrefsValue.passwordVal,value: emailController.text);
               await SharedPref.setString(key: PrefsValue.emailVal,value: passwordController.text);
               String userJson = jsonEncode(res.toJson());
-              await SharedPref.setString(
-                  key: PrefsValue.userInfo, value: userJson);
-              final appConfig = AppConfig.instanceInit();
-              if (appConfig != null) {
-                await appConfig.setLoginData(newLoginData: loginModel);
-              }
+              await SharedPref.setString(key: PrefsValue.userInfo, value: userJson);
+              await AppConfig.instanceInit()?.setLoginData(newLoginData: loginModel);
               PackageInfo packageInfo = await PackageInfo.fromPlatform();
-              await SharedPref.setString(key: PrefsValue.buildNumber,value: packageInfo.buildNumber);
+              await SharedPref.setString(
+                key: PrefsValue.buildNumber,
+                value: packageInfo.buildNumber,
+              );
+              if (res.user?.isHo == "1") {
+             //   await AppConfig.instanceInit()?.setGaId(gaId: loginModel.user!.gaId!);
+                Navigator.pushReplacementNamed(
+                  event.context,
+                  RoutesName.hogaHome,
+                );
+              } else {
+                await AppConfig.instanceInit()?.setGaId(gaId: loginModel.user!.gaId!);
                 Navigator.pushReplacementNamed(
                   event.context,
                   RoutesName.gisApp,
                 );
-
+              }
             }
           }
         } else {
@@ -98,11 +108,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   _eventCompleted(Emitter<LoginState> emit) {
-    emit(LoginFetchDataState(
-      isPageLoader: isPageLoader,
-      isPassword: isPassword,
-      emailController: emailController,
-      passwordController: passwordController,
-    ));
+    emit(
+      LoginFetchDataState(
+        isPageLoader: isPageLoader,
+        isPassword: isPassword,
+        emailController: emailController,
+        passwordController: passwordController,
+      ),
+    );
   }
 }

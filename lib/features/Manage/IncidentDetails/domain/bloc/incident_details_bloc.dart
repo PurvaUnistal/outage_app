@@ -3,24 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/Utils.dart';
+import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/bloc/report_details_event.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/bloc/report_details_state.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/IncidentTypeActionModel.dart';
-import 'package:outage_app/features/Manage/ReportDetails/domain/model/consumer_affect_model.dart';
-import 'package:outage_app/features/Manage/ReportDetails/helper/report_details_helper.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_event.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_state.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentTypeActionModel.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/consumer_affect_model.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/helper/incident_details_helper.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/helper/navigate_alert_helper.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/helper/decodePolyline.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 import '../model/IncidentActionModel.dart';
 
-class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
-  ReportDetailsBloc() : super(ReportDetailsInitialState()) {
-    on<ReportDetailsLoadEvent>(_pageLoad);
-    on<ReportDetailBlinkValveMarker>(_blinkValveMarker);
-    on<ReportDetailBlinkConsumerMarker>(_blinkConsumerMarker);
+class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> {
+  IncidentDetailBloc() : super(IncidentDetailInitialState()) {
+    on<IncidentDetailLoadEvent>(_pageLoad);
+    on<IncidentDetailBlinkValveMarker>(_blinkValveMarker);
+    on<IncidentDetailBlinkConsumerMarker>(_blinkConsumerMarker);
+    on<IncidentDetailOnCameraIdleEvent>(_onCameraIdleEvent);
     on<SubmitBtnEvent>(_submitBtnEvent);
   }
 
@@ -41,8 +45,8 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         markersPointList.removeAll(valveMarkers);
       }
       isBlinkMarker = !isBlinkMarker;
-      emit(ReportDetailsPageLoadState());
-      emit(FetchReportDetailsDataState(
+      emit(IncidentDetailPageLoadState());
+      emit(FetchIncidentDetailDataState(
         isLoader: isLoader,
         isBtnLoader: isBtnLoader,
         currentActionStatus: currentActionStatus,
@@ -93,12 +97,25 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
   Set<Marker> conMarkerPointList = {};
   Set<Marker> valveMarkerPointList = {};
   Set<Polyline> polylinePointList = {};
+
+
+
+  PipelineModel pipelineModel = PipelineModel();
+  PipelineData pipelineData = PipelineData();
+  List<PipelineData> listOfPipeline = [];
+
+
+  Set<Polyline> pipePolylinePointList = {};
+  Set<Polyline> filterPolyline = {};
+  Set<Polyline> finalPolyline = {};
+  List<LatLng> points = [];
+
   bool isBlinkMarker = true;
   Timer timer = Timer(Duration.zero, () {});
   Completer<GoogleMapController> googleMapController = Completer();
 
-  _pageLoad(ReportDetailsLoadEvent event, emit) async {
-    emit(ReportDetailsInitialState());
+  _pageLoad(IncidentDetailLoadEvent event, emit) async {
+    emit(IncidentDetailInitialState());
     isLoader = false;
     isBtnLoader = false;
     isBlinkMarker = isBlinkMarker;
@@ -143,7 +160,80 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
               CameraPosition(target: incidentLocation, zoom: 18),
             ),
           );
+
+    await _fetchGasPipelineGisApi(context: event.context, emit: emit);
     _eventCompleted(emit);
+  }
+
+  _fetchGasPipelineGisApi({required BuildContext context, emit}) async {
+    if (await HiveDataBase.pipelineDataBox!.values.isEmpty) {
+      var res = await ReportAlertHelper.getPipelineApi(
+        context: context,
+        latitude: AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+        longitude: AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+      );
+      if(res != null && res.data != null){
+        listOfPipeline = res.data!;
+      }
+    } else {
+      listOfPipeline = await HiveDataBase.pipelineDataBox!.values.toList();
+    }
+    if (listOfPipeline.isNotEmpty) {
+      finalPolyline.clear();
+      _eventCompleted(emit);
+      for (int i = 0; i < listOfPipeline.length; i++) {
+        final data = listOfPipeline[i];
+        if (data.geomencode != null && data.geomencode!.isNotEmpty) {
+          try {
+            points = await DecodePolyline.decodePolyline(data.geomencode!);
+            final color = ReportAlertHelper.getPolylineColor(
+              int.tryParse(data.nominaldia ?? '0') ?? 0,
+            );
+            Set<Polyline> polyline = ReportAlertHelper.polylinePoint(
+              i: i,
+              color: color,
+              position: points,
+              context: context,
+            );
+            finalPolyline.addAll(polyline);
+          } catch (e) {
+            print("Error decoding polyline at index $i: $e");
+          }
+        }
+      }
+      await gotoInitialPosition(points[0]);
+      _filterVisiblePolyline();
+      _eventCompleted(emit);
+    }
+  }
+
+  gotoInitialPosition(LatLng location) async {
+    GoogleMapController controller = await googleMapController.future;
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: incidentLocation, zoom: 18),
+      ),
+    );
+  }
+
+
+  Future<void> _filterVisiblePolyline() async {
+    final controller = await googleMapController.future;
+    final bounds = await controller.getVisibleRegion();
+    pipePolylinePointList =
+        finalPolyline.where((polyline) {
+          return polyline.points.any(
+                (point) => DecodePolyline.isPointInBounds(point, bounds),
+          );
+        }).toSet();
+
+    _updateMarkerPolyline();
+  }
+
+  _updateMarkerPolyline() {
+    polylinePointList = {...pipePolylinePointList, ...filterPolyline};
+    print("pipePolylinePointList-->${pipePolylinePointList.length}");
+    print("filterPolyline-->${filterPolyline.length}");
   }
 
   _fetchIncidentTypeActionApi({
@@ -151,7 +241,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     required String incidentTypeId,
     required String incidentId,
   }) async {
-    var res = await ReportDetailsHelper.getIncidentTypeActionApi(
+    var res = await IncidentDetailHelper.getIncidentTypeActionApi(
       context: context,
       incidentTypeId: incidentTypeId,
       incidentId: incidentId,
@@ -178,7 +268,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     required String incidentId,
   }) async {
     try {
-      var res = await ReportDetailsHelper.getValveConsumerAffectApi(
+      var res = await IncidentDetailHelper.getValveConsumerAffectApi(
         context: context,
         incidentId: incidentId,
       );
@@ -186,7 +276,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         consumerAffectModel = res;
         if (consumerAffectModel.data != null) {
           consumerData = consumerAffectModel.data!;
-          incidentLocation = ReportDetailsHelper.parseLatLng(
+          incidentLocation = IncidentDetailHelper.parseLatLng(
             consumerData.latitude,
             consumerData.longitude,
           )!;
@@ -266,7 +356,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
         .toList();
   }
 
-  _blinkValveMarker(ReportDetailBlinkValveMarker event,  emit) async {
+  _blinkValveMarker(IncidentDetailBlinkValveMarker event,  emit) async {
     LatLng latLng = LatLng(double.parse(event.valveData.longitude!), double.parse(event.valveData.latitude!));
     GoogleMapController controller = await googleMapController.future;
     controller.animateCamera(
@@ -277,7 +367,7 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     _eventCompleted(emit);
   }
 
-  _blinkConsumerMarker(ReportDetailBlinkConsumerMarker event,  emit) async {
+  _blinkConsumerMarker(IncidentDetailBlinkConsumerMarker event,  emit) async {
     LatLng latLng = LatLng(double.parse(event.consumerBPList.latitude!), double.parse(event.consumerBPList.longitude!));
     GoogleMapController controller = await googleMapController.future;
     controller.animateCamera(
@@ -288,12 +378,18 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     _eventCompleted(emit);
   }
 
+  _onCameraIdleEvent(IncidentDetailOnCameraIdleEvent event, emit) async {
+    await ReportAlertHelper.clearCache();
+    _filterVisiblePolyline();
+    _eventCompleted(emit);
+  }
+
   _submitBtnEvent(SubmitBtnEvent event, emit) async {
     try {
       isBtnLoader = true;
       currentActionStatus = event.actionStatus;
       _eventCompleted(emit);
-      var res = await ReportDetailsHelper.incidentActionProgressApi(
+      var res = await IncidentDetailHelper.incidentActionProgressApi(
         context: event.context,
         incidentId: incidentId.toString(),
         incidentTypeId: incidentTypeId.toString(),
@@ -323,8 +419,8 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
     }
   }
 
-  _eventCompleted(Emitter<ReportDetailsState> emit) {
-    emit(FetchReportDetailsDataState(
+  _eventCompleted(Emitter<IncidentDetailState> emit) {
+    emit(FetchIncidentDetailDataState(
       isLoader: isLoader,
       isBtnLoader: isBtnLoader,
       currentActionStatus: currentActionStatus,
@@ -337,12 +433,11 @@ class ReportDetailsBloc extends Bloc<ReportDetailsEvent, ReportDetailsState> {
       listOfConsumer: listOfConsumer,
       markersPointList: markersPointList,
       googleMapController: googleMapController,
-      polylinePointList: polylinePointList,
+      polylinePointList: Set.of(polylinePointList),
       incidentActionModel: incidentActionModel,
       listOfIncidentAction: listOfIncidentAction,
       incidentTypeActionModel: incidentTypeActionModel,
       listOfIncidentTypeAction: listOfIncidentTypeAction,
     ));
   }
-
 }

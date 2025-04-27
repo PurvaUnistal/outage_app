@@ -1,7 +1,7 @@
 class HiveBoxName {
-  static get allGisDataBox => "allGisDataBox";
+  static get pipelineDataBox => "pipelineDataBox";
 }
 
 class HiveTypeId {
-  static const tfGisData = 0;
+  static const pipelineData = 0;
 }
