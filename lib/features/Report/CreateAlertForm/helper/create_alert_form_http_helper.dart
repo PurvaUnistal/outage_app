@@ -12,9 +12,9 @@ import '../domain/model/GetChargeAreaModel.dart';
 
 class CreateAlertFormHttpHelper{
   static Future<List<GetChargeAreaModel>?> getChargeAreaListApi({required BuildContext context}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -27,9 +27,9 @@ class CreateAlertFormHttpHelper{
   }
 
   static Future<List<GetAreaModel>?> getAllAreaApi({required BuildContext context, required String gid}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "gid": gid,
     };
     String json = Uri(queryParameters: para).query;

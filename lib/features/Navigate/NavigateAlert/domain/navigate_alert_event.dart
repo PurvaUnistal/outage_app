@@ -40,7 +40,13 @@ class SelectFilterButtonEvent extends NavigateAlertEvent {
   // TODO: implement props
   List<Object> get props => [context];
 }
-
+class SelectGoogleRouteDirEvent extends NavigateAlertEvent {
+  final BuildContext context;
+  SelectGoogleRouteDirEvent({ required this.context});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context];
+}
 
 class SelectCheckBoxTFGisEvent extends NavigateAlertEvent {
   final BuildContext context;

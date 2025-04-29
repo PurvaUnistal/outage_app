@@ -41,7 +41,7 @@ class LogoutWidget extends StatelessWidget {
                     child: ButtonWidget(
                         text: AppString.logout,
                         onPressed: () async {
-                          await clearAndCloseHive();
+                          await clearAndClosePipelineBox();
                           await SharedPref.clearAll();
                           Navigator.pushAndRemoveUntil(
                               context,
@@ -70,8 +70,10 @@ class LogoutWidget extends StatelessWidget {
     );
   }
 
- static Future<void> clearAndCloseHive() async {
-    await HiveDataBase.pipelineDataBox?.clear();
-    await HiveDataBase.pipelineDataBox?.close();
+static  Future<void> clearAndClosePipelineBox() async {
+    var box = HiveDataBase.pipelineDataBox;
+    if (box != null && box.isOpen) {
+      await box.clear();
+    }
   }
 }

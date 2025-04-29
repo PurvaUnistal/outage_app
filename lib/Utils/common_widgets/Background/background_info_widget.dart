@@ -54,7 +54,7 @@ class BackgroundInfoWidget extends StatelessWidget {
                                 style: Styles.rel,
                               ),
                               Text(
-                                " (${AppConfig.instanceInit()?.loginData.user!.schema! ?? ""})",
+                                " (${AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema! ?? ""})",
                                 textAlign: TextAlign.start,
                                 style: Styles.rel,
                               ),

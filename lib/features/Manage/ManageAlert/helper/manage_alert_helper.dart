@@ -9,9 +9,9 @@ class ManageAlertHelper{
 
   static Future<ViewIncidentModel?> getViewIncidentApi(
       {required BuildContext context}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema! ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {

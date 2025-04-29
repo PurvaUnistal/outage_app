@@ -9,6 +9,7 @@ import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart'
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/bloc/report_alert_bloc.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/bloc/report_alert_event.dart';
@@ -37,16 +38,14 @@ class _ReportAlertViewState extends State<ReportAlertView> {
         title: AppString.reportAlert,
         boolLeading: true,
       ),
-      body: BackgroundInfoWidget(
-        child: BlocBuilder<ReportAlertBloc, ReportAlertState>(
-          builder: (context, state) {
-            if (state is FetchReportAlertDataState) {
-              return _itemBuilder(dataState: state);
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
-        ),
+      body: BlocBuilder<ReportAlertBloc, ReportAlertState>(
+        builder: (context, state) {
+          if (state is FetchReportAlertDataState) {
+            return _itemBuilder(dataState: state);
+          } else {
+            return const Center(child: SpinLoader());
+          }
+        },
       ),
     );
   }
@@ -65,23 +64,28 @@ class _ReportAlertViewState extends State<ReportAlertView> {
     return Stack(children: <Widget>[
       _googleMapWidget(dataState: dataState),
       dataState.isPipelineLoader == false
-          ? Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Column(
-                  children: [
-                    _mapTypeButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                    _legendButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                    _currentLocationButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                    _filterButtonWidget(dataState: dataState),
-                  ],
-                ),
-              ),
-            )
+          ? Align(
+        alignment: Alignment.topRight,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              CommonStyle.vertical(context: context),
+              _mapTypeButtonWidget(dataState: dataState),
+              SizedBox(height: 16.0),
+              _legendButtonWidget(dataState: dataState),
+              SizedBox(height: 16.0),
+              _currentLocationButtonWidget(dataState: dataState),
+              SizedBox(height: 16.0),
+              _filterButtonWidget(dataState: dataState),
+              Spacer(),
+              _routeDirButtonWidget(dataState: dataState),
+              Spacer(),
+            ],
+          ),
+        ),
+      )
           : WaveLoaderWidget(),
     ]);
   }
@@ -93,6 +97,7 @@ class _ReportAlertViewState extends State<ReportAlertView> {
       myLocationEnabled: true,
       rotateGesturesEnabled: false,
       zoomControlsEnabled: false,
+      mapToolbarEnabled: true,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
       initialCameraPosition: dataState.position,
@@ -164,6 +169,24 @@ class _ReportAlertViewState extends State<ReportAlertView> {
       onPressed: () => BlocProvider.of<ReportAlertBloc>(context)
           .add(SelectFilterButtonEvent(context: context)),
     );
+  }
+
+  Widget _routeDirButtonWidget({required FetchReportAlertDataState dataState}) {
+    return dataState.isMapDir == true ? FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
+      child: Icon(
+        Icons.alt_route,
+        size: 21.0,
+        color: AppColor.white,
+      ),
+      shape: CircleBorder(),
+      onPressed: () {
+        BlocProvider.of<ReportAlertBloc>(context).add(
+            SelectGoogleRouteDirEvent(
+              context: context,));
+      },
+    ): Container();
   }
 
   Widget _legendButtonWidget({required FetchReportAlertDataState dataState}) {

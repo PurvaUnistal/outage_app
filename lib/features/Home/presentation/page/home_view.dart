@@ -70,11 +70,7 @@ class _HomeViewState extends State<HomeView> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth < 600) {
-            if (AppConfig.instanceInit()?.loginData.user?.isHo == "1") {
-              return HoGaHomePage();
-            } else {
-              return PhoneHomeWidget();
-            }
+            return PhoneHomeWidget();
           } else {
             return TabletHomeWidget(); // Tablet Layout
           }
@@ -85,15 +81,20 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<bool> _onWillPop() async {
-    return (await showDialog(
-          context: context,
-          builder:
-              (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
-                message: "Do you want to exit an App?",
-                okButtonText: "Exit",
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-        )) ??
-        false;
+    if (AppConfig.instanceInit()?.loginData.user!.gaId == "1") {
+      // Directly allow pop
+      return true;
+    } else {
+      return (await showDialog(
+        context: context,
+        builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
+          message: "Do you want to exit the App?",
+          okButtonText: "Exit",
+          onPressed: () => Navigator.of(mContext).pop(true),
+        ),
+      )) ??
+          false; // If null (user dismisses dialog), treat as cancel
+    }
   }
+
 }

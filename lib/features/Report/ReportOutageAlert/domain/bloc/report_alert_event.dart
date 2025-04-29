@@ -205,6 +205,14 @@ class SelectCheckBoxConsumerGisEvent extends ReportAlertEvent {
   List<Object> get props => [context, checkBoxConsumer];
 }
 
+class SelectGoogleRouteDirEvent extends ReportAlertEvent {
+  final BuildContext context;
+  SelectGoogleRouteDirEvent({ required this.context});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context];
+}
+
 class OnCameraIdleEvent extends ReportAlertEvent {
   final BuildContext context;
   OnCameraIdleEvent({required this.context,});

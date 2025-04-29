@@ -20,6 +20,7 @@ class NavigateAlertPageLoadState extends NavigateAlertState {
 
 class FetchNavigateAlertDataState extends NavigateAlertState {
   final bool isLoader;
+  final bool isMapDir;
   final bool isPipelineLoader;
   final bool checkBoxTf;
   final bool isGasTfLoader;
@@ -81,6 +82,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
 
   FetchNavigateAlertDataState({
     required this.isLoader,
+    required this.isMapDir,
     required this.isPipelineLoader,
     required this.checkBoxTf,
     required this.isGasTfLoader,
@@ -141,6 +143,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   @override
   List<Object?> get props => [
     isLoader,
+    isMapDir,
     isPipelineLoader,
     checkBoxTf,
     isGasTfLoader,

@@ -281,10 +281,11 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
             consumerData.longitude,
           )!;
           Set<Marker> tempMarker = {};
-          var incidentMarker = await NavigateAlertHelper.createMarker(
-            latlngList: [incidentLocation],
+          var incidentMarker = await NavigateAlertHelper.markerIncident(
+            position: [incidentLocation],
             context: context,
-            markerIcon: BitmapDescriptor.defaultMarker,
+            icon: BitmapDescriptor.defaultMarker,
+
           );
           tempMarker.addAll(incidentMarker);
           markersPointList.addAll(tempMarker);
@@ -311,20 +312,20 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
 
   Future<void> _handleConsumerMarkers({required BuildContext context, required List<LatLng> listOfConsumer}) async {
     final BitmapDescriptor  iconBytes = await ReportAlertHelper.markerAsset(AssetPath.consumerBlink);
-    consumerMarkers = await NavigateAlertHelper.createMarker(
-      latlngList: listOfConsumer,
+    consumerMarkers = await NavigateAlertHelper.markerIncident(
+      position: listOfConsumer,
       context: context,
-      markerIcon: iconBytes,
+      icon: iconBytes,
     );
     markersPointList.addAll(consumerMarkers);
   }
 
   Future<void> _handleValveMarkers({required BuildContext context, required List<LatLng> listOfValve}) async {
     final BitmapDescriptor  iconBytes = await ReportAlertHelper.markerAsset(AssetPath.valveBlink);
-    valveMarkers = await NavigateAlertHelper.createMarker(
-      latlngList: listOfValve,
+    valveMarkers = await NavigateAlertHelper.markerIncident(
+      position: listOfValve,
       context: context,
-      markerIcon: iconBytes,
+      icon: iconBytes,
     );
     markersPointList.addAll(valveMarkers);
   }

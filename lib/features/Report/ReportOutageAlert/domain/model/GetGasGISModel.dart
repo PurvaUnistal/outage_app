@@ -37,6 +37,7 @@ class GetGasGisModel {
   };
 }
 
+
 class GasGisData {
   String? id;
   String? latitude;

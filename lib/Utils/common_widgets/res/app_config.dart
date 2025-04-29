@@ -14,6 +14,10 @@ class AppConfig {
   String _gaId = "";
   String get gaId => _gaId;
 
+  String _hoSchema = "";
+  String get hoSchema => _hoSchema;
+
+
   String _emailId = "";
   String get emailId => _emailId;
 
@@ -81,6 +85,10 @@ class AppConfig {
     print("gaId : $gaId");
   }
 
+  setHoSchema({required String hoSchema}) {
+    _hoSchema = hoSchema;
+    print("_hoSchema : $_hoSchema");
+  }
   void setToken({required String token}) {
     _password = password;
     print("password : $token");

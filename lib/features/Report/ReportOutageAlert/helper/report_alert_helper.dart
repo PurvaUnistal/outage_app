@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ConsumerGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/RegulatorGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/TFGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ValveGISModel.dart';
 import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_server_dio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -85,7 +89,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getTFGisApi({
+  static Future<TFGISModel?> getTFGisApi({
     required BuildContext context,
   }) async {
     String gaId = await AppConfig.instanceInit()?.gaId ?? "";
@@ -98,7 +102,13 @@ class ReportAlertHelper {
         context: context,
       );
       if (res != null) {
-        GetGasGisModel response = GetGasGisModel.fromJson(res);
+        TFGISModel response = TFGISModel.fromJson(res);
+        if (await HiveDataBase.tfGISBox!.isOpen) {
+          await HiveDataBase.tfGISBox!.clear();
+          for (var data in response.data!) {
+            await HiveDataBase.tfGISBox!.add(data);
+          }
+        }
         return response;
       }
     } catch (e) {
@@ -107,7 +117,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getGasValueGisApi({
+  static Future<ValveGISModel?> getGasValueGisApi({
     required BuildContext context,
   }) async {
     String gaId = await AppConfig.instanceInit()?.gaId ?? "";
@@ -120,7 +130,13 @@ class ReportAlertHelper {
         context: context,
       );
       if (res != null) {
-        GetGasGisModel response = GetGasGisModel.fromJson(res);
+        ValveGISModel response = ValveGISModel.fromJson(res);
+        if (await HiveDataBase.valveGISBox!.isOpen) {
+          await HiveDataBase.valveGISBox!.clear();
+          for (var data in response.data!) {
+            await HiveDataBase.valveGISBox!.add(data);
+          }
+        }
         return response;
       }
     } catch (e) {
@@ -129,7 +145,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getRegulatorGisApi({
+  static Future<RegulatorGISModel?> getRegulatorGisApi({
     required BuildContext context,
   }) async {
     String gaId = await AppConfig.instanceInit()?.gaId ?? "";
@@ -142,7 +158,13 @@ class ReportAlertHelper {
         context: context,
       );
       if (res != null) {
-        GetGasGisModel response = GetGasGisModel.fromJson(res);
+        RegulatorGISModel response = RegulatorGISModel.fromJson(res);
+        if (await HiveDataBase.regulatorGISBox!.isOpen) {
+          await HiveDataBase.regulatorGISBox!.clear();
+          for (var data in response.data!) {
+            await HiveDataBase.regulatorGISBox!.add(data);
+          }
+        }
         return response;
       }
     } catch (e) {
@@ -151,6 +173,39 @@ class ReportAlertHelper {
     return null;
   }
 
+
+  static Future<ConsumerGISModel?> getConsumerGisApi({
+    required BuildContext context,
+  }) async {
+    String gaId = await AppConfig.instanceInit()?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+    try {
+      Map<String, String> para = {
+        "schema": schema ?? "",
+        "ga_id": gaId,
+        "areas": areas,
+      };
+      String json = Uri(queryParameters: para).query;
+      var res = await ApiHelper.getData(
+        urlEndPoint: Apis.getConsumerGis + json,
+        context: context,
+      );
+      if (res != null) {
+        ConsumerGISModel response = ConsumerGISModel.fromJson(res);
+        if (await HiveDataBase.consumerGISBox!.isOpen) {
+          await HiveDataBase.consumerGISBox!.clear();
+          for (var data in response.data!) {
+            await HiveDataBase.consumerGISBox!.add(data);
+          }
+        }
+        return response;
+      }
+    } catch (e) {
+      log("getGasValueGis-->${e.toString()}");
+    }
+    return null;
+  }
   static Future<GetGasGisModel?> getTeeGisApi({
     required BuildContext context,
   }) async {
@@ -277,33 +332,7 @@ class ReportAlertHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getConsumerGisApi({
-    required BuildContext context,
-  }) async {
-    String gaId = await AppConfig.instanceInit()?.gaId ?? "";
-    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
-    String schema =
-        await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
-    try {
-      Map<String, String> para = {
-        "schema": schema,
-        "ga_id": gaId,
-        "areas": areas,
-      };
-      String json = Uri(queryParameters: para).query;
-      var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getConsumerGis + json,
-        context: context,
-      );
-      if (res != null) {
-        GetGasGisModel response = GetGasGisModel.fromJson(res);
-        return response;
-      }
-    } catch (e) {
-      log("getGasValueGis-->${e.toString()}");
-    }
-    return null;
-  }
+
 
   static Future<GetPipelineNetworkModel?> getPipelineNetworkApi({
     required BuildContext context,
@@ -408,7 +437,7 @@ class ReportAlertHelper {
       },
       markerId: MarkerId('$assetId-$assetsTypeId'),
       position: position,
-      infoWindow: InfoWindow(title: assetsTypeId,snippet: "${position.latitude},${position.longitude}"),
+      infoWindow: InfoWindow(title: assetsTypeId,),
       icon: icon,
     ));
  return markersPointList;

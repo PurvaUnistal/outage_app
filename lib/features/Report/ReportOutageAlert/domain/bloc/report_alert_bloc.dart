@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/Utils.dart';
@@ -11,17 +12,22 @@ import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dar
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ConsumerGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GisConfig.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/RegulatorGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/TFGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ValveGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/helper/decodePolyline.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/helper/getNearestPoint.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/presentation/widget/alert_dialog_widget.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/presentation/widget/report_pop_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'report_alert_event.dart';
 import 'report_alert_state.dart';
 
@@ -31,6 +37,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     on<SelectMapTypeButtonEvent>(_selectMapTypeButton);
     on<SelectCurrentMarkerButtonEvent>(_selectCurrentMarkerButton);
     on<SelectGoogleMapButtonEvent>(_selectGoogleMapButton);
+    on<SelectGoogleRouteDirEvent>(_selectGoogleRouteDirEvent);
     on<SelectFilterButtonEvent>(_selectFilterButton);
 
     on<SelectCheckBoxTFGisEvent>(_selectCheckBoxTFGis);
@@ -65,6 +72,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   }
 
   bool isLoader = false;
+  bool isMapDir = false;
   bool isPipelineLoader = false;
   bool checkBoxTf = false;
   bool isGasTfLoader = false;
@@ -88,6 +96,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   String role = '';
   String baseUrl = '';
   String nameofLocation = '';
+  String googleMapsUrl = "";
 
   final TextEditingController tfGisController = TextEditingController();
   final TextEditingController gasValveGISController = TextEditingController();
@@ -107,19 +116,19 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   GetGasValueGISModel fittingGISModel = GetGasValueGISModel();
   List<GetGasValueGISData> listOfFittingGIS = [];
 
-  GetGasGisModel tfGisModel = GetGasGisModel();
-  List<GasGisData> listOfTfGis = [];
-  List<GasGisData> listOfFilterTfGis = [];
+  TFGISModel tfGisModel = TFGISModel();
+  List<TFGISData> listOfTfGis = [];
+  List<TFGISData> listOfFilterTfGis = [];
   List<String> listOfTfGisId = [];
 
-  GetGasGisModel gasValueGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasValueGIS = [];
-  List<GasGisData> listOfFilterGasValueGIS = [];
+  ValveGISModel gasValueGISModel = ValveGISModel();
+  List<ValveGISData> listOfGasValueGIS = [];
+  List<ValveGISData> listOfFilterGasValueGIS = [];
   List<String> listOfGasValveGISId = [];
 
-  GetGasGisModel gasRegulatorGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasRegulatorGIS = [];
-  List<GasGisData> listOfFilterGasRegulatorGIS = [];
+  RegulatorGISModel gasRegulatorGISModel = RegulatorGISModel();
+  List<RegulatorGISData> listOfGasRegulatorGIS = [];
+  List<RegulatorGISData> listOfFilterGasRegulatorGIS = [];
   List<String> listOfGasRegulatorGISId = [];
 
   GetGasGisModel gasTeeGISModel = GetGasGisModel();
@@ -147,9 +156,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   List<GasGisData> listOfFilterGasEndCapGIS = [];
   List<String> listOfGasEndCapGISId = [];
 
-  GetGasGisModel gasConsumerGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasConsumerGIS = [];
-  List<GasGisData> listOfFilterConsumerGIS = [];
+  ConsumerGISModel gasConsumerGISModel = ConsumerGISModel();
+  List<ConsumerGISData> listOfGasConsumerGIS = [];
+  List<ConsumerGISData> listOfFilterConsumerGIS = [];
   List<String> listOfGasConsumerGISId = [];
 
   GetPipelineNetworkModel pipelineNetworkModel = GetPipelineNetworkModel();
@@ -161,6 +170,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   List<PipelineData> listOfPipeline = [];
 
   LatLng currentPosition = LatLng(0, 0);
+  LatLng latLngOnTap = LatLng(0, 0);
   List<LatLng> points = [];
   List<LatLng> allLatLongPoint = [];
 
@@ -196,6 +206,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   _pageLoad(ReportAlertLoadEvent event, emit) async {
     emit(ReportAlertPageLoadState());
     isLoader = false;
+    isMapDir = false;
     _initializeAllModels();
     ReportAlertHelper.clearCache();
     await _selectGISValue(
@@ -216,20 +227,21 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   Future<void> _initializeAllModels() async {
     isPipelineLoader = false;
     points = [];
+    googleMapsUrl = "";
     await _clearTextField();
     gasPipelineModel = GetPipelineGisModel();
     listOfPipelineGIS = [];
-    gasValueGISModel = GetGasGisModel();
+    gasValueGISModel = ValveGISModel();
     listOfGasValueGIS = [];
     listOfFilterGasValueGIS = [];
     listOfGasValveGISId = [];
     fittingGISModel = GetGasValueGISModel();
     listOfFittingGIS = [];
-    tfGisModel = GetGasGisModel();
+    tfGisModel = TFGISModel();
     listOfTfGis = [];
     listOfFilterTfGis = [];
     listOfTfGisId = [];
-    gasRegulatorGISModel = GetGasGisModel();
+    gasRegulatorGISModel = RegulatorGISModel();
     listOfGasRegulatorGIS = [];
     listOfFilterGasRegulatorGIS = [];
     listOfGasRegulatorGISId = [];
@@ -259,7 +271,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     listOfFilterGasEndCapGIS = [];
     listOfGasEndCapGISId = [];
 
-    gasConsumerGISModel = GetGasGisModel();
+    gasConsumerGISModel = ConsumerGISModel();
     listOfGasConsumerGIS = [];
     listOfFilterConsumerGIS = [];
     listOfGasConsumerGISId = [];
@@ -272,6 +284,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     pipelineData = PipelineData();
     listOfPipeline = [];
     currentPosition = LatLng(0, 0);
+    latLngOnTap = LatLng(0, 0);
 
     tempMarker = {};
     finalMarker = {};
@@ -332,8 +345,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           }
         }
       }
+      await  _filterVisiblePolyline();
       await gotoInitialPosition(points[0]);
-      _filterVisiblePolyline();
       _eventCompleted(emit);
     }
   }
@@ -380,20 +393,29 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
 
   _updateMarkerPolyline() {
     polylinePointList = {...pipePolylinePointList, ...filterPolyline};
+    markersPointList = {...markersPointList, ...filterMarkerList};
     print("pipePolylinePointList-->${pipePolylinePointList.length}");
     print("filterPolyline-->${filterPolyline.length}");
-    markersPointList = {...markersPointList, ...filterMarkerList};
     print("markersPointList-->${markersPointList.length}");
     print("filterMarkerList-->${filterMarkerList.length}");
   }
 
   _fetchTFGisApi({required BuildContext context, emit}) async {
-    if(checkBoxTf == true){
-      var res = await ReportAlertHelper.getTFGisApi(context: context);
-      if (res != null) {
-        tfGisModel = res;
-        if (tfGisModel.data != null) {
-          listOfTfGis = tfGisModel.data!;
+    if (checkBoxTf == true) {
+      try {
+        if (await HiveDataBase.tfGISBox!.isEmpty) {
+          var res = await ReportAlertHelper.getTFGisApi(context: context);
+          if (res != null) {
+            tfGisModel = res;
+            if (tfGisModel.data != null) {
+              listOfTfGis = tfGisModel.data!;
+              await HiveDataBase.tfGISBox!.addAll(listOfTfGis);
+            }
+          }
+        } else {
+          listOfTfGis = await HiveDataBase.tfGISBox!.values.toList();
+        }
+        if (listOfTfGis.isNotEmpty) {
           listOfTfGisId = listOfTfGis.map((e) => e.id!).toList();
           final customIcon = await ReportAlertHelper.markerAsset(AssetPath.tf);
           for (int i = 0; i < listOfTfGis.length; i++) {
@@ -417,20 +439,30 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             }
           }
           _filterVisiblePolyline();
-          _eventCompleted(emit);
-          return res;
         }
+      } catch (e) {
+        print("Error during TFGis API fetching: $e");
       }
     }
+    _eventCompleted(emit);
   }
 
+
   _fetchGasValueGisApi({required BuildContext context, emit}) async {
-    if(checkBoxValve == true){
-      var res = await ReportAlertHelper.getGasValueGisApi(context: context);
-      if (res != null) {
-        gasValueGISModel = res;
-        if (gasValueGISModel.data != null) {
-          listOfGasValueGIS = gasValueGISModel.data!;
+    if (checkBoxValve == true) {
+      try {
+        if (await HiveDataBase.valveGISBox!.isEmpty) {
+          var res = await ReportAlertHelper.getGasValueGisApi(context: context);
+          if (res != null) {
+            gasValueGISModel = res;
+            if (gasValueGISModel.data != null) {
+              listOfGasValueGIS = gasValueGISModel.data!;
+            }
+          }
+        } else {
+          listOfGasValueGIS = await HiveDataBase.valveGISBox!.values.toList();
+        }
+        if (listOfGasValueGIS.isNotEmpty) {
           listOfGasValveGISId = listOfGasValueGIS.map((e) => e.valveId!).toList();
           BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
             AssetPath.valve,
@@ -456,20 +488,30 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             }
           }
           _filterVisiblePolyline();
-          _eventCompleted(emit);
-          return res;
         }
+      } catch (e) {
+        print("Error during Gas Valve GIS API fetching: $e");
       }
     }
+
+    _eventCompleted(emit);
   }
 
   _fetchGasRegulatorGisApi({required BuildContext context, emit}) async {
-    if(checkBoxRegulator == true){
-      var res = await ReportAlertHelper.getRegulatorGisApi(context: context);
-      if (res != null) {
-        gasRegulatorGISModel = res;
-        if (gasRegulatorGISModel.data != null) {
-          listOfGasRegulatorGIS = gasRegulatorGISModel.data!;
+    if (checkBoxRegulator == true) {
+      try {
+        if (await HiveDataBase.regulatorGISBox!.isEmpty) {
+          var res = await ReportAlertHelper.getRegulatorGisApi(context: context);
+          if (res != null) {
+            gasRegulatorGISModel = res;
+            if (gasRegulatorGISModel.data != null) {
+              listOfGasRegulatorGIS = gasRegulatorGISModel.data!;
+            }
+          }
+        } else {
+          listOfGasRegulatorGIS = await HiveDataBase.regulatorGISBox!.values.toList();
+        }
+        if (listOfGasRegulatorGIS.isNotEmpty) {
           listOfGasRegulatorGISId =
               listOfGasRegulatorGIS.map((e) => e.id!).toList();
           BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
@@ -496,20 +538,32 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             }
           }
           _filterVisiblePolyline();
-          _eventCompleted(emit);
-          return res;
         }
+      } catch (e) {
+        print("Error during Gas Regulator GIS API fetching: $e");
       }
     }
+
+    _eventCompleted(emit);
   }
 
+
   _fetchGasConsumerGisApi({required BuildContext context, emit}) async {
-    if(checkBoxConsumer==true){
-      var res = await ReportAlertHelper.getConsumerGisApi(context: context);
-      if (res != null) {
-        gasConsumerGISModel = res;
-        if (gasConsumerGISModel.data != null) {
-          listOfGasConsumerGIS = gasConsumerGISModel.data!;
+    if (checkBoxConsumer == true) {
+      try {
+        if (await HiveDataBase.consumerGISBox!.isEmpty) {
+          var res = await ReportAlertHelper.getConsumerGisApi(context: context);
+          if (res != null) {
+            gasConsumerGISModel = res;
+            if (gasConsumerGISModel.data != null) {
+              listOfGasConsumerGIS = gasConsumerGISModel.data!;
+              await HiveDataBase.consumerGISBox!.addAll(listOfGasConsumerGIS);
+            }
+          }
+        } else {
+          listOfGasConsumerGIS = await HiveDataBase.consumerGISBox!.values.toList();
+        }
+        if (listOfGasConsumerGIS.isNotEmpty) {
           listOfGasConsumerGISId =
               listOfGasConsumerGIS.map((e) => e.id!).toList();
           BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
@@ -536,13 +590,15 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             }
           }
           _filterVisiblePolyline();
-          _eventCompleted(emit);
-          return res;
         }
+      } catch (e) {
+        print("Error during Gas Consumer GIS API fetching: $e");
       }
     }
 
+    _eventCompleted(emit);
   }
+
 
   _fetchGasTeeGisApi({required BuildContext context}) async {
     var res = await ReportAlertHelper.getTeeGisApi(context: context);
@@ -1090,6 +1146,24 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
+    final currentPoint = await CurrentLocation.getCurrentLocation();
+    latLngOnTap = event.latLngOnTap;
+    isMapDir = true;
+
+    googleMapsUrl =
+    "https://www.google.com/maps/dir/?api=1&origin=${currentPoint?.latitude},${currentPoint?.longitude}&destination=${latLngOnTap.latitude},${latLngOnTap.longitude}&travelmode=driving&dir_action=navigate";
+    print("googleMapsUrl --> $googleMapsUrl");
+
+    final placemarks = await placemarkFromCoordinates(
+      latLngOnTap.latitude,
+      latLngOnTap.longitude,
+    );
+
+    nameofLocation = placemarks.isNotEmpty
+        ? '${placemarks[0].administrativeArea}, ${placemarks[0].locality}, ${placemarks[0].country}'
+        : 'Unknown Location';
+
+    print("nameofLocation --> $nameofLocation");
     Set<Marker> tempMarker = Set.from(markersPointList);
     for (var polyData in polylinePointList) {
       for (int i = 0; i < polyData.points.length - 1; i++) {
@@ -1099,7 +1173,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           event.latLngOnTap,
           start,
           end,
-          2,
         )) {
           tempMarker.add(
             Marker(
@@ -1126,7 +1199,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
                 showModalBottomSheet(
                   context: event.context,
                   isScrollControlled: true,
-                  showDragHandle: true,
                   builder: (BuildContext context) {
                     return AlertDialogTwoBtnWidget(mContext: context);
                   },
@@ -1139,6 +1211,21 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       }
     }
     markersPointList = tempMarker;
+    _eventCompleted(emit);
+  }
+
+  _selectGoogleRouteDirEvent(SelectGoogleRouteDirEvent event, emit) async {
+    if (isMapDir == true) {
+      isMapDir = true;
+      final Uri uri = Uri.parse(googleMapsUrl);
+
+      if (await canLaunchUrl(uri)) {
+        print("uri-->${uri}");
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch $googleMapsUrl';
+      }
+    }
     _eventCompleted(emit);
   }
 
@@ -1219,6 +1306,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     emit(
       FetchReportAlertDataState(
         isLoader: isLoader,
+        isMapDir: isMapDir,
         isPipelineLoader: isPipelineLoader,
         checkBoxTf: checkBoxTf,
         isGasTfLoader: isGasTfLoader,

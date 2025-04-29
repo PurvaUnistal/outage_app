@@ -9,6 +9,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
+import 'package:outage_app/testing.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashView extends StatefulWidget {
@@ -74,10 +75,19 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     () async {
       if (oldVersion == newVersion) {
         if (email.isNotEmpty || password.isNotEmpty) {
+          if(AppConfig.instanceInit()?.loginData.user?.isHo == "1"){
+            Navigator.pushReplacementNamed(
+              context,
+              RoutesName.hogaHome,
+            );
+          }else{
+         //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => GoogleMapExample()));
             Navigator.pushReplacementNamed(
               context,
               RoutesName.gisApp,
             );
+          }
+
         }
       } else {
         await SharedPref.clearAll();

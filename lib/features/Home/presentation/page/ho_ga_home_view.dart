@@ -8,6 +8,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_bloc.dart';
+import 'package:outage_app/features/Home/domain/bloc/home_event.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_state.dart';
 import 'package:outage_app/features/Home/presentation/Widgets/logout_widget.dart';
 import 'package:outage_app/features/Home/presentation/Widgets/phone/phone_home_widget.dart';
@@ -19,7 +20,14 @@ class HoGaHomePage extends StatefulWidget {
   State<HoGaHomePage> createState() => _HoGaHomePageState();
 }
 
+
 class _HoGaHomePageState extends State<HoGaHomePage> {
+
+  @override
+  void initState() {
+    BlocProvider.of<HomeBloc>(context).add(HomeLoadEvent(context: context));
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,12 +86,14 @@ class _HoGaHomePageState extends State<HoGaHomePage> {
 
         return InkWell(
           onTap: () async {
-            await HiveDataBase.pipelineDataBox?.clear();
             await AppConfig.instanceInit()?.setGaId(gaId: item.id!);
+            await AppConfig.instanceInit()?.setHoSchema(hoSchema: item.schema!);
+            await LogoutWidget.clearAndClosePipelineBox();
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => PhoneHomeWidget()),
             );
+
           },
           child: Card(
             elevation: 12,

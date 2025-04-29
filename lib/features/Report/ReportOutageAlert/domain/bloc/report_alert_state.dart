@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 
 abstract class ReportAlertState extends Equatable {}
 
@@ -19,6 +18,7 @@ class ReportAlertPageLoadState extends ReportAlertInitialState {
 
 class FetchReportAlertDataState extends ReportAlertInitialState {
   final bool isLoader;
+  final bool isMapDir;
   final bool isPipelineLoader;
   final bool checkBoxTf;
   final bool isGasTfLoader;
@@ -42,7 +42,7 @@ class FetchReportAlertDataState extends ReportAlertInitialState {
   final String role;
   final String baseUrl;
   final CameraPosition position;
-  Completer<GoogleMapController> googleMapController;
+  final Completer<GoogleMapController> googleMapController;
 
   final TextEditingController tfGisController;
   final TextEditingController gasValveGISController;
@@ -78,6 +78,7 @@ class FetchReportAlertDataState extends ReportAlertInitialState {
 
   FetchReportAlertDataState({
     required this.isLoader,
+    required this.isMapDir,
     required this.isPipelineLoader,
 
     required this.checkBoxTf,
@@ -134,6 +135,7 @@ class FetchReportAlertDataState extends ReportAlertInitialState {
   @override
   List<Object> get props => [
     isLoader,
+    isMapDir,
     isPipelineLoader,
     checkBoxTf,
     isGasTfLoader,

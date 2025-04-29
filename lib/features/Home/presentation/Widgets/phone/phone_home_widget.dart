@@ -5,6 +5,7 @@ import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Routes/routes_name.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_state.dart';
 import 'package:outage_app/features/Home/presentation/Widgets/card_widget.dart';
@@ -45,7 +46,7 @@ class _PhoneHomeWidgetState extends State<PhoneHomeWidget> {
   _appBarWidget() {
     return AppBarWidget(
       title: RoutesName.gisApp,
-      boolLeading: false,
+      boolLeading: AppConfig.instanceInit()?.loginData.user!.gaId == "1" ?  false : true,
       actions: [
         IconButton(
             onPressed: () => showModalBottomSheet(

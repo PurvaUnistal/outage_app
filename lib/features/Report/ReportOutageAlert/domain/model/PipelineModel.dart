@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
-
 part 'PipelineModel.g.dart';
+
 class PipelineModel {
   int? success;
   bool? error;

@@ -13,10 +13,10 @@ class IncidentDetailHelper{
 
   static Future<IncidentActionModel?> getIncidentActionApi(
       {required BuildContext context, required String incidentTypeId}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     String gaId =  await AppConfig.instanceInit()?.gaId ?? "";
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "incident_type_id": incidentTypeId,
     };
     String json = Uri(queryParameters: para).query;
@@ -37,9 +37,9 @@ class IncidentDetailHelper{
         required String incidentTypeId,
         required String incidentId,
   }) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "incident_type_id": incidentTypeId,
       "incident_id": incidentId,
     };
@@ -60,10 +60,10 @@ class IncidentDetailHelper{
     required BuildContext context,
     required String incidentId,
   }) async {
-    String schema =await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     String gaId =  await AppConfig.instanceInit()?.gaId ?? "";
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "incidentId": incidentId,
       "district_id": gaId,
     };
@@ -89,9 +89,9 @@ class IncidentDetailHelper{
     required String row,
   }) async {
     String userId = await AppConfig.instanceInit()?.loginData.user?.id ?? "";
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> body = {
-      "schema": schema,
+      "schema": schema ?? "",
       "user_id": userId,
       "incident_id": incidentId.isEmpty ? "" :incidentId.toString(),
       "incident_type_id": incidentTypeId.isEmpty ? "" :incidentTypeId.toString(),

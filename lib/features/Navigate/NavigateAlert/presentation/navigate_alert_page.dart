@@ -39,16 +39,14 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         title: AppString.navigateAlert,
         boolLeading: true,
       ),
-      body: BackgroundInfoWidget(
-        child: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
-          builder: (context, state) {
-            if (state is FetchNavigateAlertDataState) {
-              return _itemBuilder(dataState: state);
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
-        ),
+      body: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
+        builder: (context, state) {
+          if (state is FetchNavigateAlertDataState) {
+            return _itemBuilder(dataState: state);
+          } else {
+            return const Center(child: SpinLoader());
+          }
+        },
       ),
     );
   }
@@ -70,7 +68,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
            ? Align(
              alignment: Alignment.topRight,
              child: Padding(
-               padding: const EdgeInsets.symmetric(horizontal: 8.0),
+               padding: const EdgeInsets.symmetric(horizontal: 10.0),
                child: Column(
                  crossAxisAlignment: CrossAxisAlignment.end,
                  children: [  CommonStyle.vertical(context: context),
@@ -85,6 +83,9 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
                    _currentLocationButtonWidget(dataState: dataState),
                    SizedBox(height: 16.0),
                    _filterButtonWidget(dataState: dataState),
+                   Spacer(),
+                   _routeDirButtonWidget(dataState: dataState),
+                   Spacer(),
                  ],
                ),
              ),
@@ -98,15 +99,21 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
   Widget _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
     return GoogleMap(
       mapType: dataState.currentMapType,
-      compassEnabled: false,
-      myLocationEnabled: true,
+    //  myLocationEnabled: true,
       rotateGesturesEnabled: false,
       zoomControlsEnabled: false,
+      mapToolbarEnabled: true,
+
+      myLocationEnabled: true,
+      myLocationButtonEnabled: true,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
       initialCameraPosition: dataState.position,
       onMapCreated: (GoogleMapController controller) {
-        dataState.googleMapController.complete(controller);
+        if (! dataState.googleMapController.isCompleted) {
+          dataState.googleMapController.complete(controller);
+
+        }
       },
       minMaxZoomPreference: MinMaxZoomPreference(15, null),
       onCameraIdle: () {
@@ -118,7 +125,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         GoogleMapController controller = await dataState.googleMapController.future;
         controller.animateCamera(
           CameraUpdate.newCameraPosition(
-            CameraPosition(target: latLng, zoom: 19),
+            CameraPosition(target: latLng, zoom: 15),
           ),
         );
         dataState.polylinePointList.isNotEmpty ?
@@ -183,19 +190,6 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
     );
   }
 
-  Widget _filterButtonWidget({required FetchNavigateAlertDataState dataState}) {
-    return FloatingActionButton(
-      heroTag: UniqueKey(),
-      backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
-      child: Icon(
-        Icons.filter_alt,
-        size: 21.0,
-        color: AppColor.white,
-      ),
-      onPressed: () => BlocProvider.of<NavigateAlertBloc>(context)
-          .add(SelectFilterButtonEvent(context: context)),
-    );
-  }
   Widget _legendButtonWidget({required FetchNavigateAlertDataState dataState}) {
     return FloatingActionButton(
       heroTag: UniqueKey(),
@@ -215,5 +209,40 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         });
       },
     );
+  }
+
+  Widget _filterButtonWidget({required FetchNavigateAlertDataState dataState}) {
+    return FloatingActionButton(
+      heroTag: UniqueKey(),
+      backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
+      child: Icon(
+        Icons.filter_alt,
+        size: 21.0,
+        color: AppColor.white,
+      ),
+      onPressed: () => BlocProvider.of<NavigateAlertBloc>(context)
+          .add(SelectFilterButtonEvent(context: context)),
+    );
+  }
+
+  Widget _routeDirButtonWidget({required FetchNavigateAlertDataState dataState}) {
+    return dataState.isMapDir == true ? Align(
+      alignment: Alignment.bottomRight,
+      child: FloatingActionButton(
+        heroTag: UniqueKey(),
+        backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
+        child: Icon(
+          Icons.alt_route,
+          size: 21.0,
+          color: AppColor.white,
+        ),
+        shape: CircleBorder(),
+        onPressed: () {
+          BlocProvider.of<NavigateAlertBloc>(context).add(
+              SelectGoogleRouteDirEvent(
+                  context: context,));
+        },
+      ),
+    ): Container();
   }
 }

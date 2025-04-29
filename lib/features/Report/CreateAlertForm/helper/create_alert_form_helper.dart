@@ -19,9 +19,9 @@ import '../domain/model/GetIncidentIndicationModel.dart';
 class CreateAlertFormHelper {
   static Future<GetModuleTypeModel?> getOutageModuleApi(
       {required BuildContext context}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -37,9 +37,9 @@ class CreateAlertFormHelper {
 
   static Future<GetIncidentTypeModel?> getIncidentTypeApi(
       {required BuildContext context, required String moduleId}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "module_id": moduleId,
     };
     String json = Uri(queryParameters: para).query;
@@ -56,9 +56,9 @@ class CreateAlertFormHelper {
 
   static Future<GetPriorityTypeModel?> getIncidentPriorityApi(
       {required BuildContext context, required String moduleId}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "module_id": moduleId,
     };
     String json = Uri(queryParameters: para).query;
@@ -87,9 +87,9 @@ class CreateAlertFormHelper {
 
   static Future<GetPriorityTypeModel?> getInformationSourceApi(
       {required BuildContext context}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -105,9 +105,9 @@ class CreateAlertFormHelper {
 
   static Future<GetIncidentIndicationModel?> getIncidentIndicationApi(
       {required BuildContext context}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -136,9 +136,9 @@ class CreateAlertFormHelper {
 
   static Future<GetAssetModel?> getAssetLocationSourceApi(
       {required BuildContext context}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -156,9 +156,9 @@ class CreateAlertFormHelper {
       {required BuildContext context,
       required String locationSource,
       required String search}) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "location_source": locationSource,
       "serach": search,
     };
@@ -180,9 +180,9 @@ class CreateAlertFormHelper {
     required BuildContext context,
     required String areaId,
   }) async {
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
-      "schema": schema,
+      "schema": schema ?? "",
       "area_id": areaId,
     };
     String json = Uri(queryParameters: para).query;
@@ -257,9 +257,9 @@ class CreateAlertFormHelper {
     required File photo,
   }) async {
     String userId = await AppConfig.instanceInit()?.loginData.user?.id ?? "";
-    String schema = await AppConfig.instanceInit()?.loginData.user?.schema ?? "";
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> body = {
-      "schema": schema,
+      "schema": schema ?? "",
       "user_id": userId,
       "module_id": "",
       "incident_type_id": incidentType.id!.isEmpty ? "" : incidentType.id!.toString(),
