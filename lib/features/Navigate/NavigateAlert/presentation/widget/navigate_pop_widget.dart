@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
@@ -36,7 +37,19 @@ class NavigatePopWidget extends StatelessWidget {
                   _tfWidget(dataState: state),
                   _valveWidget(dataState: state),
                   _regulatorWidget(dataState: state),
-                  _consumerWidget(dataState: state),
+                  _commercialWidget(dataState: state),
+                  _domesticWidget(dataState: state),
+                  _industrialWidget(dataState: state),
+                  /*   _teeWidget(dataState: state),
+                  SizedBox(height: 16.0),
+                  _elbowWidget(dataState: state),
+                  SizedBox(height: 16.0),
+                  _couplerWidget(dataState: state),
+                  SizedBox(height: 16.0),
+                  _reducerWidget(dataState: state),
+                  SizedBox(height: 16.0),
+                  _endCapWidget(dataState: state),
+                  SizedBox(height: 16.0),*/
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -57,15 +70,6 @@ class NavigatePopWidget extends StatelessWidget {
           return SizedBox.shrink();
         }
       },
-    );
-  }
-
-  Widget height() {
-    return SizedBox(
-      height: MediaQuery
-          .of(mContext)
-          .size
-          .height * 0.0001,
     );
   }
 
@@ -92,7 +96,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasTfGis,
         hintText: AppString.gasTfGis,
         enabled: dataState.checkBoxTf == true ? true : false,
-       
+
         controller: dataState.tfGisController,
         suggestions: dataState.listOfTfGisId,
         onSelected: (val) {
@@ -129,7 +133,6 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasValveGIS,
         hintText: AppString.gasValveGIS,
         enabled: dataState.checkBoxValve == true ? true : false,
-       
         controller: dataState.gasValveGISController,
         suggestions: dataState.listOfGasValveGISId,
         onSelected: (val) {
@@ -167,7 +170,7 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.gasRegulatorGIS,
         hintText: AppString.gasRegulatorGIS,
         enabled: dataState.checkBoxRegulator == true ? true : false,
-       
+
         controller: dataState.gasRegulatorGISController,
         suggestions: dataState.listOfGasRegulatorGISId,
         onSelected: (val) {
@@ -181,18 +184,18 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _consumerWidget({required FetchNavigateAlertDataState dataState}) {
+  Widget _commercialWidget({required FetchNavigateAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxConsumer,
+        value: dataState.checkCommercial,
         activeColor: Colors.green,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxConsumerGisEvent(
-                  checkBoxConsumer: val!, context: mContext));
+              SelectCheckCommercialEvent(
+                  checkCommercial: val!, context: mContext));
         },
       ),
-      title: dataState.isGasConsumerLoader == false
+      title: dataState.isCommercial == false
           ? AutoCompleteTextFieldWidget(
         prefixIcon: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -202,16 +205,17 @@ class NavigatePopWidget extends StatelessWidget {
             height: 20,
           ),
         ),
-        label: AppString.gasConsumerGIS,
-        hintText: AppString.gasConsumerGIS,
-        enabled: dataState.checkBoxConsumer == true ? true : false,
-       
-        controller: dataState.gasConsumerGISController,
-        suggestions: dataState.listOfGasConsumerGISId,
+        label: AppString.commercial,
+        hintText: AppString.commercial,
+        enabled: dataState.checkCommercial == true ? true : false,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        keyboardType: TextInputType.number,
+        controller: dataState.commercialController,
+        suggestions: dataState.listOfCommercialId,
         onSelected: (val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectConsumerGISValueEvent(
-                  gasConsumerGISId: val, context: mContext));
+              SelectCommercialValueEvent(
+                  commercialId: val, context: mContext));
           Navigator.pop(mContext);
         },
       )
@@ -219,32 +223,32 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _teeWidget({required FetchNavigateAlertDataState dataState}) {
+  Widget _domesticWidget({required FetchNavigateAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxTee,
+        value: dataState.checkDomestic,
         activeColor: Colors.green,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxTeeGisEvent(checkBoxTee: val!, context: mContext));
+              SelectCheckDomesticEvent(checkDomestic: val!, context: mContext));
         },
       ),
-      title: dataState.isGasTeeLoader == false
+      title: dataState.isDomestic == false
           ? AutoCompleteTextFieldWidget(
         prefixIcon: Icon(
           Icons.location_on,
           color: Colors.green,
         ),
-        label: AppString.gasTeeGIS,
-        hintText: AppString.gasTeeGIS,
-        enabled: dataState.checkBoxTee == true ? true : false,
-       
-        controller: dataState.gasTeeGISController,
-        suggestions: dataState.listOfGasTeeGISId,
+        label: AppString.domestic,
+        hintText: AppString.domestic,
+        enabled: dataState.checkDomestic == true ? true : false,
+
+        controller: dataState.domesticController,
+        suggestions: dataState.listOfDomesticId,
         onSelected: (val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectTeeGISValueEvent(
-                  gasTeeGISId: val, context: mContext));
+              SelectDomesticValueEvent(
+                  domesticId: val, context: mContext));
           Navigator.pop(mContext);
         },
       )
@@ -252,33 +256,33 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _elbowWidget({required FetchNavigateAlertDataState dataState}) {
+  Widget _industrialWidget({required FetchNavigateAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxElbow,
+        value: dataState.checkIndustrial,
         activeColor: Colors.green,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxElbowGisEvent(
-                  checkBoxElbow: val!, context: mContext));
+              SelectCheckIndustrialEvent(
+                  checkIndustrial: val!, context: mContext));
         },
       ),
-      title: dataState.isGasElbowLoader == false
+      title: dataState.isIndustrial == false
           ? AutoCompleteTextFieldWidget(
         prefixIcon: Icon(
           Icons.location_on,
           color: Colors.green,
         ),
-        label: AppString.gasElbowGIS,
-        hintText: AppString.gasElbowGIS,
-        enabled: dataState.checkBoxElbow == true ? true : false,
-       
-        controller: dataState.gasElbowGISController,
-        suggestions: dataState.listOfGasElbowGISId,
+        label: AppString.industrial,
+        hintText: AppString.industrial,
+        enabled: dataState.checkIndustrial == true ? true : false,
+
+        controller: dataState.industrialController,
+        suggestions: dataState.listOfIndustrialId,
         onSelected: (val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectElbowGISValueEvent(
-                  gasElbowGISId: val, context: mContext));
+              SelectIndustrialValueEvent(
+                  industrialId: val, context: mContext));
           Navigator.pop(mContext);
         },
       )
@@ -286,107 +290,6 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
-  Widget _couplerWidget({required FetchNavigateAlertDataState dataState}) {
-    return ListTile(
-      leading: Checkbox(
-        value: dataState.checkBoxCoupler,
-        activeColor: Colors.green,
-        onChanged: (bool? val) {
-          BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxCouplerGisEvent(
-                  checkBoxCoupler: val!, context: mContext));
-        },
-      ),
-      title: dataState.isGasCouplerLoader == false
-          ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.green,
-        ),
-        label: AppString.gasCouplerGIS,
-        hintText: AppString.gasCouplerGIS,
-        enabled: dataState.checkBoxCoupler == true ? true : false,
-       
-        controller: dataState.gasCouplerGISController,
-        suggestions: dataState.listOfGasCouplerGISId,
-        onSelected: (val) {
-          BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCouplerGISValueEvent(
-                  gasCouplerGISId: val, context: mContext));
-          Navigator.pop(mContext);
-        },
-      )
-          : DottedLoaderWidget(),
-    );
-  }
-
-  Widget _reducerWidget({required FetchNavigateAlertDataState dataState}) {
-    return ListTile(
-      leading: Checkbox(
-        value: dataState.checkBoxReducer,
-        activeColor: Colors.green,
-        onChanged: (bool? val) {
-          BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxReducerGisEvent(
-                  checkBoxReducer: val!, context: mContext));
-        },
-      ),
-      title: dataState.isGasReducerLoader == false
-          ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.green,
-        ),
-        label: AppString.gasReducerGIS,
-        hintText: AppString.gasReducerGIS,
-        enabled: dataState.checkBoxReducer == true ? true : false,
-       
-        controller: dataState.gasReducerGISController,
-        suggestions: dataState.listOfGasReducerGISId,
-        onSelected: (val) {
-          BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectReducerGISValueEvent(
-                  gasReducerGISId: val, context: mContext));
-          Navigator.pop(mContext);
-        },
-      )
-          : DottedLoaderWidget(),
-    );
-  }
-
-  Widget _endCapWidget({required FetchNavigateAlertDataState dataState}) {
-    return ListTile(
-      leading: Checkbox(
-        value: dataState.checkBoxEndCap,
-        activeColor: Colors.green,
-        onChanged: (bool? val) {
-          BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxEndCapGisEvent(
-                  checkBoxEndCap: val!, context: mContext));
-        },
-      ),
-      title: dataState.isGasEndCapLoader == false
-          ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.green,
-        ),
-        label: AppString.gasEndCapGIS,
-        hintText: AppString.gasEndCapGIS,
-        enabled: dataState.checkBoxEndCap == true ? true : false,
-       
-        controller: dataState.gasEndCapGISController,
-        suggestions: dataState.listOfGasEndCapGISId,
-        onSelected: (val) {
-          BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectEndCapGISValueEvent(
-                  gasEndCapGISId: val, context: mContext));
-          Navigator.pop(mContext);
-        },
-      )
-          : DottedLoaderWidget(),
-    );
-  }
 
 
   Widget _closeBtn() {

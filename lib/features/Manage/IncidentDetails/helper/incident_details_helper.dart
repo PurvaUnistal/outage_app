@@ -129,4 +129,19 @@ class IncidentDetailHelper{
         .toList();
   }
 
+
+static  Widget row({required String title, required String subtitle}){
+    return   Row(
+      children: [
+        Text(
+          "${title} : ",
+          style: TextStyle(fontSize: 13, color: Colors.black,fontWeight: FontWeight.bold),
+        ),
+        Text(
+          subtitle,
+          style: TextStyle(fontSize: 13, color: Colors.black),
+        ),
+      ],
+    );
+  }
 }

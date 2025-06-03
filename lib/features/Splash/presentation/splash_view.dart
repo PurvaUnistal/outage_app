@@ -10,7 +10,6 @@ import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
 import 'package:outage_app/testing.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -66,9 +65,11 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
   Future<void> toLogin() async {
     final email = await SharedPref.getString(key: PrefsValue.emailVal);
     final password = await SharedPref.getString(key: PrefsValue.passwordVal);
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    final newVersion  = await packageInfo.buildNumber;
-    AppConfig.instanceInit()?.setAppVersion(appVersion: packageInfo.buildNumber);
+  //  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  //  final newVersion  = await packageInfo.buildNumber;
+    final newVersion  = "8";
+  //  AppConfig.instanceInit()?.setAppVersion(appVersion: packageInfo.buildNumber);
+    AppConfig.instanceInit()?.setAppVersion(appVersion: "8");
     final oldVersion = await SharedPref.getString(key: PrefsValue.buildNumber);
     Timer(
         const Duration(seconds: 3),

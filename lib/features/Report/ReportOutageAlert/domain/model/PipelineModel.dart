@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
+
 part 'PipelineModel.g.dart';
 
 class PipelineModel {
@@ -31,30 +32,77 @@ class PipelineModel {
   }
 }
 
-
-
 @HiveType(typeId: HiveTypeId.pipelineData)
 class PipelineData {
   @HiveField(0)
-  String? gid;
-  @HiveField(1)
-  String? nominaldia;
-  @HiveField(2)
   String? geomencode;
+  @HiveField(1)
+  String? gid;
+  @HiveField(2)
+  String? districtI;
+  @HiveField(3)
+  String? nominaldia;
+  @HiveField(4)
+  String? contractor;
+  @HiveField(5)
+  String? name;
+  @HiveField(6)
+  String? location;
+  @HiveField(7)
+  String? district;
+  @HiveField(8)
+  String? imagePath;
+  @HiveField(9)
+  String? housePhoto;
+  @HiveField(10)
+  String? attachFile;
+  @HiveField(11)
+  String? bpName;
 
-  PipelineData({this.gid, this.nominaldia, this.geomencode});
+  PipelineData({
+    this.geomencode,
+    this.gid,
+    this.districtI,
+    this.nominaldia,
+    this.contractor,
+    this.name,
+    this.location,
+    this.district,
+    this.imagePath,
+    this.housePhoto,
+    this.attachFile,
+    this.bpName,
+  });
 
   PipelineData.fromJson(Map<String, dynamic> json) {
-    gid = json['gid'];
-    nominaldia = json['nominaldia'];
-    geomencode = json['geomencode'];
+    geomencode = json['geomencode'] ?? "";
+    gid = json['gid'] ?? "";
+    districtI = json['district_i'] ?? "";
+    nominaldia = json['nominaldia'] ?? "";
+    contractor = json['contractor'];
+    name = json['name'] ?? "";
+    location = json['location'] ?? "";
+    district = json['district'];
+    imagePath = json['imagepath'] ?? "";
+    housePhoto = json['house_photo'] ?? "";
+    attachFile = json['attach_file'] ?? "";
+    bpName = json['bp_name'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['gid'] = this.gid;
-    data['nominaldia'] = this.nominaldia;
     data['geomencode'] = this.geomencode;
+    data['gid'] = this.gid;
+    data['district_i'] = this.districtI;
+    data['nominaldia'] = this.nominaldia;
+    data['contractor'] = this.contractor;
+    data['name'] = this.name;
+    data['location'] = this.location;
+    data['district'] = this.district;
+    data['imagepath'] = this.imagePath;
+    data['house_photo'] = this.housePhoto;
+    data['attach_file'] = this.attachFile;
+    data['bp_name'] = this.bpName;
     return data;
   }
 }

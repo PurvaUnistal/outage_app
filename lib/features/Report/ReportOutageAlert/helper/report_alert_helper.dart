@@ -1,14 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ConsumerGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/CommercialModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/DomesticModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/IndustrialModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/RegulatorGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/TFGISModel.dart';
@@ -45,7 +47,7 @@ class ReportAlertHelper {
     }
   }
 
-  static Future<GetPipelineGisModel?> getPipelineGisApi({
+  static Future<PipelineModel?> getPipelineGisApi({
     required BuildContext context,
   }) async {
     try {
@@ -58,7 +60,7 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getPipelineGis + json,
         context: context,
       );
-      GetPipelineGisModel response = GetPipelineGisModel.fromJson(res);
+      PipelineModel response = PipelineModel.fromJson(res);
       return response;
     } catch (e) {
       log("getPipelineGis-->${e.toString()}");
@@ -173,18 +175,21 @@ class ReportAlertHelper {
     return null;
   }
 
-
-  static Future<ConsumerGISModel?> getConsumerGisApi({
+  static Future<CommercialModel?> getCommercialApi({
     required BuildContext context,
   }) async {
     String gaId = await AppConfig.instanceInit()?.gaId ?? "";
     String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+    String? schema =
+        AppConfig.instanceInit()?.loginData.user!.isHo == "1"
+            ? AppConfig.instanceInit()?.hoSchema
+            : AppConfig.instanceInit()?.loginData.user!.schema;
     try {
       Map<String, String> para = {
         "schema": schema ?? "",
         "ga_id": gaId,
         "areas": areas,
+        "type": "1",
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -192,20 +197,92 @@ class ReportAlertHelper {
         context: context,
       );
       if (res != null) {
-        ConsumerGISModel response = ConsumerGISModel.fromJson(res);
-        if (await HiveDataBase.consumerGISBox!.isOpen) {
-          await HiveDataBase.consumerGISBox!.clear();
+        CommercialModel response = CommercialModel.fromJson(res);
+        if (await HiveDataBase.commercialDataBox!.isOpen) {
+          await HiveDataBase.commercialDataBox!.clear();
           for (var data in response.data!) {
-            await HiveDataBase.consumerGISBox!.add(data);
+            await HiveDataBase.commercialDataBox!.add(data);
           }
         }
-        return response;
       }
     } catch (e) {
-      log("getGasValueGis-->${e.toString()}");
+      log("CommercialModel-->${e.toString()}");
     }
     return null;
   }
+
+  static Future<DomesticModel?> getDomesticApi({
+    required BuildContext context,
+  }) async {
+    String gaId = await AppConfig.instanceInit()?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
+    String? schema =
+    AppConfig.instanceInit()?.loginData.user!.isHo == "1"
+        ? AppConfig.instanceInit()?.hoSchema
+        : AppConfig.instanceInit()?.loginData.user!.schema;
+    try {
+      Map<String, String> para = {
+        "schema": schema ?? "",
+        "ga_id": gaId,
+        "areas": areas,
+        "type": "2",
+      };
+      String json = Uri(queryParameters: para).query;
+      var res = await ApiHelper.getData(
+        urlEndPoint: Apis.getConsumerGis + json,
+        context: context,
+      );
+      if (res != null) {
+        DomesticModel response = DomesticModel.fromJson(res);
+        if (await HiveDataBase.domesticDataBox!.isOpen) {
+          await HiveDataBase.domesticDataBox!.clear();
+          for (var data in response.data!) {
+            await HiveDataBase.domesticDataBox!.add(data);
+          }
+        }
+      }
+    } catch (e) {
+      log("DomesticModel-->${e.toString()}");
+    }
+    return null;
+  }
+
+  static Future<IndustrialModel?> getIndustrialApi({
+    required BuildContext context,
+  }) async {
+    String gaId = await AppConfig.instanceInit()?.gaId ?? "";
+    String areas = await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
+    String? schema =
+    AppConfig.instanceInit()?.loginData.user!.isHo == "1"
+        ? AppConfig.instanceInit()?.hoSchema
+        : AppConfig.instanceInit()?.loginData.user!.schema;
+    try {
+      Map<String, String> para = {
+        "schema": schema ?? "",
+        "ga_id": gaId,
+        "areas": areas,
+        "type": "3",
+      };
+      String json = Uri(queryParameters: para).query;
+      var res = await ApiHelper.getData(
+        urlEndPoint: Apis.getConsumerGis + json,
+        context: context,
+      );
+      if (res != null) {
+        IndustrialModel response = IndustrialModel.fromJson(res);
+        if (await HiveDataBase.industrialDataBox!.isOpen) {
+          await HiveDataBase.industrialDataBox!.clear();
+          for (var data in response.data!) {
+            await HiveDataBase.industrialDataBox!.add(data);
+          }
+        }
+      }
+    } catch (e) {
+      log("IndustrialModel-->${e.toString()}");
+    }
+    return null;
+  }
+
   static Future<GetGasGisModel?> getTeeGisApi({
     required BuildContext context,
   }) async {
@@ -332,8 +409,6 @@ class ReportAlertHelper {
     return null;
   }
 
-
-
   static Future<GetPipelineNetworkModel?> getPipelineNetworkApi({
     required BuildContext context,
     required String latitude,
@@ -403,6 +478,31 @@ class ReportAlertHelper {
     return null;
   }
 
+  static Future<List<String>?> getDiaColorApi({
+    required BuildContext context,
+  }) async {
+    String? schema = AppConfig.instanceInit()?.loginData.user?.isHo == "1"
+        ? AppConfig.instanceInit()?.hoSchema
+        : AppConfig.instanceInit()?.loginData.user?.schema;
+
+    Map<String, String> para = {"schema": schema ?? ""};
+    String query = Uri(queryParameters: para).query;
+
+    var res = await ApiHelper.getData(
+      urlEndPoint: Apis.diaColor + query,
+      context: context,
+    );
+    if (res != null && res["data"] != null) {
+      final data = res["data"];
+      if (data is Map<String, dynamic>) {
+        return data.values.map((e) => e.toString()).toList();
+      }
+    }
+
+    return null;
+  }
+
+
   static Future<BitmapDescriptor> markerAsset(String path) async {
     return await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(28, 28)),
@@ -416,31 +516,39 @@ class ReportAlertHelper {
     required BitmapDescriptor icon,
     required LatLng position,
     required BuildContext context,
+    required dynamic data,
   }) {
     Set<Marker> markersPointList = {};
-    markersPointList.add(Marker(
-      onTap: () {
-        AppConfig.instanceInit()?.setAssets(assets: assetId);
-        AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: assetsTypeId);
-        AppConfig.instanceInit()?.setMarkerPoint(
-          newPointMarkerLat: position.latitude.toString(),
-          newPointMarkerLong: position.longitude.toString(),
-        );
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          showDragHandle: true,
-          builder: (BuildContext c) {
-            return AlertDialogTwoBtnWidget(mContext: context);
-          },
-        );
-      },
-      markerId: MarkerId('$assetId-$assetsTypeId'),
-      position: position,
-      infoWindow: InfoWindow(title: assetsTypeId,),
-      icon: icon,
-    ));
- return markersPointList;
+    markersPointList.add(
+      Marker(
+        onTap: () {
+          AppConfig.instanceInit()?.setAssets(assets: assetId);
+          AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: assetsTypeId);
+          AppConfig.instanceInit()?.setMarkerPoint(
+            newPointMarkerLat: position.latitude.toString(),
+            newPointMarkerLong: position.longitude.toString(),
+          );
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              contentPadding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              content: AlertDialogTwoBtnWidget(mContext: context,pipelineData: data,),
+            ),
+          );
+
+        },
+        markerId: MarkerId('$assetId-$assetsTypeId'),
+        position: position,
+        infoWindow: InfoWindow(
+            title: assetsTypeId,
+        ),
+        icon: icon,
+      ),
+    );
+    return markersPointList;
   }
 
   static Set<Polyline> polylinePoint({
@@ -450,31 +558,66 @@ class ReportAlertHelper {
     required BuildContext context,
   }) {
     Set<Polyline> polylineList = {};
-    polylineList.add(Polyline(
+    polylineList.add(
+      Polyline(
         polylineId: PolylineId("polyline_$i"),
         points: position,
         color: color,
         width: 4,
-        onTap: (){
-
+        onTap: () {
+          print("-------------------------------->polyline_$i");
           AppConfig.instanceInit()?.setAssets(assets: "");
           AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: "");
-        }
-    ));
+        },
+      ),
+    );
     return polylineList;
   }
+  static Color getPolylineColor({required int value, required List<String> color}) {
+    if (color.length < 4) {
+      throw ArgumentError('color list must have at least 4 values');
+    }
 
-  static Color getPolylineColor(int value) {
-    if (value < 0 || value > 50) {
-      return Colors.green;
-    } else if (value < 63 || value > 90) {
-      return Colors.pinkAccent;
-    } else if (value < 100 || value > 140) {
-      return Colors.purple;
-    } else if (value < 150 || value > 200) {
-      return Colors.teal;
+    if (value >= 0 && value <= 50) {
+      return Color(int.parse(color[0]));
+    } else if (value >= 63 && value <= 90) {
+      return Color(int.parse(color[1]));
+    } else if (value >= 100 && value <= 140) {
+      return Color(int.parse(color[2]));
+    } else if (value >= 150 && value <= 200) {
+      return Color(int.parse(color[3]));
     } else {
-      return Colors.blue.shade800;
+      return Colors.blue.shade800; // default color
     }
   }
+
+  static showMyCupertinoDialog(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('Alert'),
+          content: Text('This is a Cupertino-style dialog.'),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text('OK'),
+              isDefaultAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Add your logic here
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 }

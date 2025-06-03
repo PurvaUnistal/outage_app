@@ -70,10 +70,23 @@ class LogoutWidget extends StatelessWidget {
     );
   }
 
-static  Future<void> clearAndClosePipelineBox() async {
-    var box = HiveDataBase.pipelineDataBox;
-    if (box != null && box.isOpen) {
-      await box.clear();
+  static Future<void> clearAndClosePipelineBox() async {
+    final boxes = [
+      HiveDataBase.pipelineDataBox,
+      HiveDataBase.tfGISBox,
+      HiveDataBase.valveGISBox,
+      HiveDataBase.regulatorGISBox,
+
+    ];
+
+    final pipelineBox = boxes.first;
+    if (pipelineBox != null && pipelineBox.isOpen) {
+      for (final box in boxes) {
+        if (box?.isOpen ?? false) {
+          await box!.clear();
+        }
+      }
     }
   }
+
 }

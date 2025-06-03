@@ -12,12 +12,12 @@ import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dar
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ConsumerGISModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/CommercialModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/DomesticModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasValueGISModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineGisModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetPipelineNetworkModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GisConfig.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/IndustrialModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/RegulatorGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/TFGISModel.dart';
@@ -49,23 +49,15 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     on<SelectCheckBoxRegulatorGisEvent>(_selectCheckBoxRegulatorGis);
     on<SelectRegulatorGISValueEvent>(_selectRegulatorGISValue);
 
-    on<SelectCheckBoxTeeGisEvent>(_selectCheckBoxTeeGis);
-    on<SelectTeeGISValueEvent>(_selectTeeGISValue);
+    on<SelectCheckCommercialEvent>(_selectCheckCommercial);
+    on<SelectCommercialValueEvent>(_selectCommercialValue);
 
-    on<SelectCheckBoxElbowGisEvent>(_selectCheckBoxElbowGis);
-    on<SelectElbowGISValueEvent>(_selectElbowGISValue);
+    on<SelectCheckDomesticEvent>(_selectCheckDomestic);
+    on<SelectDomesticValueEvent>(_selectDomesticValue);
 
-    on<SelectCheckBoxCouplerGisEvent>(_selectCheckBoxCouplerGis);
-    on<SelectCouplerGISValueEvent>(_selectCouplerGISValue);
-
-    on<SelectCheckBoxReducerGisEvent>(_selectCheckBoxReducerGis);
-    on<SelectReducerGISValueEvent>(_selectReducerGISValue);
-
-    on<SelectCheckBoxEndCapGisEvent>(_selectCheckBoxEndCapGis);
-    on<SelectEndCapGISValueEvent>(_selectEndCapGISValue);
-
-    on<SelectCheckBoxConsumerGisEvent>(_selectCheckBoxConsumerGis);
-    on<SelectConsumerGISValueEvent>(_selectConsumerGISValue);
+    on<SelectCheckIndustrialEvent>(_selectCheckIndustrial);
+    on<SelectIndustrialValueEvent>(_selectIndustrial);
+    
 
     on<OnCameraIdleEvent>(_onCameraIdleEvent);
     on<ResetFilterEvent>(_onResetFilterEvent);
@@ -80,18 +72,12 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   bool isGasValveLoader = false;
   bool checkBoxRegulator = false;
   bool isGasRegulatorLoader = false;
-  bool checkBoxTee = false;
-  bool isGasTeeLoader = false;
-  bool checkBoxElbow = false;
-  bool isGasElbowLoader = false;
-  bool checkBoxCoupler = false;
-  bool isGasCouplerLoader = false;
-  bool checkBoxReducer = false;
-  bool isGasReducerLoader = false;
-  bool checkBoxEndCap = false;
-  bool isGasEndCapLoader = false;
-  bool checkBoxConsumer = false;
-  bool isGasConsumerLoader = false;
+  bool checkCommercial = false;
+  bool isCommercial = false;
+  bool checkDomestic = false;
+  bool isDomestic = false;
+  bool checkIndustrial = false;
+  bool isIndustrial = false;
 
   String role = '';
   String baseUrl = '';
@@ -102,64 +88,52 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   final TextEditingController gasValveGISController = TextEditingController();
   final TextEditingController gasRegulatorGISController =
       TextEditingController();
-  final TextEditingController gasTeeGISController = TextEditingController();
-  final TextEditingController gasElbowGISController = TextEditingController();
-  final TextEditingController gasCouplerGISController = TextEditingController();
-  final TextEditingController gasReducerGISController = TextEditingController();
-  final TextEditingController gasEndCapGISController = TextEditingController();
-  final TextEditingController gasConsumerGISController =
-      TextEditingController();
+  final TextEditingController commercialController = TextEditingController();
+  final TextEditingController domesticController = TextEditingController();
+  final TextEditingController industrialController = TextEditingController();
 
-  GetPipelineGisModel gasPipelineModel = GetPipelineGisModel();
-  List<GetPipelineGisData> listOfPipelineGIS = [];
+
 
   GetGasValueGISModel fittingGISModel = GetGasValueGISModel();
   List<GetGasValueGISData> listOfFittingGIS = [];
 
   TFGISModel tfGisModel = TFGISModel();
+  TFGISData detailsTf = TFGISData();
   List<TFGISData> listOfTfGis = [];
   List<TFGISData> listOfFilterTfGis = [];
   List<String> listOfTfGisId = [];
 
   ValveGISModel gasValueGISModel = ValveGISModel();
+  ValveGISData detailsValve = ValveGISData();
   List<ValveGISData> listOfGasValueGIS = [];
   List<ValveGISData> listOfFilterGasValueGIS = [];
   List<String> listOfGasValveGISId = [];
 
   RegulatorGISModel gasRegulatorGISModel = RegulatorGISModel();
+  RegulatorGISData detailsRegulator = RegulatorGISData();
   List<RegulatorGISData> listOfGasRegulatorGIS = [];
   List<RegulatorGISData> listOfFilterGasRegulatorGIS = [];
   List<String> listOfGasRegulatorGISId = [];
 
-  GetGasGisModel gasTeeGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasTeeGIS = [];
-  List<GasGisData> listOfFilterGasTeeGIS = [];
-  List<String> listOfGasTeeGISId = [];
+  CommercialModel commercialModel = CommercialModel();
+  CommercialData detailsCommercial = CommercialData();
+  List<CommercialData> listOfCommercial = [];
+  List<CommercialData> listOfFilterCommercial = [];
+  List<String> listOfCommercialId = [];
 
-  GetGasGisModel gasElbowGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasElbowGIS = [];
-  List<GasGisData> listOfFilterGasElbowGIS = [];
-  List<String> listOfGasElbowGISId = [];
+  DomesticModel domesticModel = DomesticModel();
+  DomesticData detailsDomestic = DomesticData();
+  List<DomesticData> listOfDomestic = [];
+  List<DomesticData> listOfFilterDomestic = [];
+  List<String> listOfDomesticId = [];
 
-  GetGasGisModel gasCouplerGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasCouplerGIS = [];
-  List<GasGisData> listOfFilterGasCouplerGIS = [];
-  List<String> listOfGasCouplerGISId = [];
+  IndustrialModel industrialModel = IndustrialModel();
+  IndustrialData detailsIndustrial = IndustrialData();
+  List<IndustrialData> listOfIndustrial = [];
+  List<IndustrialData> listOfFilterIndustrial = [];
+  List<String> listOfIndustrialId = [];
 
-  GetGasGisModel gasReducerGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasReducerGIS = [];
-  List<GasGisData> listOfFilterGasReducerGIS = [];
-  List<String> listOfGasReducerGISId = [];
-
-  GetGasGisModel gasEndCapGISModel = GetGasGisModel();
-  List<GasGisData> listOfGasEndCapGIS = [];
-  List<GasGisData> listOfFilterGasEndCapGIS = [];
-  List<String> listOfGasEndCapGISId = [];
-
-  ConsumerGISModel gasConsumerGISModel = ConsumerGISModel();
-  List<ConsumerGISData> listOfGasConsumerGIS = [];
-  List<ConsumerGISData> listOfFilterConsumerGIS = [];
-  List<String> listOfGasConsumerGISId = [];
+  List<String> listOfDiaColor = [];
 
   GetPipelineNetworkModel pipelineNetworkModel = GetPipelineNetworkModel();
   PipelineNetworkData pipelineNetworkData = PipelineNetworkData();
@@ -180,7 +154,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   Set<Marker> tfMarker = {};
   Set<Marker> valveMarker = {};
   Set<Marker> regularMarker = {};
-  Set<Marker> consumerMarker = {};
+  Set<Marker> commercialMarker = {};
+  Set<Marker> domesticMarker = {};
+  Set<Marker> industrialMarker = {};
   Set<Marker> markersPointList = {};
 
   Set<Polyline> polylinePointList = {};
@@ -217,7 +193,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       context: event.context,
       assetPath: "",
       filteredList: [],
+      data: ""
     );
+
+      var res = await ReportAlertHelper.getDiaColorApi(context: event.context);
+      if (res != null) {
+        listOfDiaColor = res;
+      }
 
     await _currentPointMarker();
     await _fetchGasPipelineGisApi(context: event.context, emit: emit);
@@ -229,9 +211,12 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     points = [];
     googleMapsUrl = "";
     await _clearTextField();
-    gasPipelineModel = GetPipelineGisModel();
-    listOfPipelineGIS = [];
+    detailsTf = TFGISData();
     gasValueGISModel = ValveGISModel();
+    detailsValve = ValveGISData();
+    detailsRegulator = RegulatorGISData();
+
+    detailsCommercial = CommercialData();
     listOfGasValueGIS = [];
     listOfFilterGasValueGIS = [];
     listOfGasValveGISId = [];
@@ -246,35 +231,30 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     listOfFilterGasRegulatorGIS = [];
     listOfGasRegulatorGISId = [];
 
-    gasTeeGISModel = GetGasGisModel();
-    listOfGasTeeGIS = [];
-    listOfFilterGasTeeGIS = [];
-    listOfGasTeeGISId = [];
 
-    gasElbowGISModel = GetGasGisModel();
-    listOfGasElbowGIS = [];
-    listOfFilterGasElbowGIS = [];
-    listOfGasElbowGISId = [];
 
-    gasCouplerGISModel = GetGasGisModel();
-    listOfGasCouplerGIS = [];
-    listOfFilterGasCouplerGIS = [];
-    listOfGasCouplerGISId = [];
 
-    gasReducerGISModel = GetGasGisModel();
-    listOfGasReducerGIS = [];
-    listOfFilterGasReducerGIS = [];
-    listOfGasReducerGISId = [];
+     domesticModel = DomesticModel();
+     detailsDomestic = DomesticData();
+     listOfDomestic = [];
+    listOfFilterDomestic = [];
+    listOfDomesticId = [];
 
-    gasEndCapGISModel = GetGasGisModel();
-    listOfGasEndCapGIS = [];
-    listOfFilterGasEndCapGIS = [];
-    listOfGasEndCapGISId = [];
+    industrialModel = IndustrialModel();
+     detailsIndustrial = IndustrialData();
+     listOfIndustrial = [];
+     listOfFilterIndustrial = [];
+    listOfIndustrialId = [];
 
-    gasConsumerGISModel = ConsumerGISModel();
-    listOfGasConsumerGIS = [];
-    listOfFilterConsumerGIS = [];
-    listOfGasConsumerGISId = [];
+
+
+
+
+    commercialModel = CommercialModel();
+    listOfCommercial = [];
+    listOfFilterCommercial = [];
+    listOfCommercialId = [];
+    listOfDiaColor = [];
 
     pipelineNetworkModel = GetPipelineNetworkModel();
     pipelineNetworkData = PipelineNetworkData();
@@ -292,7 +272,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     tfMarker = {};
     valveMarker = {};
     regularMarker = {};
-    consumerMarker = {};
+   commercialMarker = {};
+    domesticMarker = {};
+    industrialMarker = {};
     markersPointList = {};
 
     filterPolyline = {};
@@ -326,13 +308,13 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       finalMarker.clear();
       _eventCompleted(emit);
       for (int i = 0; i < listOfPipeline.length; i++) {
-        final data = listOfPipeline[i];
-        if (data.geomencode != null && data.geomencode!.isNotEmpty) {
+        pipelineData = listOfPipeline[i];
+        if (pipelineData.geomencode != null && pipelineData.geomencode!.isNotEmpty) {
           try {
-            points = await DecodePolyline.decodePolyline(data.geomencode!);
+            points = await DecodePolyline.decodePolyline(pipelineData.geomencode!);
             final color = ReportAlertHelper.getPolylineColor(
-              int.tryParse(data.nominaldia ?? '0') ?? 0,
-            );
+                value : int.tryParse(pipelineData.nominaldia ?? '0') ?? 0,
+                color: listOfDiaColor);
             Set<Polyline> polyline = ReportAlertHelper.polylinePoint(
               i: i,
               color: color,
@@ -350,6 +332,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       _eventCompleted(emit);
     }
   }
+
+
 
   _onResetFilterEvent(ResetFilterEvent event, emit) async {
     tempMarker = {};
@@ -416,21 +400,22 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           listOfTfGis = await HiveDataBase.tfGISBox!.values.toList();
         }
         if (listOfTfGis.isNotEmpty) {
-          listOfTfGisId = listOfTfGis.map((e) => e.id!).toList();
+          listOfTfGisId = listOfTfGis.map((e) => e.id ?? "").toList();
           final customIcon = await ReportAlertHelper.markerAsset(AssetPath.tf);
           for (int i = 0; i < listOfTfGis.length; i++) {
-            final data = listOfTfGis[i];
+            detailsTf = listOfTfGis[i];
             try {
               LatLng latLngList = LatLng(
-                double.parse(data.latitude!),
-                double.parse(data.longitude!),
+                double.parse(detailsTf.latitude!),
+                double.parse(detailsTf.longitude!),
               );
               Set<Marker> marker = ReportAlertHelper.markerPoint(
                 assetId: tfGisModel.assetId ?? "",
-                assetsTypeId: data.id ?? "",
+                assetsTypeId: detailsTf.id ?? "",
                 icon: customIcon,
                 position: latLngList,
                 context: context,
+                data: detailsTf,
               );
               tfMarker.addAll(marker);
               finalMarker.addAll(tfMarker);
@@ -463,23 +448,24 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           listOfGasValueGIS = await HiveDataBase.valveGISBox!.values.toList();
         }
         if (listOfGasValueGIS.isNotEmpty) {
-          listOfGasValveGISId = listOfGasValueGIS.map((e) => e.valveId!).toList();
+          listOfGasValveGISId = listOfGasValueGIS.map((e) => e.valveId ?? "").toList();
           BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
             AssetPath.valve,
           );
           for (int i = 0; i < listOfGasValueGIS.length; i++) {
-            final data = listOfGasValueGIS[i];
+            detailsValve = listOfGasValueGIS[i];
             try {
               LatLng latLngList = LatLng(
-                double.parse(data.latitude!),
-                double.parse(data.longitude!),
+                double.parse(detailsValve.latitude!),
+                double.parse(detailsValve.longitude!),
               );
               Set<Marker> marker = ReportAlertHelper.markerPoint(
                 assetId: gasValueGISModel.assetId ?? "",
-                assetsTypeId: data.valveId ?? "",
+                assetsTypeId: detailsValve.valveId ?? "",
                 icon: customIcon,
                 position: latLngList,
                 context: context,
+                data: detailsValve,
               );
               valveMarker.addAll(marker);
               finalMarker.addAll(valveMarker);
@@ -513,34 +499,35 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         }
         if (listOfGasRegulatorGIS.isNotEmpty) {
           listOfGasRegulatorGISId =
-              listOfGasRegulatorGIS.map((e) => e.id!).toList();
+              listOfGasRegulatorGIS.map((e) => e.id ?? "").toList();
           BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
             AssetPath.regulator,
           );
           for (int i = 0; i < listOfGasRegulatorGIS.length; i++) {
-            final data = listOfGasRegulatorGIS[i];
+            detailsRegulator = listOfGasRegulatorGIS[i];
             try {
               LatLng latLngList = LatLng(
-                double.parse(data.latitude!),
-                double.parse(data.longitude!),
+                double.parse(detailsRegulator.latitude!),
+                double.parse(detailsRegulator.longitude!),
               );
               Set<Marker> marker = ReportAlertHelper.markerPoint(
                 assetId: gasRegulatorGISModel.assetId ?? "",
-                assetsTypeId: data.id ?? "",
+                assetsTypeId: detailsRegulator.id ?? "",
                 icon: customIcon,
                 position: latLngList,
                 context: context,
+                data: detailsRegulator,
               );
               regularMarker.addAll(marker);
               finalMarker.addAll(regularMarker);
             } catch (e) {
-              print("Error decoding polyline at index $i: $e");
+              print("Error decoding fetchGasRegulatorGisApi $i: $e");
             }
           }
           _filterVisiblePolyline();
         }
       } catch (e) {
-        print("Error during Gas Regulator GIS API fetching: $e");
+        print("Error _fetchGasRegulatorGisApi: $e");
       }
     }
 
@@ -548,43 +535,44 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
   }
 
 
-  _fetchGasConsumerGisApi({required BuildContext context, emit}) async {
-    if (checkBoxConsumer == true) {
+  _fetchCommercialApi({required BuildContext context, emit}) async {
+    if (checkCommercial == true) {
       try {
-        if (await HiveDataBase.consumerGISBox!.isEmpty) {
-          var res = await ReportAlertHelper.getConsumerGisApi(context: context);
+        if (await HiveDataBase.commercialDataBox!.isEmpty) {
+          var res = await ReportAlertHelper.getCommercialApi(context: context);
           if (res != null) {
-            gasConsumerGISModel = res;
-            if (gasConsumerGISModel.data != null) {
-              listOfGasConsumerGIS = gasConsumerGISModel.data!;
-              await HiveDataBase.consumerGISBox!.addAll(listOfGasConsumerGIS);
+            commercialModel = res;
+            if (commercialModel.data != null) {
+              listOfCommercial = commercialModel.data!;
             }
           }
         } else {
-          listOfGasConsumerGIS = await HiveDataBase.consumerGISBox!.values.toList();
+          listOfCommercial = await HiveDataBase.commercialDataBox!.values.toList();
         }
-        if (listOfGasConsumerGIS.isNotEmpty) {
-          listOfGasConsumerGISId =
-              listOfGasConsumerGIS.map((e) => e.id!).toList();
+        if (listOfCommercial.isNotEmpty) {
+          listOfCommercialId =
+              listOfCommercial.map((e) => e.id ?? "").toList();
           BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
             AssetPath.consumer,
           );
-          for (int i = 0; i < listOfGasConsumerGIS.length; i++) {
-            final data = listOfGasConsumerGIS[i];
+          for (int i = 0; i < listOfCommercial.length; i++) {
+            detailsCommercial = listOfCommercial[i];
             try {
               LatLng latLngList = LatLng(
-                double.parse(data.latitude!),
-                double.parse(data.longitude!),
+                double.parse(detailsCommercial.latitude!),
+                double.parse(detailsCommercial.longitude!),
               );
               Set<Marker> marker = ReportAlertHelper.markerPoint(
-                assetId: gasConsumerGISModel.assetId ?? "",
-                assetsTypeId: data.id ?? "",
+              //  assetId: commercialModel.assetId ?? "",
+                assetId: "",
+                assetsTypeId: detailsCommercial.id ?? "",
                 icon: customIcon,
                 position: latLngList,
                 context: context,
+                data: detailsCommercial,
               );
-              consumerMarker.addAll(marker);
-              finalMarker.addAll(consumerMarker);
+              commercialMarker.addAll(marker);
+              finalMarker.addAll(commercialMarker);
             } catch (e) {
               print("Error decoding polyline at index $i: $e");
             }
@@ -595,69 +583,111 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         print("Error during Gas Consumer GIS API fetching: $e");
       }
     }
-
     _eventCompleted(emit);
   }
 
+  _fetchDomesticApi({required BuildContext context, emit}) async {
+    if (checkDomestic == true) {
+      try {
+        if (await HiveDataBase.domesticDataBox!.isEmpty) {
+          var res = await ReportAlertHelper.getDomesticApi(context: context);
+          if (res != null) {
+            domesticModel = res;
+            if (domesticModel.data != null) {
+              listOfDomestic = domesticModel.data!;
 
-  _fetchGasTeeGisApi({required BuildContext context}) async {
-    var res = await ReportAlertHelper.getTeeGisApi(context: context);
-    if (res != null) {
-      gasTeeGISModel = res;
-      if (gasTeeGISModel.data != null) {
-        listOfGasTeeGIS = gasTeeGISModel.data!;
-        listOfGasTeeGISId = listOfGasTeeGIS.map((e) => e.id!).toList();
-        return res;
+            }
+          }
+        } else {
+          listOfDomestic = await HiveDataBase.domesticDataBox!.values.toList();
+        }
+        if (listOfDomestic.isNotEmpty) {
+          listOfDomesticId =
+              listOfDomestic.map((e) => e.id ?? "").toList();
+          BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
+            AssetPath.consumer,
+          );
+          for (int i = 0; i < listOfDomestic.length; i++) {
+            detailsDomestic = listOfDomestic[i];
+            try {
+              LatLng latLngList = LatLng(
+                double.parse(detailsDomestic.latitude!),
+                double.parse(detailsDomestic.longitude!),
+              );
+              Set<Marker> marker = ReportAlertHelper.markerPoint(
+                //  assetId: commercialModel.assetId ?? "",
+                assetId: "",
+                assetsTypeId: detailsDomestic.id ?? "",
+                icon: customIcon,
+                position: latLngList,
+                context: context,
+                data: detailsDomestic,
+              );
+              domesticMarker.addAll(marker);
+              finalMarker.addAll(domesticMarker);
+            } catch (e) {
+              print("Error decoding polyline at index $i: $e");
+            }
+          }
+          _filterVisiblePolyline();
+        }
+      } catch (e) {
+        print("Error during Gas Consumer GIS API fetching: $e");
       }
     }
+    _eventCompleted(emit);
   }
 
-  _fetchGasElbowGisApi({required BuildContext context}) async {
-    var res = await ReportAlertHelper.getElbowGisApi(context: context);
-    if (res != null) {
-      gasElbowGISModel = res;
-      if (gasElbowGISModel.data != null) {
-        listOfGasElbowGIS = gasElbowGISModel.data!;
-        listOfGasElbowGISId = listOfGasElbowGIS.map((e) => e.id!).toList();
-        return res;
-      }
-    }
-  }
+  _fetchIndustrialApi({required BuildContext context, emit}) async {
+    if (checkIndustrial == true) {
+      try {
+        if (await HiveDataBase.industrialDataBox!.isEmpty) {
+          var res = await ReportAlertHelper.getIndustrialApi(context: context);
+          if (res != null) {
+            industrialModel = res;
+            if (industrialModel.data != null) {
+              listOfIndustrial = industrialModel.data!;
 
-  _fetchGasCouplerGisApi({required BuildContext context}) async {
-    var res = await ReportAlertHelper.getCouplerGisApi(context: context);
-    if (res != null) {
-      gasCouplerGISModel = res;
-      if (gasCouplerGISModel.data != null) {
-        listOfGasCouplerGIS = gasCouplerGISModel.data!;
-        listOfGasCouplerGISId = listOfGasCouplerGIS.map((e) => e.id!).toList();
-        return res;
+            }
+          }
+        } else {
+          listOfIndustrial = await HiveDataBase.industrialDataBox!.values.toList();
+        }
+        if (listOfIndustrial.isNotEmpty) {
+          listOfIndustrialId =
+              listOfIndustrial.map((e) => e.id ?? "").toList();
+          BitmapDescriptor customIcon = await ReportAlertHelper.markerAsset(
+            AssetPath.consumer,
+          );
+          for (int i = 0; i < listOfIndustrial.length; i++) {
+            detailsIndustrial = listOfIndustrial[i];
+            try {
+              LatLng latLngList = LatLng(
+                double.parse(detailsIndustrial.latitude!),
+                double.parse(detailsIndustrial.longitude!),
+              );
+              Set<Marker> marker = ReportAlertHelper.markerPoint(
+                //  assetId: commercialModel.assetId ?? "",
+                assetId: "",
+                assetsTypeId: detailsIndustrial.id ?? "",
+                icon: customIcon,
+                position: latLngList,
+                context: context,
+                data: detailsIndustrial,
+              );
+              industrialMarker.addAll(marker);
+              finalMarker.addAll(industrialMarker);
+            } catch (e) {
+              print("Error decoding polyline at index $i: $e");
+            }
+          }
+          _filterVisiblePolyline();
+        }
+      } catch (e) {
+        print("Error during Gas Consumer GIS API fetching: $e");
       }
     }
-  }
-
-  _fetchGasReducerGisApi({required BuildContext context}) async {
-    var res = await ReportAlertHelper.getReducerGisApi(context: context);
-    if (res != null) {
-      gasReducerGISModel = res;
-      if (gasReducerGISModel.data != null) {
-        listOfGasReducerGIS = gasReducerGISModel.data!;
-        listOfGasReducerGISId = listOfGasReducerGIS.map((e) => e.id!).toList();
-        return res;
-      }
-    }
-  }
-
-  _fetchGasEndCapGisApi({required BuildContext context}) async {
-    var res = await ReportAlertHelper.getEndCapGisApi(context: context);
-    if (res != null) {
-      gasEndCapGISModel = res;
-      if (gasEndCapGISModel.data != null) {
-        listOfGasEndCapGIS = gasEndCapGISModel.data!;
-        listOfGasEndCapGISId = listOfGasEndCapGIS.map((e) => e.id!).toList();
-        return res;
-      }
-    }
+    _eventCompleted(emit);
   }
 
   _fetchPipelineNetworkApi({
@@ -684,8 +714,8 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
                 List<LatLng> filterLatLngGis =
                     await DecodePolyline.decodePolyline(data.geomencode!);
                 final color = ReportAlertHelper.getPolylineColor(
-                  int.tryParse(data.nominaldia ?? '0') ?? 0,
-                );
+                    value : int.tryParse(data.nominaldia ?? '0') ?? 0,
+                    color: listOfDiaColor);
                 Set<Polyline> polyline = ReportAlertHelper.polylinePoint(
                   i: i,
                   color: color,
@@ -791,136 +821,86 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     _eventCompleted(emit);
   }
 
-  _selectCheckBoxTeeGis(SelectCheckBoxTeeGisEvent event, emit) async {
+  _selectCheckCommercial(SelectCheckCommercialEvent event, emit) async {
     await _clearPopTextField();
-    checkBoxTee = event.checkBoxTee;
-    if (checkBoxTee == true) {
-      isGasTeeLoader = true;
+    checkCommercial = event.checkCommercial;
+    if (checkCommercial == true) {
+      isCommercial = true;
       _eventCompleted(emit);
-      await _fetchGasTeeGisApi(context: event.context);
+      await _fetchCommercialApi(context: event.context,emit: emit);
     }
-    isGasTeeLoader = false;
+    isCommercial = false;
     _eventCompleted(emit);
   }
 
-  _selectCheckBoxElbowGis(SelectCheckBoxElbowGisEvent event, emit) async {
+  _selectCheckDomestic(SelectCheckDomesticEvent event, emit) async {
     await _clearPopTextField();
-    checkBoxElbow = event.checkBoxElbow;
-    if (checkBoxElbow == true) {
-      isGasElbowLoader = true;
+    checkDomestic = event.checkDomestic;
+    if (checkDomestic == true) {
+      isDomestic = true;
       _eventCompleted(emit);
-      await _fetchGasElbowGisApi(context: event.context);
+      await _fetchDomesticApi(context: event.context,emit: emit);
     }
-    isGasElbowLoader = false;
+    isDomestic = false;
     _eventCompleted(emit);
   }
 
-  _selectCheckBoxCouplerGis(SelectCheckBoxCouplerGisEvent event, emit) async {
+  _selectCheckIndustrial(SelectCheckIndustrialEvent event, emit) async {
     await _clearPopTextField();
-    checkBoxCoupler = event.checkBoxCoupler;
-    if (checkBoxCoupler == true) {
-      isGasCouplerLoader = true;
+    checkIndustrial = event.checkIndustrial;
+    if (checkIndustrial == true) {
+      isIndustrial = true;
       _eventCompleted(emit);
-      await _fetchGasCouplerGisApi(context: event.context);
+      await _fetchIndustrialApi(context: event.context, emit: emit);
     }
-    isGasCouplerLoader = false;
+    isIndustrial = false;
     _eventCompleted(emit);
   }
 
-  _selectCheckBoxReducerGis(SelectCheckBoxReducerGisEvent event, emit) async {
-    await _clearPopTextField();
-    checkBoxReducer = event.checkBoxReducer;
-    if (checkBoxReducer == true) {
-      isGasReducerLoader = true;
-      _eventCompleted(emit);
-      await _fetchGasReducerGisApi(context: event.context);
-    }
-    isGasReducerLoader = false;
-    _eventCompleted(emit);
-  }
 
-  _selectCheckBoxEndCapGis(SelectCheckBoxEndCapGisEvent event, emit) async {
-    await _clearPopTextField();
-    checkBoxEndCap = event.checkBoxEndCap;
-    if (checkBoxEndCap == true) {
-      isGasEndCapLoader = true;
-      _eventCompleted(emit);
-      await _fetchGasEndCapGisApi(context: event.context);
-    }
-    isGasEndCapLoader = false;
-    _eventCompleted(emit);
-  }
-
-  _selectCheckBoxConsumerGis(SelectCheckBoxConsumerGisEvent event, emit) async {
-    await _clearPopTextField();
-    checkBoxConsumer = event.checkBoxConsumer;
-    if (checkBoxConsumer == true) {
-      isGasConsumerLoader = true;
-      _eventCompleted(emit);
-      await _fetchGasConsumerGisApi(context: event.context, emit: emit);
-    }else{
-      finalMarker.removeWhere((marker) => consumerMarker.contains(marker));
-      consumerMarker.clear();            
-      _eventCompleted(emit);
-    }
-    isGasConsumerLoader = false;
-    _eventCompleted(emit);
-  }
 
   Future<GisConfig?> _getActiveGisConfig() async {
     if (tfGisController.text.isNotEmpty) {
       return GisConfig(
-        assetPath: AssetPath.tf,
+
         markerList: filterMarkerList,
         polylineList: filterPolyline,
+        detailsData: detailsTf
       );
     } else if (gasValveGISController.text.isNotEmpty) {
       return GisConfig(
-        assetPath: AssetPath.valve,
+
         markerList: filterMarkerList,
         polylineList: filterPolyline,
+        detailsData: detailsValve
       );
     } else if (gasRegulatorGISController.text.isNotEmpty) {
       return GisConfig(
-        assetPath: AssetPath.regulator,
+
         markerList: filterMarkerList,
         polylineList: filterPolyline,
+        detailsData: detailsRegulator
       );
-    } else if (gasTeeGISController.text.isNotEmpty) {
+    } else if (commercialController.text.isNotEmpty) {
       return GisConfig(
-        assetPath: AssetPath.tee,
+
         markerList: filterMarkerList,
         polylineList: filterPolyline,
+        detailsData: detailsCommercial
       );
-    } else if (gasElbowGISController.text.isNotEmpty) {
+    } else if (domesticController.text.isNotEmpty) {
       return GisConfig(
-        assetPath: AssetPath.elbow,
+
         markerList: filterMarkerList,
         polylineList: filterPolyline,
+        detailsData: detailsDomestic
       );
-    } else if (gasCouplerGISController.text.isNotEmpty) {
+    } else if (industrialController.text.isNotEmpty) {
       return GisConfig(
-        assetPath: AssetPath.coupler,
+
         markerList: filterMarkerList,
         polylineList: filterPolyline,
-      );
-    } else if (gasReducerGISController.text.isNotEmpty) {
-      return GisConfig(
-        assetPath: AssetPath.reduce,
-        markerList: filterMarkerList,
-        polylineList: filterPolyline,
-      );
-    } else if (gasEndCapGISController.text.isNotEmpty) {
-      return GisConfig(
-        assetPath: AssetPath.endcap,
-        markerList: filterMarkerList,
-        polylineList: filterPolyline,
-      );
-    } else if (gasConsumerGISController.text.isNotEmpty) {
-      return GisConfig(
-        assetPath: AssetPath.consumer,
-        markerList: filterMarkerList,
-        polylineList: filterPolyline,
+        detailsData: detailsIndustrial
       );
     }
     if (filterMarkerList.isNotEmpty) {
@@ -931,7 +911,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       );
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(target: currentPosition, zoom: 16),
+          CameraPosition(target: currentPosition, zoom: 18),
         ),
       );
     }
@@ -946,6 +926,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     required BuildContext context,
     required String assetPath,
     required List filteredList,
+    required dynamic data,
   }) async {
     filteredList.clear();
     assetId == '';
@@ -974,8 +955,10 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           icon: iconBytes,
           assetId: assetId,
           assetsTypeId: assetTypeId,
+          data: data
+
         );
-        await _fetchPipelineNetworkApi(
+       await _fetchPipelineNetworkApi(
           context: context,
           latitude: location.latitude.toString(),
           longitude: location.longitude.toString(),
@@ -990,7 +973,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
           );
           controller.animateCamera(
             CameraUpdate.newCameraPosition(
-              CameraPosition(target: currentPosition, zoom: 16),
+              CameraPosition(target: currentPosition, zoom: 17 ),
             ),
           );
         }
@@ -1012,6 +995,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       context: event.context,
       assetPath: AssetPath.tf,
       filteredList: listOfFilterTfGis,
+      data: detailsTf
     );
     isPipelineLoader = false;
     _eventCompleted(emit);
@@ -1028,6 +1012,7 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       context: event.context,
       assetPath: AssetPath.valve,
       filteredList: listOfFilterGasValueGIS,
+      data: detailsValve
     );
     isPipelineLoader = false;
     _eventCompleted(emit);
@@ -1044,112 +1029,68 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       context: event.context,
       assetPath: AssetPath.regulator,
       filteredList: listOfFilterGasRegulatorGIS,
+      data: detailsRegulator
     );
     isPipelineLoader = false;
     _eventCompleted(emit);
   }
 
-  _selectTeeGISValue(SelectTeeGISValueEvent event, emit) async {
+  _selectCommercialValue(SelectCommercialValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
     await _selectGISValue(
-      assetId: gasTeeGISModel.assetId!,
-      assetTypeId: event.gasTeeGISId,
-      dataList: listOfGasTeeGIS,
-      controller: gasTeeGISController,
+      assetId: "",
+      assetTypeId: event.commercialId,
+      dataList: listOfCommercial,
+      controller: commercialController,
       context: event.context,
       assetPath: AssetPath.tee,
-      filteredList: listOfFilterGasTeeGIS,
+      filteredList: listOfFilterCommercial,
+      data: detailsCommercial
     );
     isPipelineLoader = false;
     _eventCompleted(emit);
   }
-
-  _selectElbowGISValue(SelectElbowGISValueEvent event, emit) async {
+  _selectDomesticValue(SelectDomesticValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
     await _selectGISValue(
-      assetId: gasElbowGISModel.assetId!,
-      assetTypeId: event.gasElbowGISId,
-      dataList: listOfGasElbowGIS,
-      controller: gasElbowGISController,
+      assetId: "",
+      assetTypeId: event.domesticId,
+      dataList: listOfDomestic,
+      controller: domesticController,
       context: event.context,
       assetPath: AssetPath.elbow,
-      filteredList: listOfFilterGasElbowGIS,
+      filteredList: listOfFilterDomestic,
+      data: detailsDomestic
     );
     isPipelineLoader = false;
     _eventCompleted(emit);
   }
 
-  _selectCouplerGISValue(SelectCouplerGISValueEvent event, emit) async {
+  _selectIndustrial(SelectIndustrialValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
     await _selectGISValue(
-      assetId: gasCouplerGISModel.assetId!,
-      assetTypeId: event.gasCouplerGISId,
-      dataList: listOfGasCouplerGIS,
-      controller: gasCouplerGISController,
+      assetId: "",
+      assetTypeId: event.industrialId,
+      dataList: listOfIndustrial,
+      controller: industrialController,
       context: event.context,
       assetPath: AssetPath.coupler,
-      filteredList: listOfFilterGasCouplerGIS,
+      filteredList: listOfFilterIndustrial,
+      data: detailsIndustrial
     );
     isPipelineLoader = false;
     _eventCompleted(emit);
   }
 
-  _selectReducerGISValue(SelectReducerGISValueEvent event, emit) async {
-    isPipelineLoader = true;
-    _eventCompleted(emit);
-    await _selectGISValue(
-      assetId: gasReducerGISModel.assetId!,
-      assetTypeId: event.gasReducerGISId,
-      dataList: listOfGasReducerGIS,
-      controller: gasReducerGISController,
-      context: event.context,
-      assetPath: AssetPath.reduce,
-      filteredList: listOfFilterGasReducerGIS,
-    );
-    isPipelineLoader = false;
-    _eventCompleted(emit);
-  }
 
-  _selectEndCapGISValue(SelectEndCapGISValueEvent event, emit) async {
-    isPipelineLoader = true;
-    _eventCompleted(emit);
-    await _selectGISValue(
-      assetId: gasEndCapGISModel.assetId!,
-      assetTypeId: event.gasEndCapGISId,
-      dataList: listOfGasEndCapGIS,
-      controller: gasEndCapGISController,
-      context: event.context,
-      assetPath: AssetPath.endcap,
-      filteredList: listOfFilterGasEndCapGIS,
-    );
-    isPipelineLoader = false;
-    _eventCompleted(emit);
-  }
-
-  _selectConsumerGISValue(SelectConsumerGISValueEvent event, emit) async {
-    isPipelineLoader = true;
-    _eventCompleted(emit);
-    await _selectGISValue(
-      assetId: gasConsumerGISModel.assetId!,
-      assetTypeId: event.gasConsumerGISId,
-      dataList: listOfGasConsumerGIS,
-      controller: gasConsumerGISController,
-      context: event.context,
-      assetPath: AssetPath.consumer,
-      filteredList: listOfFilterConsumerGIS,
-    );
-    isPipelineLoader = false;
-    _eventCompleted(emit);
-  }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
     final currentPoint = await CurrentLocation.getCurrentLocation();
     latLngOnTap = event.latLngOnTap;
     isMapDir = true;
-
     googleMapsUrl =
     "https://www.google.com/maps/dir/?api=1&origin=${currentPoint?.latitude},${currentPoint?.longitude}&destination=${latLngOnTap.latitude},${latLngOnTap.longitude}&travelmode=driving&dir_action=navigate";
     print("googleMapsUrl --> $googleMapsUrl");
@@ -1158,7 +1099,6 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
       latLngOnTap.latitude,
       latLngOnTap.longitude,
     );
-
     nameofLocation = placemarks.isNotEmpty
         ? '${placemarks[0].administrativeArea}, ${placemarks[0].locality}, ${placemarks[0].country}'
         : 'Unknown Location';
@@ -1178,7 +1118,9 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
             Marker(
               markerId: MarkerId('Pipeline'),
               position: event.latLngOnTap,
-              infoWindow: InfoWindow(title: 'Create Report Incident'),
+              infoWindow: InfoWindow(
+                  title: 'Create Report Incident',
+              ),
               icon: BitmapDescriptor.defaultMarkerWithHue(
                 BitmapDescriptor.hueYellow,
               ),
@@ -1196,12 +1138,15 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
                     newPointMarkerLong: event.latLngOnTap.longitude.toString(),
                   );
                 }
-                showModalBottomSheet(
+                showDialog(
                   context: event.context,
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return AlertDialogTwoBtnWidget(mContext: context);
-                  },
+                  builder: (context) => AlertDialog(
+                    contentPadding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    content: AlertDialogTwoBtnWidget(mContext: context,pipelineData: pipelineData,),
+                  ),
                 );
               },
             ),
@@ -1250,47 +1195,36 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
     isGasValveLoader = false;
     checkBoxRegulator = false;
     isGasRegulatorLoader = false;
-    checkBoxTee = false;
-    isGasTeeLoader = false;
-    checkBoxElbow = false;
-    isGasElbowLoader = false;
-    checkBoxCoupler = false;
-    isGasCouplerLoader = false;
-    checkBoxReducer = false;
-    isGasReducerLoader = false;
-    checkBoxEndCap = false;
-    isGasEndCapLoader = false;
-    checkBoxConsumer = false;
-    isGasConsumerLoader = false;
+    checkCommercial = false;
+    isCommercial = false;
+    checkDomestic = false;
+    isDomestic = false;
+    checkIndustrial = false;
+    isIndustrial = false;
+
     tfGisController.text = "";
     gasValveGISController.text = "";
     gasRegulatorGISController.text = "";
-    gasTeeGISController.text = "";
-    gasElbowGISController.text = "";
-    gasCouplerGISController.text = "";
-    gasReducerGISController.text = "";
-    gasEndCapGISController.text = "";
-    gasConsumerGISController.text = "";
+    commercialController.text = "";
+    domesticController.text = "";
+    industrialController.text = "";
+
   }
 
   _clearPopTextField() {
     isGasTfLoader = false;
     isGasValveLoader = false;
     isGasRegulatorLoader = false;
-    isGasTeeLoader = false;
-    isGasElbowLoader = false;
-    isGasCouplerLoader = false;
-    isGasReducerLoader = false;
-    isGasEndCapLoader = false;
+    isCommercial = false;
+    isDomestic = false;
+    isIndustrial = false;
     tfGisController.text = "";
     gasValveGISController.text = "";
     gasRegulatorGISController.text = "";
-    gasTeeGISController.text = "";
-    gasElbowGISController.text = "";
-    gasCouplerGISController.text = "";
-    gasReducerGISController.text = "";
-    gasEndCapGISController.text = "";
-    gasConsumerGISController.text = "";
+    commercialController.text = "";
+    domesticController.text = "";
+    industrialController.text = "";
+
   }
 
   _clearMarkerPolyline() {
@@ -1314,18 +1248,14 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         isGasValveLoader: isGasValveLoader,
         checkBoxRegulator: checkBoxRegulator,
         isGasRegulatorLoader: isGasRegulatorLoader,
-        checkBoxTee: checkBoxTee,
-        isGasTeeLoader: isGasTeeLoader,
-        checkBoxElbow: checkBoxElbow,
-        isGasElbowLoader: isGasElbowLoader,
-        checkBoxCoupler: checkBoxCoupler,
-        isGasCouplerLoader: isGasCouplerLoader,
-        checkBoxReducer: checkBoxReducer,
-        isGasReducerLoader: isGasReducerLoader,
-        checkBoxEndCap: checkBoxEndCap,
-        isGasEndCapLoader: isGasEndCapLoader,
-        checkBoxConsumer: checkBoxConsumer,
-        isGasConsumerLoader: isGasConsumerLoader,
+
+        checkCommercial: checkCommercial,
+        isCommercial: isCommercial,
+        checkDomestic: checkDomestic,
+        isDomestic: isDomestic,
+        checkIndustrial: checkIndustrial,
+        isIndustrial: isIndustrial,
+
         baseUrl: baseUrl,
         nameofLocation: nameofLocation,
         role: role,
@@ -1335,25 +1265,19 @@ class ReportAlertBloc extends Bloc<ReportAlertEvent, ReportAlertState> {
         markersPointList: Set.of(markersPointList),
         currentPosition: currentPosition,
         polylinePointList: Set.of(polylinePointList),
-
         tfGisController: tfGisController,
         gasValveGISController: gasValveGISController,
         gasRegulatorGISController: gasRegulatorGISController,
-        gasTeeGISController: gasTeeGISController,
-        gasElbowGISController: gasElbowGISController,
-        gasCouplerGISController: gasCouplerGISController,
-        gasReducerGISController: gasReducerGISController,
-        gasEndCapGISController: gasEndCapGISController,
-        gasConsumerGISController: gasConsumerGISController,
+        commercialController: commercialController,
+        domesticController: domesticController,
+        industrialController: industrialController,
         listOfTfGisId: listOfTfGisId,
         listOfGasValveGISId: listOfGasValveGISId,
         listOfGasRegulatorGISId: listOfGasRegulatorGISId,
-        listOfGasTeeGISId: listOfGasTeeGISId,
-        listOfGasElbowGISId: listOfGasElbowGISId,
-        listOfGasCouplerGISId: listOfGasCouplerGISId,
-        listOfGasReducerGISId: listOfGasReducerGISId,
-        listOfGasEndCapGISId: listOfGasEndCapGISId,
-        listOfGasConsumerGISId: listOfGasConsumerGISId,
+        listOfCommercialId: listOfCommercialId,
+        listOfDomesticId: listOfDomesticId,
+        listOfIndustrialId: listOfIndustrialId,
+
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:outage_app/Utils/common_widgets/icon_button.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
@@ -33,8 +34,9 @@ class _ManageAlertViewState extends State<ManageAlertView>
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
-    BlocProvider.of<ManageAlertBloc>(context)
-        .add(ManageAlertLoadEvent(context: context));
+    BlocProvider.of<ManageAlertBloc>(
+      context,
+    ).add(ManageAlertLoadEvent(context: context));
 
     super.initState();
   }
@@ -42,10 +44,7 @@ class _ManageAlertViewState extends State<ManageAlertView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(
-        title: AppString.manageAlert,
-        boolLeading: true,
-      ),
+      appBar: AppBarWidget(title: AppString.manageAlert, boolLeading: true),
       body: BackgroundInfoWidget(
         child: BlocBuilder<ManageAlertBloc, ManageAlertState>(
           builder: (context, state) {
@@ -62,11 +61,14 @@ class _ManageAlertViewState extends State<ManageAlertView>
 
   Future<bool> _onWillPop() async {
     return (await showDialog(
-            context: context,
-            builder: (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
+          context: context,
+          builder:
+              (BuildContext mContext) => MessageBoxTwoButtonPopWidget(
                 message: "Do you want to  Manage Incident?",
                 okButtonText: "Exit",
-                onPressed: () => Navigator.of(context).pop(true)))) ??
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+        )) ??
         false;
   }
 
@@ -83,20 +85,23 @@ class _ManageAlertViewState extends State<ManageAlertView>
     );
   }
 
-  Widget _searchPriorityController(
-      {required FetchManageAlertDataState dataState}) {
+  Widget _searchPriorityController({
+    required FetchManageAlertDataState dataState,
+  }) {
     return TextFieldWidget(
       label: AppString.searchPriority,
       hintText: AppString.searchPriority,
       controller: dataState.searchPriorityController,
       keyboardType: TextInputType.name,
       maxLength: 10,
-      suffixIcon:
-          IconButtonWidget(iconData: Icons.search_rounded, onPressed: () {}),
+      suffixIcon: IconButtonWidget(
+        iconData: Icons.search_rounded,
+        onPressed: () {},
+      ),
       onChanged: (val) {
-        BlocProvider.of<ManageAlertBloc>(context).add(SelectSearchPriorityEvent(
-          searchPriority: val,
-        ));
+        BlocProvider.of<ManageAlertBloc>(
+          context,
+        ).add(SelectSearchPriorityEvent(searchPriority: val));
       },
     );
   }
@@ -110,29 +115,50 @@ class _ManageAlertViewState extends State<ManageAlertView>
             child: Container(
               height: 40,
               decoration: BoxDecoration(
-                color: EnvironmentConfig.of(context)!.primaryTheme.withOpacity(0.2),
+                color: EnvironmentConfig.of(
+                  context,
+                )!.primaryTheme.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: TabBar(
                 controller: _tabController,
                 tabs: [
                   TabItem(
-                      title: AppString.newData,
-                        count: dataState.listOfViewIncident.where((taskData) => taskData.actionStatus == ActionStatus.newAction).toList().length),
+                    title: AppString.newData,
+                    count:
+                        dataState.listOfViewIncident
+                            .where(
+                              (taskData) =>
+                                  taskData.actionStatus ==
+                                  ActionStatus.newAction,
+                            )
+                            .toList()
+                            .length,
+                  ),
                   TabItem(
-                      title: AppString.inProgress,
-                      count: dataState.listOfViewIncident
-                          .where((taskData) =>
-                              taskData.actionStatus == ActionStatus.inProgress)
-                          .toList()
-                          .length),
+                    title: AppString.inProgress,
+                    count:
+                        dataState.listOfViewIncident
+                            .where(
+                              (taskData) =>
+                                  taskData.actionStatus ==
+                                  ActionStatus.inProgress,
+                            )
+                            .toList()
+                            .length,
+                  ),
                   TabItem(
-                      title: AppString.completed,
-                      count: dataState.listOfViewIncident
-                          .where((taskData) =>
-                              taskData.actionStatus == ActionStatus.completed)
-                          .toList()
-                          .length),
+                    title: AppString.completed,
+                    count:
+                        dataState.listOfViewIncident
+                            .where(
+                              (taskData) =>
+                                  taskData.actionStatus ==
+                                  ActionStatus.completed,
+                            )
+                            .toList()
+                            .length,
+                  ),
                 ],
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
@@ -144,7 +170,8 @@ class _ManageAlertViewState extends State<ManageAlertView>
                 unselectedLabelColor: AppColor.black,
                 onTap: (index) {
                   BlocProvider.of<ManageAlertBloc>(context).add(
-                      SelectTabChangedEvent(tabIndex: index, context: context));
+                    SelectTabChangedEvent(tabIndex: index, context: context),
+                  );
                 },
               ),
             ),
@@ -165,34 +192,32 @@ class _ManageAlertViewState extends State<ManageAlertView>
     );
   }
 
-
   Widget _itemWidget({required FetchManageAlertDataState dataState}) {
     return dataState.listOfFilterViewIncident.isNotEmpty
         ? dataState.tabIndexLoader == false
             ? ListView.builder(
-                itemCount: dataState.listOfFilterViewIncident.length,
-                itemBuilder: (BuildContext context, int i) {
-                  return InkWell(
-                      onTap: () {
-                        BlocProvider.of<ManageAlertBloc>(context)
-                            .add(SelectPageSelectDataEvent(index: i));
-                      },
-                      child: ActionItemsWidget(
-                          viewIncidentData:
-                              dataState.listOfFilterViewIncident[i]));
-                })
+              itemCount: dataState.listOfFilterViewIncident.length,
+              itemBuilder: (BuildContext context, int i) {
+                return InkWell(
+                  onTap: () async {
+                    BlocProvider.of<ManageAlertBloc>(
+                      context,
+                    ).add(SelectPageSelectDataEvent(index: i));
+                  },
+                  child: ActionItemsWidget(
+                    viewIncidentData: dataState.listOfFilterViewIncident[i],
+                  ),
+                );
+              },
+            )
             : SpinKitDancingSquareLoader()
-        : Center(
-            child: Text(
-            "No records found",
-            style: Styles.labels,
-          ));
+        : Center(child: Text("No records found", style: Styles.labels));
   }
 
   Future<void> _handleRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
     BlocProvider.of<ManageAlertBloc>(!context.mounted ? context : context).add(
-        ManagePageRefreshDataEvent(
-            context: !context.mounted ? context : context));
+      ManagePageRefreshDataEvent(context: !context.mounted ? context : context),
+    );
   }
 }

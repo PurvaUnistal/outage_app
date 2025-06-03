@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
-import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
@@ -125,7 +124,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         GoogleMapController controller = await dataState.googleMapController.future;
         controller.animateCamera(
           CameraUpdate.newCameraPosition(
-            CameraPosition(target: latLng, zoom: 15),
+            CameraPosition(target: latLng, zoom: AppString.zoom),
           ),
         );
         dataState.polylinePointList.isNotEmpty ?
@@ -137,18 +136,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
     );
   }
 
-  Widget _startLocationWidget(
-      {required FetchNavigateAlertDataState dataState}) {
-    return TextFieldWidget(
-      label: "Start",
-      hintText: "Start",
-      suffixIcon: IconButton(
-          icon: Icon(Icons.my_location),
-        onPressed: () => BlocProvider.of<NavigateAlertBloc>(context)
-          .add(SelectCurrentMarkerButtonEvent(context:context)), ),
-        controller:dataState.startLocationController
-    );
-  }
+
 
   Widget _destinationLocationWidget(
       {required FetchNavigateAlertDataState dataState}) {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_bloc.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_event.dart';
@@ -256,7 +257,7 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
             polylines: dataState.polylinePointList,
             initialCameraPosition: CameraPosition(
               target: dataState.incidentLocation,
-              zoom: 16,
+              zoom: AppString.zoom,
             ),
             minMaxZoomPreference: MinMaxZoomPreference(16, null),
             onCameraIdle: () {
@@ -281,7 +282,7 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
                     context,
                     MaterialPageRoute(
                       builder:
-                          (context) => FullGoogleMapWidget(mContext: context),
+                          (context) => FullGoogleMapWidget(),
                     ),
                   );
                 },

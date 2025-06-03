@@ -11,7 +11,6 @@ import 'package:outage_app/features/Login/domain/bloc/login_event.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_state.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
 import 'package:outage_app/features/Login/helper/login_helper.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginInitState()) {
@@ -74,10 +73,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               String userJson = jsonEncode(res.toJson());
               await SharedPref.setString(key: PrefsValue.userInfo, value: userJson);
               await AppConfig.instanceInit()?.setLoginData(newLoginData: loginModel);
-              PackageInfo packageInfo = await PackageInfo.fromPlatform();
+           //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
               await SharedPref.setString(
                 key: PrefsValue.buildNumber,
-                value: packageInfo.buildNumber,
+                value: "8",
               );
               if (res.user?.isHo == "1") {
              //   await AppConfig.instanceInit()?.setGaId(gaId: loginModel.user!.gaId!);

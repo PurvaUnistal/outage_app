@@ -1,24 +1,20 @@
 import 'package:hive/hive.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
-
-part 'TFGISModel.g.dart';
-
-class TFGISModel {
+part 'IndustrialModel.g.dart';
+class IndustrialModel {
   int? success;
   bool? error;
-  String? assetId;
-  List<TFGISData>? data;
+  dynamic data;
 
-  TFGISModel({this.success, this.error, this.assetId, this.data});
+  IndustrialModel({this.success, this.error,  this.data});
 
-  TFGISModel.fromJson(Map<String, dynamic> json) {
+  IndustrialModel.fromJson(Map<String, dynamic> json) {
     success = json['success'] ?? "";
     error = json['error'] ?? "";
-    assetId = json['assetid'] ?? "";
     if (json['data'] != null) {
-      data = <TFGISData>[];
+      data = <IndustrialData>[];
       json['data'].forEach((v) {
-        data!.add(new TFGISData.fromJson(v));
+        data!.add(new IndustrialData.fromJson(v));
       });
     }
   }
@@ -27,7 +23,6 @@ class TFGISModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
     data['error'] = this.error;
-    data['assetid'] = this.assetId;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -35,86 +30,89 @@ class TFGISModel {
   }
 }
 
-@HiveType(typeId: HiveTypeId.tfGis)
-class TFGISData {
+@HiveType(typeId: HiveTypeId.industrial)
+class IndustrialData {
   @HiveField(0)
-  String? id;
-  @HiveField(1)
-  String? latitude;
-  @HiveField(2)
-  String? longitude;
-  @HiveField(3)
-  String? tfNumber;
-  @HiveField(4)
-  String? nominaldia;
-  @HiveField(5)
-  String? contractor;
-  @HiveField(6)
-  String? name;
-  @HiveField(7)
-  String? location;
-  @HiveField(8)
-  String? district;
-  @HiveField(9)
   String? imagePath;
-  @HiveField(10)
-  String? housePhoto;
-  @HiveField(11)
+  @HiveField(1)
   String? attachFile;
-  @HiveField(12)
+  @HiveField(2)
+  String? housePhoto;
+  @HiveField(3)
+  String? id;
+  @HiveField(4)
   String? bpName;
+  @HiveField(5)
+  String? bpNumber;
+  @HiveField(6)
+  String? legacyNo;
+  @HiveField(7)
+  String? latitude;
+  @HiveField(8)
+  String? longitude;
+  @HiveField(9)
+  String? nominaldia;
+  @HiveField(10)
+  String? contractor;
+  @HiveField(11)
+  String? name;
+  @HiveField(12)
+  String? location;
+  @HiveField(13)
+  String? district;
 
+  IndustrialData(
+      {this.imagePath,
+        this.housePhoto,
+        this.attachFile,
+        this.id,
+        this.bpName,
+        this.bpNumber,
+        this.legacyNo,
+        this.latitude,
+        this.longitude,
+        this.nominaldia,
+        this.contractor,
+        this.name,
+        this.location,
+        this.district
+      });
 
-  TFGISData({
-    this.id,
-    this.latitude,
-    this.longitude,
-    this.tfNumber,
-    this.nominaldia,
-    this.contractor,
-    this.name,
-    this.location,
-    this.district,
-    this.imagePath,
-    this.housePhoto,
-    this.attachFile,
-    this.bpName,
-  });
-
-  TFGISData.fromJson(Map<String, dynamic> json) {
+  IndustrialData.fromJson(Map<String, dynamic> json) {
+    imagePath = json['imagepath'] ?? "";
+    housePhoto = json['house_photo'] ?? "";
+    attachFile = json['attach_file'] ?? "";
     id = json['id'] ?? "";
+    bpName = json['bp_name'] ?? "";
+    bpNumber = json['bp_number'] ?? "";
+    legacyNo = json['legacy_no'] ?? "";
     latitude = json['latitude'] ?? "";
     longitude = json['longitude'] ?? "";
-    tfNumber = json['tf_number'] ?? "";
     nominaldia = json['nominaldia'] ?? "";
     contractor = json['contractor'];
     name = json['name'] ?? "";
     location = json['location'] ?? "";
     district = json['district'] ?? "";
-    imagePath = json['imagepath'] ?? "";
-    housePhoto = json['house_photo'] ?? "";
-    attachFile = json['attach_file'] ?? "";
-    bpName = json['bp_name'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['imagepath'] = this.imagePath;
+    data['house_photo'] = this.housePhoto;
+    data['attach_file'] = this.attachFile;
     data['id'] = this.id;
+    data['bp_name'] = this.bpName;
+    data['bp_number'] = this.bpNumber;
+    data['legacy_no'] = this.legacyNo;
     data['latitude'] = this.latitude;
     data['longitude'] = this.longitude;
-    data['tf_number'] = this.tfNumber;
     data['nominaldia'] = this.nominaldia;
     data['contractor'] = this.contractor;
     data['name'] = this.name;
     data['location'] = this.location;
     data['district'] = this.district;
-    data['imagepath'] = this.imagePath;
-    data['house_photo'] = this.housePhoto;
-    data['attach_file'] = this.attachFile;
-    data['bp_name'] = this.bpName;
     return data;
   }
-
   @override
   String toString() {
     // TODO: implement toString

@@ -17,22 +17,49 @@ class PipelineDataAdapter extends TypeAdapter<PipelineData> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PipelineData(
-      gid: fields[0] as String?,
-      nominaldia: fields[1] as String?,
-      geomencode: fields[2] as String?,
+      geomencode: fields[0] as String?,
+      gid: fields[1] as String?,
+      districtI: fields[2] as String?,
+      nominaldia: fields[3] as String?,
+      contractor: fields[4] as String?,
+      name: fields[5] as String?,
+      location: fields[6] as String?,
+      district: fields[7] as String?,
+      imagePath: fields[8] as String?,
+      housePhoto: fields[9] as String?,
+      attachFile: fields[10] as String?,
+      bpName: fields[11] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PipelineData obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(12)
       ..writeByte(0)
-      ..write(obj.gid)
+      ..write(obj.geomencode)
       ..writeByte(1)
-      ..write(obj.nominaldia)
+      ..write(obj.gid)
       ..writeByte(2)
-      ..write(obj.geomencode);
+      ..write(obj.districtI)
+      ..writeByte(3)
+      ..write(obj.nominaldia)
+      ..writeByte(4)
+      ..write(obj.contractor)
+      ..writeByte(5)
+      ..write(obj.name)
+      ..writeByte(6)
+      ..write(obj.location)
+      ..writeByte(7)
+      ..write(obj.district)
+      ..writeByte(8)
+      ..write(obj.imagePath)
+      ..writeByte(9)
+      ..write(obj.housePhoto)
+      ..writeByte(10)
+      ..write(obj.attachFile)
+      ..writeByte(11)
+      ..write(obj.bpName);
   }
 
   @override

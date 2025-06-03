@@ -1,24 +1,20 @@
 import 'package:hive/hive.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart';
-
-part 'RegulatorGISModel.g.dart';
-
-class RegulatorGISModel {
+part 'CommercialModel.g.dart';
+class CommercialModel {
   int? success;
   bool? error;
-  String? assetId;
-  List<RegulatorGISData>? data;
+  dynamic data;
 
-  RegulatorGISModel({this.success, this.error, this.assetId, this.data});
+  CommercialModel({this.success, this.error, this.data});
 
-  RegulatorGISModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    error = json['error'];
-    assetId = json['assetid'];
+  CommercialModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'] ?? "";
+    error = json['error'] ?? "";
     if (json['data'] != null) {
-      data = <RegulatorGISData>[];
+      data = <CommercialData>[];
       json['data'].forEach((v) {
-        data!.add(new RegulatorGISData.fromJson(v));
+        data!.add(new CommercialData.fromJson(v));
       });
     }
   }
@@ -27,7 +23,6 @@ class RegulatorGISModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
     data['error'] = this.error;
-    data['assetid'] = this.assetId;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -35,35 +30,45 @@ class RegulatorGISModel {
   }
 }
 
-@HiveType(typeId: HiveTypeId.regulatorGis)
-class RegulatorGISData {
+@HiveType(typeId: HiveTypeId.commercial)
+class CommercialData {
   @HiveField(0)
-  String? id;
-  @HiveField(1)
-  String? latitude;
-  @HiveField(2)
-  String? longitude;
-  @HiveField(3)
-  String? nominaldia;
-  @HiveField(4)
-  String? contractor;
-  @HiveField(5)
-  String? name;
-  @HiveField(6)
-  String? location;
-  @HiveField(7)
-  String? district;
-  @HiveField(9)
   String? imagePath;
-  @HiveField(10)
-  String? housePhoto;
-  @HiveField(11)
+  @HiveField(1)
   String? attachFile;
-  @HiveField(12)
+  @HiveField(2)
+  String? housePhoto;
+  @HiveField(3)
+  String? id;
+  @HiveField(4)
   String? bpName;
+  @HiveField(5)
+  String? bpNumber;
+  @HiveField(6)
+  String? legacyNo;
+  @HiveField(7)
+  String? latitude;
+  @HiveField(8)
+  String? longitude;
+  @HiveField(9)
+  String? nominaldia;
+  @HiveField(10)
+  String? contractor;
+  @HiveField(11)
+  String? name;
+  @HiveField(12)
+  String? location;
+  @HiveField(13)
+  String? district;
 
-  RegulatorGISData({
+  CommercialData({
+    this.imagePath,
+    this.housePhoto,
+    this.attachFile,
     this.id,
+    this.bpName,
+    this.bpNumber,
+    this.legacyNo,
     this.latitude,
     this.longitude,
     this.nominaldia,
@@ -71,30 +76,34 @@ class RegulatorGISData {
     this.name,
     this.location,
     this.district,
-    this.imagePath,
-    this.housePhoto,
-    this.attachFile,
-    this.bpName,
   });
 
-  RegulatorGISData.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
+  CommercialData.fromJson(Map<String, dynamic> json) {
+    imagePath = json['imagepath'] ?? "";
+    housePhoto = json['house_photo'] ?? "";
+    attachFile = json['attach_file'] ?? "";
+    id = json['id'] ?? "";
+    bpName = json['bp_name'] ?? "";
+    bpNumber = json['bp_number'] ?? "";
+    legacyNo = json['legacy_no'] ?? "";
+    latitude = json['latitude'] ?? "";
+    longitude = json['longitude'] ?? "";
     nominaldia = json['nominaldia'] ?? "";
     contractor = json['contractor'];
     name = json['name'] ?? "";
     location = json['location'] ?? "";
     district = json['district'] ?? "";
-    imagePath = json['imagepath'] ?? "";
-    housePhoto = json['house_photo'] ?? "";
-    attachFile = json['attach_file'] ?? "";
-    bpName = json['bp_name'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['imagepath'] = this.imagePath;
+    data['house_photo'] = this.housePhoto;
+    data['attach_file'] = this.attachFile;
     data['id'] = this.id;
+    data['bp_name'] = this.bpName;
+    data['bp_number'] = this.bpNumber;
+    data['legacy_no'] = this.legacyNo;
     data['latitude'] = this.latitude;
     data['longitude'] = this.longitude;
     data['nominaldia'] = this.nominaldia;
@@ -102,10 +111,6 @@ class RegulatorGISData {
     data['name'] = this.name;
     data['location'] = this.location;
     data['district'] = this.district;
-    data['imagepath'] = this.imagePath;
-    data['house_photo'] = this.housePhoto;
-    data['attach_file'] = this.attachFile;
-    data['bp_name'] = this.bpName;
     return data;
   }
 

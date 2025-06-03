@@ -3,7 +3,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 class AppString {
   static double zoom = 15;
   static String version =
-      "Version : Outage-${AppConfig.instanceInit()?.appVersion}-29/04/2025";
+      "Version : Outage-${AppConfig.instanceInit()?.appVersion}-03/06/2025";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";
@@ -48,12 +48,14 @@ class AppString {
   static const String gasTfGis = 'TF';
   static const String gasValveGIS = 'Valve';
   static const String gasRegulatorGIS = 'Regulator';
+  static const String domestic = 'Domestic';
+  static const String industrial = 'Industrial';
   static const String gasTeeGIS = 'Tee';
   static const String gasElbowGIS = 'Elbow';
   static const String gasCouplerGIS = 'Coupler';
   static const String gasReducerGIS = 'Reducer';
   static const String gasEndCapGIS = 'End Cap';
-  static const String gasConsumerGIS = 'Consumer';
+  static const String commercial = 'Commercial';
   static const String controlRoom = 'Control Room';
   static const String description = 'Description';
   static const String remarks = 'Remarks';

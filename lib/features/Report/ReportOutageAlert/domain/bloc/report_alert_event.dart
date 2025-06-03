@@ -100,109 +100,58 @@ class SelectCheckBoxRegulatorGisEvent extends ReportAlertEvent {
 }
 
 
-class SelectTeeGISValueEvent extends ReportAlertEvent {
+class SelectCommercialValueEvent extends ReportAlertEvent {
   final BuildContext context;
-  final String gasTeeGISId;
-  SelectTeeGISValueEvent({required this.context, required this.gasTeeGISId});
+  final String commercialId;
+  SelectCommercialValueEvent({required this.context, required this.commercialId});
   @override
   // TODO: implement props
-  List<Object> get props => [context, gasTeeGISId];
+  List<Object> get props => [context, commercialId];
 }
 
-class SelectCheckBoxTeeGisEvent extends ReportAlertEvent {
+class SelectCheckCommercialEvent extends ReportAlertEvent {
   final BuildContext context;
-  final bool checkBoxTee;
-  SelectCheckBoxTeeGisEvent({required this.context, required this.checkBoxTee});
+  final bool checkCommercial;
+  SelectCheckCommercialEvent({required this.context, required this.checkCommercial});
   @override
   // TODO: implement props
-  List<Object> get props => [context, checkBoxTee];
-}
-class SelectElbowGISValueEvent extends ReportAlertEvent {
-  final BuildContext context;
-  final String gasElbowGISId;
-  SelectElbowGISValueEvent({required this.context, required this.gasElbowGISId});
-  @override
-  // TODO: implement props
-  List<Object> get props => [context, gasElbowGISId];
+  List<Object> get props => [context, checkCommercial];
 }
 
-class SelectCheckBoxElbowGisEvent extends ReportAlertEvent {
+class SelectDomesticValueEvent extends ReportAlertEvent {
   final BuildContext context;
-  final bool checkBoxElbow;
-  SelectCheckBoxElbowGisEvent({required this.context, required this.checkBoxElbow});
+  final String domesticId;
+  SelectDomesticValueEvent({required this.context, required this.domesticId});
   @override
   // TODO: implement props
-  List<Object> get props => [context, checkBoxElbow];
-}
-class SelectCouplerGISValueEvent extends ReportAlertEvent {
-  final BuildContext context;
-  final String gasCouplerGISId;
-  SelectCouplerGISValueEvent({required this.context, required this.gasCouplerGISId});
-  @override
-  // TODO: implement props
-  List<Object> get props => [context, gasCouplerGISId];
+  List<Object> get props => [context, domesticId];
 }
 
-class SelectCheckBoxCouplerGisEvent extends ReportAlertEvent {
+class SelectCheckDomesticEvent extends ReportAlertEvent {
   final BuildContext context;
-  final bool checkBoxCoupler;
-  SelectCheckBoxCouplerGisEvent({required this.context, required this.checkBoxCoupler});
+  final bool checkDomestic;
+  SelectCheckDomesticEvent({required this.context, required this.checkDomestic});
   @override
   // TODO: implement props
-  List<Object> get props => [context, checkBoxCoupler];
-}
-class SelectReducerGISValueEvent extends ReportAlertEvent {
-  final BuildContext context;
-  final String gasReducerGISId;
-  SelectReducerGISValueEvent({required this.context, required this.gasReducerGISId});
-  @override
-  // TODO: implement props
-  List<Object> get props => [context, gasReducerGISId];
+  List<Object> get props => [context, checkDomestic];
 }
 
-class SelectCheckBoxReducerGisEvent extends ReportAlertEvent {
+class SelectIndustrialValueEvent extends ReportAlertEvent {
   final BuildContext context;
-  final bool checkBoxReducer;
-  SelectCheckBoxReducerGisEvent({required this.context, required this.checkBoxReducer});
+  final String industrialId;
+  SelectIndustrialValueEvent({required this.context, required this.industrialId});
   @override
   // TODO: implement props
-  List<Object> get props => [context, checkBoxReducer];
-}
-class SelectEndCapGISValueEvent extends ReportAlertEvent {
-  final BuildContext context;
-  final String gasEndCapGISId;
-  SelectEndCapGISValueEvent({required this.context, required this.gasEndCapGISId});
-  @override
-  // TODO: implement props
-  List<Object> get props => [context, gasEndCapGISId];
+  List<Object> get props => [context, industrialId];
 }
 
-class SelectCheckBoxEndCapGisEvent extends ReportAlertEvent {
+class SelectCheckIndustrialEvent extends ReportAlertEvent {
   final BuildContext context;
-  final bool checkBoxEndCap;
-  SelectCheckBoxEndCapGisEvent({required this.context, required this.checkBoxEndCap});
+  final bool checkIndustrial;
+  SelectCheckIndustrialEvent({required this.context, required this.checkIndustrial});
   @override
   // TODO: implement props
-  List<Object> get props => [context, checkBoxEndCap];
-}
-
-class SelectConsumerGISValueEvent extends ReportAlertEvent {
-  final BuildContext context;
-  final String gasConsumerGISId;
-  SelectConsumerGISValueEvent({required this.context, required this.gasConsumerGISId});
-  @override
-  // TODO: implement props
-  List<Object> get props => [context, gasConsumerGISId];
-}
-
-
-class SelectCheckBoxConsumerGisEvent extends ReportAlertEvent {
-  final BuildContext context;
-  final bool checkBoxConsumer;
-  SelectCheckBoxConsumerGisEvent({required this.context, required this.checkBoxConsumer});
-  @override
-  // TODO: implement props
-  List<Object> get props => [context, checkBoxConsumer];
+  List<Object> get props => [context, checkIndustrial];
 }
 
 class SelectGoogleRouteDirEvent extends ReportAlertEvent {

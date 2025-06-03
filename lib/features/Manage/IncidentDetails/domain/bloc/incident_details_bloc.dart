@@ -19,7 +19,8 @@ import 'package:outage_app/features/Report/ReportOutageAlert/helper/decodePolyli
 import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 import '../model/IncidentActionModel.dart';
 
-class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> {
+class IncidentDetailBloc
+    extends Bloc<IncidentDetailEvent, IncidentDetailState> {
   IncidentDetailBloc() : super(IncidentDetailInitialState()) {
     on<IncidentDetailLoadEvent>(_pageLoad);
     on<IncidentDetailBlinkValveMarker>(_blinkValveMarker);
@@ -27,7 +28,6 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     on<IncidentDetailOnCameraIdleEvent>(_onCameraIdleEvent);
     on<SubmitBtnEvent>(_submitBtnEvent);
   }
-
 
   @override
   Future<void> close() {
@@ -37,7 +37,7 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
 
   _startBlinking() {
     timer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      if(isBlinkMarker) {
+      if (isBlinkMarker) {
         markersPointList.addAll(consumerMarkers);
         markersPointList.addAll(valveMarkers);
       } else {
@@ -46,25 +46,27 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
       }
       isBlinkMarker = !isBlinkMarker;
       emit(IncidentDetailPageLoadState());
-      emit(FetchIncidentDetailDataState(
-        isLoader: isLoader,
-        isBtnLoader: isBtnLoader,
-        currentActionStatus: currentActionStatus,
-        baseUrl: baseUrl,
-        role: role,
-        incidentLocation: incidentLocation,
-        consumerAffectMode: consumerAffectModel,
-        consumerData: consumerData,
-        listOfValve: listOfValve,
-        listOfConsumer: listOfConsumer,
-        markersPointList: markersPointList,
-        googleMapController: googleMapController,
-        polylinePointList: polylinePointList,
-        incidentActionModel: incidentActionModel,
-        listOfIncidentAction: listOfIncidentAction,
-        incidentTypeActionModel: incidentTypeActionModel,
-        listOfIncidentTypeAction: listOfIncidentTypeAction,
-      ));
+      emit(
+        FetchIncidentDetailDataState(
+          isLoader: isLoader,
+          isBtnLoader: isBtnLoader,
+          currentActionStatus: currentActionStatus,
+          baseUrl: baseUrl,
+          role: role,
+          incidentLocation: incidentLocation,
+          consumerAffectMode: consumerAffectModel,
+          consumerData: consumerData,
+          listOfValve: listOfValve,
+          listOfConsumer: listOfConsumer,
+          markersPointList: markersPointList,
+          googleMapController: googleMapController,
+          polylinePointList: polylinePointList,
+          incidentActionModel: incidentActionModel,
+          listOfIncidentAction: listOfIncidentAction,
+          incidentTypeActionModel: incidentTypeActionModel,
+          listOfIncidentTypeAction: listOfIncidentTypeAction,
+        ),
+      );
     });
   }
 
@@ -98,18 +100,15 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
   Set<Marker> valveMarkerPointList = {};
   Set<Polyline> polylinePointList = {};
 
-
-
   PipelineModel pipelineModel = PipelineModel();
   PipelineData pipelineData = PipelineData();
   List<PipelineData> listOfPipeline = [];
-
 
   Set<Polyline> pipePolylinePointList = {};
   Set<Polyline> filterPolyline = {};
   Set<Polyline> finalPolyline = {};
   List<LatLng> points = [];
-
+  List<String> listOfDiaColor = [];
   bool isBlinkMarker = true;
   Timer timer = Timer(Duration.zero, () {});
   Completer<GoogleMapController> googleMapController = Completer();
@@ -140,26 +139,33 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     conMarkerPointList = {};
     valveMarkerPointList = {};
     polylinePointList = {};
+    listOfDiaColor = [];
 
-    incidentTypeId = await AppConfig.instanceInit()?.incidentTypeId ?? "";
-    incidentId = await AppConfig.instanceInit()?.incidentId ?? "";
+    incidentTypeId =
+        await AppConfig.instanceInit()?.viewIncidentData.incidentTypeId ?? "";
+    incidentId = await AppConfig.instanceInit()?.viewIncidentData.incid ?? "";
     print("incidentTypeId-->${incidentTypeId}");
     role = await AppConfig.instanceInit()?.loginData.user?.role ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
+    var res = await ReportAlertHelper.getDiaColorApi(context: event.context);
+    if (res != null) {
+      listOfDiaColor = res;
+    }
     await _fetchIncidentTypeActionApi(
-        context: event.context,
-        incidentTypeId: incidentTypeId,
-        incidentId: incidentId);
+      context: event.context,
+      incidentTypeId: incidentTypeId,
+      incidentId: incidentId,
+    );
     await _fetchValveConsumerAffectApi(
       context: event.context,
       incidentId: incidentId,
     );
-     GoogleMapController controller = await googleMapController.future;
-          controller.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(target: incidentLocation, zoom: 18),
-            ),
-          );
+    GoogleMapController controller = await googleMapController.future;
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: incidentLocation, zoom: 18),
+      ),
+    );
 
     await _fetchGasPipelineGisApi(context: event.context, emit: emit);
     _eventCompleted(emit);
@@ -169,10 +175,12 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     if (await HiveDataBase.pipelineDataBox!.values.isEmpty) {
       var res = await ReportAlertHelper.getPipelineApi(
         context: context,
-        latitude: AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
-        longitude: AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+        latitude:
+            AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+        longitude:
+            AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
       );
-      if(res != null && res.data != null){
+      if (res != null && res.data != null) {
         listOfPipeline = res.data!;
       }
     } else {
@@ -187,7 +195,8 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
           try {
             points = await DecodePolyline.decodePolyline(data.geomencode!);
             final color = ReportAlertHelper.getPolylineColor(
-              int.tryParse(data.nominaldia ?? '0') ?? 0,
+              value: int.tryParse(data.nominaldia ?? '0') ?? 0,
+              color: listOfDiaColor,
             );
             Set<Polyline> polyline = ReportAlertHelper.polylinePoint(
               i: i,
@@ -216,14 +225,13 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     );
   }
 
-
   Future<void> _filterVisiblePolyline() async {
     final controller = await googleMapController.future;
     final bounds = await controller.getVisibleRegion();
     pipePolylinePointList =
         finalPolyline.where((polyline) {
           return polyline.points.any(
-                (point) => DecodePolyline.isPointInBounds(point, bounds),
+            (point) => DecodePolyline.isPointInBounds(point, bounds),
           );
         }).toSet();
 
@@ -267,51 +275,99 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     required BuildContext context,
     required String incidentId,
   }) async {
-    try {
-      var res = await IncidentDetailHelper.getValveConsumerAffectApi(
-        context: context,
-        incidentId: incidentId,
-      );
-      if(res != null){
-        consumerAffectModel = res;
-        if (consumerAffectModel.data != null) {
-          consumerData = consumerAffectModel.data!;
-          incidentLocation = IncidentDetailHelper.parseLatLng(
-            consumerData.latitude,
-            consumerData.longitude,
-          )!;
-          Set<Marker> tempMarker = {};
-          var incidentMarker = await NavigateAlertHelper.markerIncident(
-            position: [incidentLocation],
+    // try {
+    var res = await IncidentDetailHelper.getValveConsumerAffectApi(
+      context: context,
+      incidentId: incidentId,
+    );
+    if (res != null) {
+      consumerAffectModel = res;
+      final incidentData = AppConfig.instanceInit()?.viewIncidentData;
+      if (consumerAffectModel.data != null) {
+        consumerData = consumerAffectModel.data!;
+        incidentLocation =
+            IncidentDetailHelper.parseLatLng(
+              consumerData.latitude,
+              consumerData.longitude,
+            )!;
+        Set<Marker> tempMarker = {};
+        var incidentMarker = await NavigateAlertHelper.markerIncident(
+          position: [incidentLocation],
+          context: context,
+          icon: BitmapDescriptor.defaultMarker,
+          onTap:
+              () => showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IncidentDetailHelper.row(
+                          title: "Incident Priority",
+                          subtitle: incidentData?.incidentpriority ?? 'N/A'
+                        ),
+                        IncidentDetailHelper.row(
+                            title: "Incident Type",
+                            subtitle: incidentData?.incidenttype ?? 'N/A'
+                        ),
+                        IncidentDetailHelper.row(
+                            title: "Incident Status",
+                            subtitle: incidentData?.actionStatus!.name ?? 'N/A'
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        child: Text(
+                          "Close",
+                          style: TextStyle(fontSize: 15, color: Colors.blue.shade800),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  );
+                },
+              ),
+        );
+        tempMarker.addAll(incidentMarker);
+        markersPointList.addAll(tempMarker);
+        print("markersPointList-->${markersPointList.length}");
+        if (consumerData.consumer?.isNotEmpty) {
+          listOfConsumer = consumerData.consumer;
+          listOfConsumerPoint = _getConLatLngList(listOfConsumer);
+          await _handleConsumerMarkers(
             context: context,
-            icon: BitmapDescriptor.defaultMarker,
-
+            listOfConsumer: listOfConsumerPoint,
           );
-          tempMarker.addAll(incidentMarker);
-          markersPointList.addAll(tempMarker);
-          print("markersPointList-->${markersPointList.length}");
-          if (consumerData.consumer?.isNotEmpty) {
-            listOfConsumer = consumerData.consumer;
-            listOfConsumerPoint = _getConLatLngList(listOfConsumer);
-            await _handleConsumerMarkers(context: context,listOfConsumer: listOfConsumerPoint);
-          }
-          if (consumerData.valve?.isNotEmpty) {
-              listOfValve = consumerData.valve;
-              listOfValvePoint = _getLatLngList(listOfValve);
-              await _handleValveMarkers(context: context,listOfValve: listOfValvePoint);
-          }
-          _restartBlinking();
         }
-        return res;
+        if (consumerData.valve?.isNotEmpty) {
+          listOfValve = consumerData.valve;
+          listOfValvePoint = _getLatLngList(listOfValve);
+          await _handleValveMarkers(
+            context: context,
+            listOfValve: listOfValvePoint,
+          );
+        }
+        _restartBlinking();
       }
-
-    } catch (e) {
-      print("Error in _fetchValveConsumerAffectApi: $e");
+      return res;
     }
+    /*} catch (e) {
+      print("Error in _fetchValveConsumerAffectApi: $e");
+    }*/
   }
 
-  Future<void> _handleConsumerMarkers({required BuildContext context, required List<LatLng> listOfConsumer}) async {
-    final BitmapDescriptor  iconBytes = await ReportAlertHelper.markerAsset(AssetPath.consumerBlink);
+  Future<void> _handleConsumerMarkers({
+    required BuildContext context,
+    required List<LatLng> listOfConsumer,
+  }) async {
+    final BitmapDescriptor iconBytes = await ReportAlertHelper.markerAsset(
+      AssetPath.consumerBlink,
+    );
     consumerMarkers = await NavigateAlertHelper.markerIncident(
       position: listOfConsumer,
       context: context,
@@ -320,8 +376,13 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     markersPointList.addAll(consumerMarkers);
   }
 
-  Future<void> _handleValveMarkers({required BuildContext context, required List<LatLng> listOfValve}) async {
-    final BitmapDescriptor  iconBytes = await ReportAlertHelper.markerAsset(AssetPath.valveBlink);
+  Future<void> _handleValveMarkers({
+    required BuildContext context,
+    required List<LatLng> listOfValve,
+  }) async {
+    final BitmapDescriptor iconBytes = await ReportAlertHelper.markerAsset(
+      AssetPath.valveBlink,
+    );
     valveMarkers = await NavigateAlertHelper.markerIncident(
       position: listOfValve,
       context: context,
@@ -330,9 +391,6 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     markersPointList.addAll(valveMarkers);
   }
 
-
-
-
   void _restartBlinking() {
     if (timer.isActive == true) {
       timer.cancel();
@@ -340,42 +398,48 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
     _startBlinking();
   }
 
-
   List<LatLng> _getConLatLngList(List<ConsumerBPList> dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
-        .map((data) =>
-            LatLng(double.parse(data.latitude!), double.parse(data.longitude!)))
+        .map(
+          (data) => LatLng(
+            double.parse(data.latitude!),
+            double.parse(data.longitude!),
+          ),
+        )
         .toList();
   }
 
-  List<LatLng> _getLatLngList(List<ValveData>  dataList) {
+  List<LatLng> _getLatLngList(List<ValveData> dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
-        .map((data) =>
-            LatLng(double.parse(data.longitude!), double.parse(data.latitude!)))
+        .map(
+          (data) => LatLng(
+            double.parse(data.longitude!),
+            double.parse(data.latitude!),
+          ),
+        )
         .toList();
   }
 
-  _blinkValveMarker(IncidentDetailBlinkValveMarker event,  emit) async {
-    LatLng latLng = LatLng(double.parse(event.valveData.longitude!), double.parse(event.valveData.latitude!));
-    GoogleMapController controller = await googleMapController.future;
-    controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: latLng, zoom: 18),
-      ),
+  _blinkValveMarker(IncidentDetailBlinkValveMarker event, emit) async {
+    LatLng latLng = LatLng(
+      double.parse(event.valveData.longitude!),
+      double.parse(event.valveData.latitude!),
     );
+    GoogleMapController controller = await googleMapController.future;
+    await controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
+
     _eventCompleted(emit);
   }
 
-  _blinkConsumerMarker(IncidentDetailBlinkConsumerMarker event,  emit) async {
-    LatLng latLng = LatLng(double.parse(event.consumerBPList.latitude!), double.parse(event.consumerBPList.longitude!));
-    GoogleMapController controller = await googleMapController.future;
-    controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: latLng, zoom: 18),
-      ),
+  _blinkConsumerMarker(IncidentDetailBlinkConsumerMarker event, emit) async {
+    LatLng latLng = LatLng(
+      double.parse(event.consumerBPList.latitude!),
+      double.parse(event.consumerBPList.longitude!),
     );
+    GoogleMapController controller = await googleMapController.future;
+    await controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
     _eventCompleted(emit);
   }
 
@@ -401,9 +465,10 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
       if (res != null) {
         print(res.data!.response);
         await _fetchIncidentTypeActionApi(
-            context: event.context,
-            incidentTypeId: incidentTypeId,
-            incidentId: incidentId);
+          context: event.context,
+          incidentTypeId: incidentTypeId,
+          incidentId: incidentId,
+        );
         Utils.successSnackBar(msg: "Successful update", context: event.context);
         isBtnLoader = false;
         currentActionStatus = event.actionStatus;
@@ -421,24 +486,26 @@ class IncidentDetailBloc extends Bloc<IncidentDetailEvent, IncidentDetailState> 
   }
 
   _eventCompleted(Emitter<IncidentDetailState> emit) {
-    emit(FetchIncidentDetailDataState(
-      isLoader: isLoader,
-      isBtnLoader: isBtnLoader,
-      currentActionStatus: currentActionStatus,
-      baseUrl: baseUrl,
-      role: role,
-      incidentLocation: incidentLocation,
-      consumerAffectMode: consumerAffectModel,
-      consumerData: consumerData,
-      listOfValve: listOfValve,
-      listOfConsumer: listOfConsumer,
-      markersPointList: markersPointList,
-      googleMapController: googleMapController,
-      polylinePointList: Set.of(polylinePointList),
-      incidentActionModel: incidentActionModel,
-      listOfIncidentAction: listOfIncidentAction,
-      incidentTypeActionModel: incidentTypeActionModel,
-      listOfIncidentTypeAction: listOfIncidentTypeAction,
-    ));
+    emit(
+      FetchIncidentDetailDataState(
+        isLoader: isLoader,
+        isBtnLoader: isBtnLoader,
+        currentActionStatus: currentActionStatus,
+        baseUrl: baseUrl,
+        role: role,
+        incidentLocation: incidentLocation,
+        consumerAffectMode: consumerAffectModel,
+        consumerData: consumerData,
+        listOfValve: listOfValve,
+        listOfConsumer: listOfConsumer,
+        markersPointList: markersPointList,
+        googleMapController: googleMapController,
+        polylinePointList: Set.of(polylinePointList),
+        incidentActionModel: incidentActionModel,
+        listOfIncidentAction: listOfIncidentAction,
+        incidentTypeActionModel: incidentTypeActionModel,
+        listOfIncidentTypeAction: listOfIncidentTypeAction,
+      ),
+    );
   }
 }

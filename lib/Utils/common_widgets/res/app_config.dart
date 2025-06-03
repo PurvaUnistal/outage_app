@@ -1,12 +1,14 @@
 
 import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
+import 'package:outage_app/features/Manage/ManageAlert/domain/model/ViewIncidentModel.dart';
 
 class AppConfig {
   static AppConfig? instance;
 
   Client? client;
   LoginModel loginData = LoginModel();
+  ViewIncidentData viewIncidentData = ViewIncidentData();
 
   String _baseURL = "";
   String get baseURL => _baseURL;
@@ -38,12 +40,6 @@ class AppConfig {
 
   String _assetsTypeId = "";
   String get assetsTypeId => _assetsTypeId;
-
-  String _incidentId = "";
-  String get incidentId => _incidentId;
-
-  String _incidentTypeId = "";
-  String get incidentTypeId => _incidentTypeId;
 
   String _markerLat = "";
   String get markerLat => _markerLat;
@@ -114,19 +110,15 @@ class AppConfig {
     print("setAssetsTypeId : $_assetsTypeId");
   }
 
-  void setIncidentId({required String newIncidentId}) {
-    _incidentId = newIncidentId;
-    print("newIncidentId : $_incidentId");
-  }
-
-  void setIncidentTypeId({required String newIncidentTypeId}) {
-    _incidentTypeId = newIncidentTypeId;
-    print("newIncidentTypeId : $_incidentTypeId");
-  }
 
   void setMarkerPoint({required String newPointMarkerLat, required String newPointMarkerLong}) {
     _markerLat = newPointMarkerLat;
     _markerLong = newPointMarkerLong;
     print("updatePoint : ${_markerLat+_markerLong}");
+  }
+
+   setViewIncidentData({required ViewIncidentData newViewIncidentData}) {
+    viewIncidentData = newViewIncidentData;
+    print("newViewIncidentData : ${newViewIncidentData}");
   }
 }

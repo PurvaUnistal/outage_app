@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ConsumerGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/CommercialModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/DomesticModel.dart';
+import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/IndustrialModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/RegulatorGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/TFGISModel.dart';
@@ -14,7 +16,9 @@ class HiveDataBase {
   static Box<TFGISData>? tfGISBox;
   static Box<ValveGISData>? valveGISBox;
   static Box<RegulatorGISData>? regulatorGISBox;
-  static Box<ConsumerGISData>? consumerGISBox;
+  static Box<CommercialData>? commercialDataBox;
+  static Box<DomesticData>? domesticDataBox;
+  static Box<IndustrialData>? industrialDataBox;
 
 
 Future<void> init() async {
@@ -25,13 +29,17 @@ Future<void> init() async {
   Hive.registerAdapter(TFGISDataAdapter());
   Hive.registerAdapter(ValveGISDataAdapter());
   Hive.registerAdapter(RegulatorGISDataAdapter());
-  Hive.registerAdapter(ConsumerGISDataAdapter());
+  Hive.registerAdapter(CommercialDataAdapter());
+  Hive.registerAdapter(DomesticDataAdapter());
+  Hive.registerAdapter(IndustrialDataAdapter());
 
    pipelineDataBox = await Hive.openBox<PipelineData>(HiveBoxName.pipelineDataBox);
   tfGISBox = await Hive.openBox<TFGISData>(HiveBoxName.tfGISBox);
   valveGISBox = await Hive.openBox<ValveGISData>(HiveBoxName.valveGISBox);
   regulatorGISBox = await Hive.openBox<RegulatorGISData>(HiveBoxName.regulatorGISBox);
-  consumerGISBox = await Hive.openBox<ConsumerGISData>(HiveBoxName.consumerGISBox);
+  commercialDataBox = await Hive.openBox<CommercialData>(HiveBoxName.commercialDataBox);
+  domesticDataBox = await Hive.openBox<DomesticData>(HiveBoxName.domesticDataBox);
+  industrialDataBox = await Hive.openBox<IndustrialData>(HiveBoxName.industrialDataBox);
 
 }
 }

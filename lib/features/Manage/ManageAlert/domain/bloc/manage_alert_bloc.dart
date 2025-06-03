@@ -61,7 +61,7 @@ class ManageAlertBloc extends Bloc<ManageAlertEvent, ManageAlertState> {
       if (viewIncidentModel.data != null) {
         listOfViewIncident = viewIncidentModel.data!;
         listOfFilterViewIncident = listOfViewIncident;
-        _filterList();
+       await _filterList();
       }
       return res;
     }

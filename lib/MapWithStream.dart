@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
 import 'features/Report/ReportOutageAlert/helper/decodePolyline.dart';
@@ -78,13 +79,11 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
           try {
             List<LatLng> points =
                 await DecodePolyline.decodePolyline(data.geomencode!);
-            final color = ReportAlertHelper.getPolylineColor(
-              int.tryParse(data.nominaldia ?? '0') ?? 0,
-            );
+
             Polyline polyline = Polyline(
               polylineId: PolylineId("polyline_$i"),
               points: points,
-              color: color,
+              color: Colors.green,
               width: 4,
             );
             finalPolylines.add(polyline);
@@ -132,7 +131,7 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
         body: GoogleMap(
             initialCameraPosition: CameraPosition(
               target: loginPosition,
-              zoom: 12,
+              zoom: AppString.zoom,
             ),
             onMapCreated: (GoogleMapController controller) {
               googleMapController.complete(controller);
