@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/Utils.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
@@ -33,7 +34,7 @@ class LoginHelper {
     }
   }
 
-  /*static getUniqueDeviceId() async {
+  static getUniqueDeviceId() async {
     var deviceInfo = DeviceInfoPlugin();
     if (Platform.isIOS) {
       var iosDeviceInfo = await deviceInfo.iosInfo;
@@ -43,18 +44,18 @@ class LoginHelper {
       return androidDeviceInfo.id;
     }
     return null;
-  }*/
+  }
 
   static Future<LoginModel?> loginData({
     required String emailId,
     required String password,
     required BuildContext context,
   }) async {
-  //  var deviceId = await getUniqueDeviceId();
+    var deviceId = await getUniqueDeviceId();
     Map<String, String> para = {
       "email": emailId,
       "password": password,
-      "deviceId": '',
+      "deviceId": deviceId.toString(),
     };
    try {
       var res = await ApiHelper.postData(

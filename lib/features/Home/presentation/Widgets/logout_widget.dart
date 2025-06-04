@@ -76,6 +76,9 @@ class LogoutWidget extends StatelessWidget {
       HiveDataBase.tfGISBox,
       HiveDataBase.valveGISBox,
       HiveDataBase.regulatorGISBox,
+      HiveDataBase.commercialDataBox,
+      HiveDataBase.domesticDataBox,
+      HiveDataBase.industrialDataBox,
 
     ];
 

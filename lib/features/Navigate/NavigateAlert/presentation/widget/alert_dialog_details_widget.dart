@@ -36,7 +36,7 @@ class AlertDialogDetailsWidgetWidget extends StatelessWidget {
                   buildInfoRow("Latitude", pipelineData.latitude ?? "NA"),
                   buildInfoRow("Longitude", pipelineData.longitude ?? "NA"),
                   buildInfoRow("Dia", pipelineData.nominaldia ?? "NA"),
-                  (pipelineData.imagePath != null && pipelineData.imagePath.isNotEmpty && pipelineData.housePhoto != null)
+                  (pipelineData.imagePath != null && pipelineData.imagePath.isNotEmpty && pipelineData.housePhoto != null && pipelineData.housePhoto.isNotEmpty)
                       ? IconButton(
                       icon: Icon(Icons.image,size: 23,color: EnvironmentConfig.of(context)?.primaryTheme,),
                       onPressed: () {

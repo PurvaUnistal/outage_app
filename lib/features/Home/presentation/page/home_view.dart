@@ -10,6 +10,7 @@ import 'package:outage_app/features/Home/domain/bloc/home_bloc.dart';
 import 'package:outage_app/features/Home/domain/bloc/home_event.dart';
 import 'package:outage_app/features/Home/presentation/Widgets/phone/phone_home_widget.dart';
 import 'package:outage_app/features/Home/presentation/Widgets/tablet_home_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -32,9 +33,8 @@ class _HomeViewState extends State<HomeView> {
 
   callMethodeChannel() async {
     try {
-     /* PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      String applicationId = packageInfo.packageName;*/
-      String applicationId = "unistal.agcloutage.app";
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String applicationId = packageInfo.packageName;
       String androidPlayStoreUrl =
           "https://play.google.com/store/apps/details?id=$applicationId&hl=en&gl=US";
       final dynamic result = await platform.invokeMethod('getAppUpdate');

@@ -11,6 +11,7 @@ import 'package:outage_app/features/Login/domain/bloc/login_event.dart';
 import 'package:outage_app/features/Login/domain/bloc/login_state.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
 import 'package:outage_app/features/Login/helper/login_helper.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginInitState()) {
@@ -66,20 +67,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           _eventCompleted(emit);
           if (res.user != null) {
             loginModel = res;
-          //  if(res.status == 200 && res.user!.role!.toLowerCase().contains('complain management')){
             if(res.status == 200 ){
               await SharedPref.setString(key: PrefsValue.passwordVal,value: emailController.text);
               await SharedPref.setString(key: PrefsValue.emailVal,value: passwordController.text);
               String userJson = jsonEncode(res.toJson());
               await SharedPref.setString(key: PrefsValue.userInfo, value: userJson);
               await AppConfig.instanceInit()?.setLoginData(newLoginData: loginModel);
-           //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
+              PackageInfo packageInfo = await PackageInfo.fromPlatform();
               await SharedPref.setString(
                 key: PrefsValue.buildNumber,
-                value: "8",
+                value: packageInfo.buildNumber,
               );
               if (res.user?.isHo == "1") {
-             //   await AppConfig.instanceInit()?.setGaId(gaId: loginModel.user!.gaId!);
                 Navigator.pushReplacementNamed(
                   event.context,
                   RoutesName.hogaHome,
