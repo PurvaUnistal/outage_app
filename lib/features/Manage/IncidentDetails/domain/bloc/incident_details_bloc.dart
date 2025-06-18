@@ -366,7 +366,7 @@ class IncidentDetailBloc
     required List<LatLng> listOfConsumer,
   }) async {
     final BitmapDescriptor iconBytes = await ReportAlertHelper.markerAsset(
-      AssetPath.consumerBlink,
+      path:AssetPath.consumerBlink,
     );
     consumerMarkers = await NavigateAlertHelper.markerIncident(
       position: listOfConsumer,
@@ -381,7 +381,7 @@ class IncidentDetailBloc
     required List<LatLng> listOfValve,
   }) async {
     final BitmapDescriptor iconBytes = await ReportAlertHelper.markerAsset(
-      AssetPath.valveBlink,
+      path:AssetPath.valveBlink,
     );
     valveMarkers = await NavigateAlertHelper.markerIncident(
       position: listOfValve,

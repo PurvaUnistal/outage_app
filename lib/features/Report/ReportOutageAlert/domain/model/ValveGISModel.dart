@@ -7,7 +7,7 @@ class ValveGISModel {
   int? success;
   bool? error;
   String? assetId;
-  List<ValveGISData>? data;
+  dynamic data;
 
   ValveGISModel({this.success, this.error, this.assetId, this.data});
 
@@ -65,6 +65,8 @@ class ValveGISData {
   String? attachFile;
   @HiveField(13)
   String? bpName;
+  @HiveField(14)
+  String? assetid = "2";
 
   ValveGISData({
     this.id,
@@ -81,6 +83,7 @@ class ValveGISData {
     this.housePhoto,
     this.attachFile,
     this.bpName,
+    this.assetid,
   });
 
   ValveGISData.fromJson(Map<String, dynamic> json) {

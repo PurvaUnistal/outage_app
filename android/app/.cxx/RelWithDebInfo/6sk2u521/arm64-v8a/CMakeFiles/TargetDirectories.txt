@@ -1,2 +1,0 @@
-D:/All Update Office Project/IGL Project/outage_app/android/app/.cxx/RelWithDebInfo/6sk2u521/arm64-v8a/CMakeFiles/edit_cache.dir
-D:/All Update Office Project/IGL Project/outage_app/android/app/.cxx/RelWithDebInfo/6sk2u521/arm64-v8a/CMakeFiles/rebuild_cache.dir

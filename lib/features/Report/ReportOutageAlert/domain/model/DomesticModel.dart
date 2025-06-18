@@ -60,9 +60,11 @@ class DomesticData {
   String? location;
   @HiveField(13)
   String? district;
+  @HiveField(14)
+  String? assetid = "0";
 
-  DomesticData(
-      {this.imagePath,
+  DomesticData({
+    this.imagePath,
         this.housePhoto,
         this.attachFile,
         this.id,
@@ -75,7 +77,8 @@ class DomesticData {
         this.contractor,
         this.name,
         this.location,
-        this.district
+        this.district,
+        this.assetid,
       });
 
   DomesticData.fromJson(Map<String, dynamic> json) {
@@ -93,6 +96,7 @@ class DomesticData {
     name = json['name'] ?? "";
     location = json['location'] ?? "";
     district = json['district'] ?? "";
+    assetid = json['assetid'] ?? "0";
   }
 
   Map<String, dynamic> toJson() {

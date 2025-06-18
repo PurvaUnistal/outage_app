@@ -60,6 +60,8 @@ class IndustrialData {
   String? location;
   @HiveField(13)
   String? district;
+  @HiveField(14)
+  String? assetid = "0";
 
   IndustrialData(
       {this.imagePath,
@@ -75,7 +77,8 @@ class IndustrialData {
         this.contractor,
         this.name,
         this.location,
-        this.district
+        this.district,
+        this.assetid,
       });
 
   IndustrialData.fromJson(Map<String, dynamic> json) {

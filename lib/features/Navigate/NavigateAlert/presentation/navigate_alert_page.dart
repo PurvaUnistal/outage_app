@@ -192,8 +192,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         context: context,
         builder: (BuildContext context) {
           return LegendPopWidget(
-              mContext: context,
-            );
+            context: context);
         });
       },
     );

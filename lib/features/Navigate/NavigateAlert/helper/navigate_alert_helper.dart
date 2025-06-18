@@ -8,7 +8,6 @@ class NavigateAlertHelper{
 static Set<Marker> markerPoint({
   required BitmapDescriptor icon,
   required LatLng position,
-  required String assetsTypeId,
   required BuildContext context,
   required dynamic data,
 }) {
@@ -28,7 +27,9 @@ static Set<Marker> markerPoint({
     },
     markerId: MarkerId('${position.latitude.toString()}'),
     position: position,
-    infoWindow: InfoWindow(title: assetsTypeId,),
+    infoWindow: InfoWindow(
+      title: data.id,
+    ),
     icon: icon,
   ));
   return markersPointList;

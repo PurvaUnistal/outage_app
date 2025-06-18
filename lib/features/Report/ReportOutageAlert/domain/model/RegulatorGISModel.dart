@@ -7,7 +7,7 @@ class RegulatorGISModel {
   int? success;
   bool? error;
   String? assetId;
-  List<RegulatorGISData>? data;
+  dynamic data;
 
   RegulatorGISModel({this.success, this.error, this.assetId, this.data});
 
@@ -61,6 +61,8 @@ class RegulatorGISData {
   String? attachFile;
   @HiveField(12)
   String? bpName;
+  @HiveField(13)
+  String? assetid = "10";
 
   RegulatorGISData({
     this.id,
@@ -75,6 +77,7 @@ class RegulatorGISData {
     this.housePhoto,
     this.attachFile,
     this.bpName,
+    this.assetid,
   });
 
   RegulatorGISData.fromJson(Map<String, dynamic> json) {

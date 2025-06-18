@@ -76,14 +76,14 @@ class NavigatePopWidget extends StatelessWidget {
   Widget _tfWidget({required FetchNavigateAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxTf,
+        value: dataState.checkTf,
         activeColor: Colors.yellow.shade900,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
-              SelectCheckBoxTFGisEvent(checkBoxTf: val!, context: mContext));
+              SelectCheckBoxTFGisEvent(checkTf: val!, context: mContext));
         },
       ),
-      title: dataState.isGasTfLoader == false
+      title: dataState.isTfLoader == false
           ? AutoCompleteTextFieldWidget(
         prefixIcon: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -95,10 +95,10 @@ class NavigatePopWidget extends StatelessWidget {
         ),
         label: AppString.gasTfGis,
         hintText: AppString.gasTfGis,
-        enabled: dataState.checkBoxTf == true ? true : false,
+        enabled: dataState.checkTf == true ? true : false,
 
-        controller: dataState.tfGisController,
-        suggestions: dataState.listOfTfGisId,
+        controller: dataState.tfController,
+        suggestions: dataState.listOfTfId,
         onSelected: (val) {
           BlocProvider.of<NavigateAlertBloc>(mContext)
               .add(SelectTFGisEvent(tfGisId: val, context: mContext));
@@ -112,7 +112,7 @@ class NavigatePopWidget extends StatelessWidget {
   Widget _valveWidget({required FetchNavigateAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxValve,
+        value: dataState.checkValve,
         activeColor: Colors.deepOrange,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
@@ -120,7 +120,7 @@ class NavigatePopWidget extends StatelessWidget {
                   checkBoxValve: val!, context: mContext));
         },
       ),
-      title: dataState.isGasValveLoader == false
+      title: dataState.isValveLoader == false
           ? AutoCompleteTextFieldWidget(
         prefixIcon: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -132,9 +132,9 @@ class NavigatePopWidget extends StatelessWidget {
         ),
         label: AppString.gasValveGIS,
         hintText: AppString.gasValveGIS,
-        enabled: dataState.checkBoxValve == true ? true : false,
-        controller: dataState.gasValveGISController,
-        suggestions: dataState.listOfGasValveGISId,
+        enabled: dataState.checkValve == true ? true : false,
+        controller: dataState.valveController,
+        suggestions: dataState.listOfValveId,
         onSelected: (val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectValveGISValueEvent(
@@ -149,7 +149,7 @@ class NavigatePopWidget extends StatelessWidget {
   Widget _regulatorWidget({required FetchNavigateAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxRegulator,
+        value: dataState.checkRegulator,
         activeColor: Colors.yellowAccent.shade700,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
@@ -157,7 +157,7 @@ class NavigatePopWidget extends StatelessWidget {
                   checkBoxRegulator: val!, context: mContext));
         },
       ),
-      title: dataState.isGasRegulatorLoader == false
+      title: dataState.isRegulatorLoader == false
           ? AutoCompleteTextFieldWidget(
         prefixIcon: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -169,10 +169,10 @@ class NavigatePopWidget extends StatelessWidget {
         ),
         label: AppString.gasRegulatorGIS,
         hintText: AppString.gasRegulatorGIS,
-        enabled: dataState.checkBoxRegulator == true ? true : false,
+        enabled: dataState.checkRegulator == true ? true : false,
 
-        controller: dataState.gasRegulatorGISController,
-        suggestions: dataState.listOfGasRegulatorGISId,
+        controller: dataState.regulatorController,
+        suggestions: dataState.listOfRegulatorId,
         onSelected: (val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectRegulatorGISValueEvent(
@@ -188,22 +188,18 @@ class NavigatePopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkCommercial,
-        activeColor: Colors.green,
+        activeColor: Colors.deepOrangeAccent,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckCommercialEvent(
                   checkCommercial: val!, context: mContext));
         },
       ),
-      title: dataState.isCommercial == false
+      title: dataState.isCommercialLoader == false
           ? AutoCompleteTextFieldWidget(
         prefixIcon: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3.0),
-          child: Image.asset(
-            AssetPath.consumer,
-            width: 20,
-            height: 20,
-          ),
+          child: Icon(Icons.circle, color: Colors.deepOrangeAccent,size: 12,),
         ),
         label: AppString.commercial,
         hintText: AppString.commercial,
@@ -227,17 +223,17 @@ class NavigatePopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkDomestic,
-        activeColor: Colors.green,
+        activeColor: Colors.yellowAccent,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckDomesticEvent(checkDomestic: val!, context: mContext));
         },
       ),
-      title: dataState.isDomestic == false
+      title: dataState.isDomesticLoader == false
           ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.green,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0),
+          child: Icon(Icons.circle, color: Colors.yellowAccent,size: 12,),
         ),
         label: AppString.domestic,
         hintText: AppString.domestic,
@@ -260,19 +256,19 @@ class NavigatePopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkIndustrial,
-        activeColor: Colors.green,
+        activeColor: Colors.blue.shade800,
         onChanged: (bool? val) {
           BlocProvider.of<NavigateAlertBloc>(mContext).add(
               SelectCheckIndustrialEvent(
                   checkIndustrial: val!, context: mContext));
         },
       ),
-      title: dataState.isIndustrial == false
+      title: dataState.isIndustrialLoader == false
           ? AutoCompleteTextFieldWidget(
-        prefixIcon: Icon(
-          Icons.location_on,
-          color: Colors.green,
-        ),
+    prefixIcon: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 3.0),
+    child: Icon(Icons.circle, color: Colors.blue.shade800,size: 12,),
+    ),
         label: AppString.industrial,
         hintText: AppString.industrial,
         enabled: dataState.checkIndustrial == true ? true : false,

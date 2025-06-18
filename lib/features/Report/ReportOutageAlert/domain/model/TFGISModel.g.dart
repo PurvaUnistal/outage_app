@@ -30,13 +30,14 @@ class TFGISDataAdapter extends TypeAdapter<TFGISData> {
       housePhoto: fields[10] as String?,
       attachFile: fields[11] as String?,
       bpName: fields[12] as String?,
+      assetid: fields[13] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, TFGISData obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class TFGISDataAdapter extends TypeAdapter<TFGISData> {
       ..writeByte(11)
       ..write(obj.attachFile)
       ..writeByte(12)
-      ..write(obj.bpName);
+      ..write(obj.bpName)
+      ..writeByte(13)
+      ..write(obj.assetid);
   }
 
   @override

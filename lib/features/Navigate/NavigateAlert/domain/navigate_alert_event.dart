@@ -50,11 +50,11 @@ class SelectGoogleRouteDirEvent extends NavigateAlertEvent {
 
 class SelectCheckBoxTFGisEvent extends NavigateAlertEvent {
   final BuildContext context;
-  final bool checkBoxTf;
-  SelectCheckBoxTFGisEvent({required this.context, required this.checkBoxTf});
+  final bool checkTf;
+  SelectCheckBoxTFGisEvent({required this.context, required this.checkTf});
   @override
   // TODO: implement props
-  List<Object> get props => [context, checkBoxTf];
+  List<Object> get props => [context, checkTf];
 }
 
 class SelectTFGisEvent extends NavigateAlertEvent {

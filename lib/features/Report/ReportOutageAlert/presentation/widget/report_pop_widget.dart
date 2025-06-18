@@ -62,7 +62,7 @@ class ReportPopWidget extends StatelessWidget {
   Widget _tfWidget({required FetchReportAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxTf,
+        value: dataState.checkTf,
         activeColor: Colors.yellow.shade900,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(
@@ -71,7 +71,7 @@ class ReportPopWidget extends StatelessWidget {
         },
       ),
       title:
-          dataState.isGasTfLoader == false
+          dataState.isTfLoader == false
               ? AutoCompleteTextFieldWidget(
                 prefixIcon: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -79,9 +79,9 @@ class ReportPopWidget extends StatelessWidget {
                 ),
                 label: AppString.gasTfGis,
                 hintText: AppString.gasTfGis,
-                enabled: dataState.checkBoxTf == true ? true : false,
-                controller: dataState.tfGisController,
-                suggestions: dataState.listOfTfGisId,
+                enabled: dataState.checkTf == true ? true : false,
+                controller: dataState.tfController,
+                suggestions: dataState.listOfTfId,
                 onSelected: (val) {
                   BlocProvider.of<ReportAlertBloc>(
                     mContext,
@@ -96,7 +96,7 @@ class ReportPopWidget extends StatelessWidget {
   Widget _valveWidget({required FetchReportAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxValve,
+        value: dataState.checkValve,
         activeColor: Colors.deepOrange,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
@@ -105,7 +105,7 @@ class ReportPopWidget extends StatelessWidget {
         },
       ),
       title:
-          dataState.isGasValveLoader == false
+          dataState.isValveLoader == false
               ? AutoCompleteTextFieldWidget(
                 prefixIcon: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -113,9 +113,9 @@ class ReportPopWidget extends StatelessWidget {
                 ),
                 label: AppString.gasValveGIS,
                 hintText: AppString.gasValveGIS,
-                enabled: dataState.checkBoxValve == true ? true : false,
-                controller: dataState.gasValveGISController,
-                suggestions: dataState.listOfGasValveGISId,
+                enabled: dataState.checkValve == true ? true : false,
+                controller: dataState.valveController,
+                suggestions: dataState.listOfValveId,
                 onSelected: (val) {
                   BlocProvider.of<ReportAlertBloc>(mContext).add(
                     SelectValveGISValueEvent(
@@ -133,7 +133,7 @@ class ReportPopWidget extends StatelessWidget {
   Widget _regulatorWidget({required FetchReportAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(
-        value: dataState.checkBoxRegulator,
+        value: dataState.checkRegulator,
         activeColor: Colors.yellowAccent.shade700,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
@@ -145,7 +145,7 @@ class ReportPopWidget extends StatelessWidget {
         },
       ),
       title:
-          dataState.isGasRegulatorLoader == false
+          dataState.isRegulatorLoader == false
               ? AutoCompleteTextFieldWidget(
                 prefixIcon: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -157,9 +157,9 @@ class ReportPopWidget extends StatelessWidget {
                 ),
                 label: AppString.gasRegulatorGIS,
                 hintText: AppString.gasRegulatorGIS,
-                enabled: dataState.checkBoxRegulator == true ? true : false,
-                controller: dataState.gasRegulatorGISController,
-                suggestions: dataState.listOfGasRegulatorGISId,
+                enabled: dataState.checkRegulator == true ? true : false,
+                controller: dataState.regulatorController,
+                suggestions: dataState.listOfRegulatorId,
                 onSelected: (val) {
                   BlocProvider.of<ReportAlertBloc>(mContext).add(
                     SelectRegulatorGISValueEvent(
@@ -178,7 +178,7 @@ class ReportPopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkCommercial,
-        activeColor: Colors.green,
+        activeColor: Colors.deepOrangeAccent,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
             SelectCheckCommercialEvent(
@@ -189,12 +189,12 @@ class ReportPopWidget extends StatelessWidget {
         },
       ),
       title:
-          dataState.isCommercial == false
+          dataState.isCommercialLoader == false
               ? AutoCompleteTextFieldWidget(
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                  child: Image.asset(AssetPath.consumer, width: 20, height: 20),
-                ),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3.0),
+              child: Icon(Icons.circle, color: Colors.deepOrangeAccent,size: 12,),
+            ),
                 label: AppString.commercial,
                 hintText: AppString.commercial,
                 enabled: dataState.checkCommercial == true ? true : false,
@@ -220,16 +220,19 @@ class ReportPopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkDomestic,
-        activeColor: Colors.blue.shade800,
+        activeColor: Colors.yellowAccent,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
             SelectCheckDomesticEvent(checkDomestic: val!, context: mContext),
           );
         },
       ),
-      title: dataState.isDomestic == false
+      title: dataState.isDomesticLoader == false
               ? AutoCompleteTextFieldWidget(
-                prefixIcon: Icon(Icons.location_on, color: Colors.green),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                  child: Icon(Icons.circle, color: Colors.yellowAccent,size: 12,),
+                ),
                 label: AppString.domestic,
                 hintText: AppString.domestic,
                 enabled: dataState.checkDomestic == true ? true : false,
@@ -253,7 +256,7 @@ class ReportPopWidget extends StatelessWidget {
     return ListTile(
       leading: Checkbox(
         value: dataState.checkIndustrial,
-        activeColor: Colors.green,
+        activeColor: Colors.blue.shade800,
         onChanged: (bool? val) {
           BlocProvider.of<ReportAlertBloc>(mContext).add(
             SelectCheckIndustrialEvent(
@@ -264,9 +267,12 @@ class ReportPopWidget extends StatelessWidget {
         },
       ),
       title:
-          dataState.isIndustrial == false
+          dataState.isIndustrialLoader == false
               ? AutoCompleteTextFieldWidget(
-                prefixIcon: Icon(Icons.location_on, color: Colors.green),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3.0),
+              child: Icon(Icons.circle, color: Colors.blue.shade800,size: 12,),
+            ),
                 label: AppString.industrial,
                 hintText: AppString.industrial,
                 enabled: dataState.checkIndustrial == true ? true : false,

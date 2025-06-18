@@ -7,7 +7,7 @@ class TFGISModel {
   int? success;
   bool? error;
   String? assetId;
-  List<TFGISData>? data;
+  dynamic data;
 
   TFGISModel({this.success, this.error, this.assetId, this.data});
 
@@ -63,7 +63,8 @@ class TFGISData {
   String? attachFile;
   @HiveField(12)
   String? bpName;
-
+  @HiveField(13)
+  String? assetid = "7";
 
   TFGISData({
     this.id,
@@ -79,6 +80,7 @@ class TFGISData {
     this.housePhoto,
     this.attachFile,
     this.bpName,
+    this.assetid,
   });
 
   TFGISData.fromJson(Map<String, dynamic> json) {

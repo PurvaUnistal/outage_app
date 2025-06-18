@@ -31,13 +31,14 @@ class CommercialDataAdapter extends TypeAdapter<CommercialData> {
       name: fields[11] as String?,
       location: fields[12] as String?,
       district: fields[13] as String?,
+      assetid: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CommercialData obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.imagePath)
       ..writeByte(1)
@@ -65,7 +66,9 @@ class CommercialDataAdapter extends TypeAdapter<CommercialData> {
       ..writeByte(12)
       ..write(obj.location)
       ..writeByte(13)
-      ..write(obj.district);
+      ..write(obj.district)
+      ..writeByte(14)
+      ..write(obj.assetid);
   }
 
   @override

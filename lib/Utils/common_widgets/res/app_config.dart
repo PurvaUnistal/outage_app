@@ -35,11 +35,8 @@ class AppConfig {
   String _packageName = "";
   String get packageName => _packageName;
 
-  String _assets = "";
-  String get assets => _assets;
+  dynamic data = "";
 
-  String _assetsTypeId = "";
-  String get assetsTypeId => _assetsTypeId;
 
   String _markerLat = "";
   String get markerLat => _markerLat;
@@ -100,15 +97,12 @@ class AppConfig {
     print("packageName : $packageName");
   }
 
-  void setAssets({required String assets}) {
-    _assets = assets;
-    print("setAssets : $_assets");
+  void setData({required dynamic newData}) {
+    data = newData;
+    print("newData : $newData");
   }
 
-  void setAssetsTypeId({required String assetsTypeId}) {
-    _assetsTypeId = assetsTypeId;
-    print("setAssetsTypeId : $_assetsTypeId");
-  }
+
 
 
   void setMarkerPoint({required String newPointMarkerLat, required String newPointMarkerLong}) {

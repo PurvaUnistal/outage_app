@@ -44,6 +44,7 @@ class CreateAlertFormBloc
   String baseUrl = '';
   String assetId = '';
   String locationSource = '';
+  dynamic assetData = '';
 
   TextEditingController assetIdController = TextEditingController();
   TextEditingController assetTypeIdController = TextEditingController();
@@ -88,9 +89,8 @@ class CreateAlertFormBloc
     isBtnLoader = false;
     locationSource = "";
     print(
-        "AppConfig.instanceInit()?.assets--->${AppConfig.instanceInit()?.assets}"); // Output: active
-    print(
-        "AppConfig.instanceInit()?.assetsTypeId--->${AppConfig.instanceInit()?.assetsTypeId}"); // Output: active
+        "AppConfig.instanceInit()?.assets--->${AppConfig.instanceInit()?.data}"); // Output: active
+    // Output: active
     incidentTypeModel = GetIncidentTypeModel();
     incidentTypeValue = GetIncidentTypeData();
     listOfIncidentType = [];
@@ -117,16 +117,12 @@ class CreateAlertFormBloc
     landmarkController.text = "";
     descriptionController.text = "";
     remarksController.text = "";
-    assetId = "";
-    assetTypeIdController.text = "";
     await ReportAlertHelper.clearCache();
-    assetId = (await AppConfig.instanceInit()?.assets) ?? "";
-    assetTypeIdController.text =
-        (await AppConfig.instanceInit()?.assetsTypeId) ?? "";
-    markerLatitudeController.text =
-        await AppConfig.instanceInit()?.markerLat ?? "";
-    markerLongitudeController.text =
-        await AppConfig.instanceInit()?.markerLong ?? "";
+    assetData = await AppConfig.instanceInit()?.data ?? "";
+    assetId = assetData == "" ? "" : assetData.assetid;
+    assetTypeIdController.text = assetData == "" ? "" : assetData.id;
+    markerLatitudeController.text = await AppConfig.instanceInit()?.markerLat ?? "";
+    markerLongitudeController.text = await AppConfig.instanceInit()?.markerLong ?? "";
     role = await AppConfig.instanceInit()?.loginData.user?.role ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
 
@@ -139,11 +135,6 @@ class CreateAlertFormBloc
       ),
     ]);
 
-    /*await _fetchIncidentIndicationApi(context: event.context);
-    await _fetchIncidentTypeApi(context: event.context, moduleId: "");
-    await _fetchAssetLocationSourceApi(
-      context: event.context,
-    );*/
     _eventCompleted(emit);
   }
 
@@ -183,7 +174,7 @@ class CreateAlertFormBloc
     }
   }
 
-  Future _fetchAssetLocationSourceApi({
+   _fetchAssetLocationSourceApi({
     required BuildContext context,
   }) async {
     var res = await CreateAlertFormHelper.getAssetLocationSourceApi(
@@ -196,9 +187,7 @@ class CreateAlertFormBloc
         print("assetId--->$assetId");
         print("assetTypeIdController--->${assetTypeIdController.text}");
         if (assetId != '') {
-          listOfFilterAsset = listOfAsset
-              .where((assetIdData) => assetId == assetIdData.id)
-              .toList();
+          listOfFilterAsset = listOfAsset.where((assetIdData) => assetId == assetIdData.id).toList();
           if (listOfFilterAsset.isNotEmpty) {
             assetIdController.text = listOfFilterAsset[0].assetName!;
             locationSource = "1";

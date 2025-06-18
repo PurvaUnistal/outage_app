@@ -19,8 +19,10 @@ import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_server_dio.dart';
 import 'package:path_provider/path_provider.dart';
 import '../presentation/widget/alert_dialog_widget.dart';
-
+import 'dart:ui' as ui;
+import 'dart:typed_data';
 class ReportAlertHelper {
+
   static Future<void> clearCache() async {
     try {
       Directory pathIGL1 = Directory(
@@ -47,26 +49,7 @@ class ReportAlertHelper {
     }
   }
 
-  static Future<PipelineModel?> getPipelineGisApi({
-    required BuildContext context,
-  }) async {
-    try {
-      String gaId = await AppConfig.instanceInit()?.gaId ?? "";
-      String areas =
-          await AppConfig.instanceInit()?.loginData.user?.areas ?? "";
-      Map<String, String> para = {"ga_id": gaId, "areas": areas};
-      String json = Uri(queryParameters: para).query;
-      var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getPipelineGis + json,
-        context: context,
-      );
-      PipelineModel response = PipelineModel.fromJson(res);
-      return response;
-    } catch (e) {
-      log("getPipelineGis-->${e.toString()}");
-    }
-    return null;
-  }
+
 
   static Future<GetGasValueGISModel?> getFittingGisApi({
     required BuildContext context,
@@ -103,13 +86,11 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getTFGis + json,
         context: context,
       );
-      if (res != null) {
+      if (res != null && res['data'] != null) {
         TFGISModel response = TFGISModel.fromJson(res);
         if (await HiveDataBase.tfGISBox!.isOpen) {
           await HiveDataBase.tfGISBox!.clear();
-          for (var data in response.data!) {
-            await HiveDataBase.tfGISBox!.add(data);
-          }
+          await HiveDataBase.tfGISBox!.addAll(response.data);
         }
         return response;
       }
@@ -131,13 +112,11 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getGasValueGis + json,
         context: context,
       );
-      if (res != null) {
+      if (res != null && res["data"] != null) {
         ValveGISModel response = ValveGISModel.fromJson(res);
         if (await HiveDataBase.valveGISBox!.isOpen) {
           await HiveDataBase.valveGISBox!.clear();
-          for (var data in response.data!) {
-            await HiveDataBase.valveGISBox!.add(data);
-          }
+          await HiveDataBase.valveGISBox!.addAll(response.data);
         }
         return response;
       }
@@ -159,13 +138,11 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getRegulatorGis + json,
         context: context,
       );
-      if (res != null) {
+      if (res != null && res["data"] != null) {
         RegulatorGISModel response = RegulatorGISModel.fromJson(res);
         if (await HiveDataBase.regulatorGISBox!.isOpen) {
           await HiveDataBase.regulatorGISBox!.clear();
-          for (var data in response.data!) {
-            await HiveDataBase.regulatorGISBox!.add(data);
-          }
+          await HiveDataBase.regulatorGISBox!.addAll(response.data);
         }
         return response;
       }
@@ -196,14 +173,13 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getConsumerGis + json,
         context: context,
       );
-      if (res != null) {
+      if (res != null && res["data"] != null) {
         CommercialModel response = CommercialModel.fromJson(res);
         if (await HiveDataBase.commercialDataBox!.isOpen) {
           await HiveDataBase.commercialDataBox!.clear();
-          for (var data in response.data!) {
-            await HiveDataBase.commercialDataBox!.add(data);
-          }
+          await HiveDataBase.commercialDataBox!.addAll(response.data);
         }
+       return response;
       }
     } catch (e) {
       log("CommercialModel-->${e.toString()}");
@@ -232,14 +208,13 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getConsumerGis + json,
         context: context,
       );
-      if (res != null) {
+      if (res != null && res["data"] != null) {
         DomesticModel response = DomesticModel.fromJson(res);
         if (await HiveDataBase.domesticDataBox!.isOpen) {
           await HiveDataBase.domesticDataBox!.clear();
-          for (var data in response.data!) {
-            await HiveDataBase.domesticDataBox!.add(data);
-          }
+          await HiveDataBase.domesticDataBox!.addAll(response.data);
         }
+        return response;
       }
     } catch (e) {
       log("DomesticModel-->${e.toString()}");
@@ -268,14 +243,13 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getConsumerGis + json,
         context: context,
       );
-      if (res != null) {
+      if (res != null && res["data"] != null) {
         IndustrialModel response = IndustrialModel.fromJson(res);
         if (await HiveDataBase.industrialDataBox!.isOpen) {
           await HiveDataBase.industrialDataBox!.clear();
-          for (var data in response.data!) {
-            await HiveDataBase.industrialDataBox!.add(data);
-          }
+          await HiveDataBase.industrialDataBox!.addAll(response.data);
         }
+      return response;
       }
     } catch (e) {
       log("IndustrialModel-->${e.toString()}");
@@ -454,7 +428,7 @@ class ReportAlertHelper {
       "areas": areas,
       "latitude": latitude,
       "longitude": longitude,
-      "buffer": "1.5",
+      "buffer": "3",
     };
     String json = Uri(queryParameters: para).query;
     try {
@@ -462,13 +436,11 @@ class ReportAlertHelper {
         urlEndPoint: Apis.getPipeline + json,
         context: context,
       );
-      if (res != null) {
+      if (res != null && res["data"] != null) {
         PipelineModel response = PipelineModel.fromJson(res);
         if (await HiveDataBase.pipelineDataBox!.isOpen) {
           await HiveDataBase.pipelineDataBox!.clear();
-          for (var data in response.data!) {
-            await HiveDataBase.pipelineDataBox!.add(data);
-          }
+          await HiveDataBase.pipelineDataBox!.addAll(response.data!);
         }
         return response;
       }
@@ -503,16 +475,27 @@ class ReportAlertHelper {
   }
 
 
-  static Future<BitmapDescriptor> markerAsset(String path) async {
+  static Future<BitmapDescriptor> markerAsset({required String path}) async {
     return await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(28, 28)),
       path,
     );
   }
 
+  static Future<Uint8List> generateDotImage({
+    required Color color,
+    double size = 20.0,
+  }) async {
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(recorder);
+    final Paint paint = Paint()..color = color;
+    canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint,);
+    final img = await recorder.endRecording().toImage(size.toInt(), size.toInt());
+    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+  }
+
   static Set<Marker> markerPoint({
-    required String assetId,
-    required String assetsTypeId,
     required BitmapDescriptor icon,
     required LatLng position,
     required BuildContext context,
@@ -522,8 +505,7 @@ class ReportAlertHelper {
     markersPointList.add(
       Marker(
         onTap: () {
-          AppConfig.instanceInit()?.setAssets(assets: assetId);
-          AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: assetsTypeId);
+          AppConfig.instanceInit()?.setData(newData: data);
           AppConfig.instanceInit()?.setMarkerPoint(
             newPointMarkerLat: position.latitude.toString(),
             newPointMarkerLong: position.longitude.toString(),
@@ -540,10 +522,10 @@ class ReportAlertHelper {
           );
 
         },
-        markerId: MarkerId('$assetId-$assetsTypeId'),
+        markerId: MarkerId('${data.assetid}--${data.id}'),
         position: position,
         infoWindow: InfoWindow(
-            title: assetsTypeId,
+            title: data.id,
         ),
         icon: icon,
       ),
@@ -566,8 +548,7 @@ class ReportAlertHelper {
         width: 4,
         onTap: () {
           print("-------------------------------->polyline_$i");
-          AppConfig.instanceInit()?.setAssets(assets: "");
-          AppConfig.instanceInit()?.setAssetsTypeId(assetsTypeId: "");
+          AppConfig.instanceInit()?.setData(newData: "");
         },
       ),
     );

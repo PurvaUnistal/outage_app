@@ -4,12 +4,14 @@ part 'CommercialModel.g.dart';
 class CommercialModel {
   int? success;
   bool? error;
+  String? assetid;
   dynamic data;
 
-  CommercialModel({this.success, this.error, this.data});
+  CommercialModel({this.success,this.assetid, this.error, this.data});
 
   CommercialModel.fromJson(Map<String, dynamic> json) {
     success = json['success'] ?? "";
+    assetid = json['assetid'] ?? "";
     error = json['error'] ?? "";
     if (json['data'] != null) {
       data = <CommercialData>[];
@@ -22,6 +24,7 @@ class CommercialModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
+    data['assetid'] = this.assetid;
     data['error'] = this.error;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
@@ -60,6 +63,8 @@ class CommercialData {
   String? location;
   @HiveField(13)
   String? district;
+  @HiveField(14)
+  String? assetid = "0";
 
   CommercialData({
     this.imagePath,
@@ -76,6 +81,7 @@ class CommercialData {
     this.name,
     this.location,
     this.district,
+    this.assetid,
   });
 
   CommercialData.fromJson(Map<String, dynamic> json) {

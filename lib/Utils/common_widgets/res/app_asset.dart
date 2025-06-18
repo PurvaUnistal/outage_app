@@ -15,7 +15,7 @@ class AssetPath {
   static String tf = 'assets/gis/TF.png';
   static String valve = 'assets/gis/valve.png';
   static String station = 'assets/gis/cng-station.png';
-  static String coupler = 'assets/gis/coupler.png';
+  //static String coupler = 'assets/gis/coupler.png';
   static String elbow = 'assets/gis/elbow.png';
   static String endcap = 'assets/gis/endcap.png';
   static String pipelineStation = 'assets/gis/gas-pipeline-station.png';
@@ -23,7 +23,7 @@ class AssetPath {
   static String redusingStation = 'assets/gis/preeser-redusing-station.png';
   static String marker = 'assets/gis/RCC-Marker.png';
   static String reduce = 'assets/gis/reduce.png';
-  static String regulator = 'assets/gis/regulator.png';
+   static String regulator = 'assets/gis/regulator.png';
   static String serviceRegulator = 'assets/gis/service-regulator.png';
   static String tapFitting = 'assets/gis/tap-fitting.png';
   static String tee = 'assets/gis/tee.png';

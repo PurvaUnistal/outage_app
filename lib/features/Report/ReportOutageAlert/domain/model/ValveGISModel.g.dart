@@ -31,13 +31,14 @@ class ValveGISDataAdapter extends TypeAdapter<ValveGISData> {
       housePhoto: fields[11] as String?,
       attachFile: fields[12] as String?,
       bpName: fields[13] as String?,
+      assetid: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ValveGISData obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +66,9 @@ class ValveGISDataAdapter extends TypeAdapter<ValveGISData> {
       ..writeByte(12)
       ..write(obj.attachFile)
       ..writeByte(13)
-      ..write(obj.bpName);
+      ..write(obj.bpName)
+      ..writeByte(14)
+      ..write(obj.assetid);
   }
 
   @override

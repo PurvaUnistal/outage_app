@@ -202,9 +202,7 @@ class _ReportAlertViewState extends State<ReportAlertView> {
         await showDialog(
             context: context,
             builder: (BuildContext context) {
-              return LegendPopWidget(
-                mContext: context,
-              );
+              return LegendPopWidget(context: context);
             });
       },
     );
