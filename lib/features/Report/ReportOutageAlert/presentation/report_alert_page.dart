@@ -106,7 +106,7 @@ class _ReportAlertViewState extends State<ReportAlertView> {
           dataState.googleMapController.complete(controller);
         }
         },
-      minMaxZoomPreference: MinMaxZoomPreference(15, null),
+      minMaxZoomPreference: dataState.polylinePointList.length == 2000 ? MinMaxZoomPreference(15, null):MinMaxZoomPreference(18, null),
       onCameraIdle: () {
         BlocProvider.of<ReportAlertBloc>(context).add(OnCameraIdleEvent(
           context: context,
