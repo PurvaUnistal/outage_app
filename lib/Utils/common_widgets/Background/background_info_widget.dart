@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
-import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import '../res/app_string.dart';
 import '../res/app_styles.dart';
@@ -12,64 +12,38 @@ class BackgroundInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    final ctx = UserContext.getUserContext();
+
+    final themeColor =
+        EnvironmentConfig.of(context)?.primaryTheme ??
+        Theme.of(context).primaryColor;
+
+    return Column(
       children: [
-        child,
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: EnvironmentConfig.of(context)!.primaryTheme,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    AppString.companyName,
-                    textAlign: TextAlign.start,
+        Container(
+          width: double.infinity,
+          color: themeColor,
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+          child:
+              ctx.user.name?.isNotEmpty == true
+                  ? Text(
+                    "${ctx.user.name!.toUpperCase()} ${ctx.schema == "" ? "" : "(${ctx.schema.toUpperCase()}${ctx.gaId == "" ? "" : " (${ctx.gridData.gridName!.toUpperCase()})"})"}",
                     style: Styles.rel,
-                  ),
-                ),
-                Flexible(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      AppConfig.instanceInit()?.loginData.user == null
-                          ? SizedBox.shrink()
-                          : Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                AppConfig.instanceInit()
-                                        ?.loginData
-                                        .user!
-                                        .name! ??
-                                    "",
-                                textAlign: TextAlign.start,
-                                style: Styles.rel,
-                              ),
-                              Text(
-                                " (${AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema! ?? ""})",
-                                textAlign: TextAlign.start,
-                                style: Styles.rel,
-                              ),
-                            ],
-                          ),
-                      Text(
-                        AppString.version,
-                        textAlign: TextAlign.start,
-                        style: Styles.rel,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                    overflow: TextOverflow.ellipsis,
+                  )
+                  : Container(),
+        ),
+        Expanded(child: child),
+        Container(
+          width: double.infinity,
+          color: themeColor,
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(AppString.companyName, style: Styles.rel),
+              Text(AppString.version, style: Styles.rel),
+            ],
           ),
         ),
       ],

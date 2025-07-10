@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/CommercialModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/DomesticModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/IndustrialModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/RegulatorGISModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/TFGISModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/ValveGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/CommercialModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/DomesticModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/IndustrialModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/RegulatorGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/TFGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/ValveGISModel.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'hive_box_name.dart';
 
 class HiveDataBase {

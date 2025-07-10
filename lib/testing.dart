@@ -15,11 +15,12 @@ class _GoogleMapExampleState extends State<GoogleMapExample> {
     return Scaffold(
       appBar: AppBar(title: Text('Google Map Tap Example')),
       body: GoogleMap(
+
         initialCameraPosition: CameraPosition(
           target: LatLng(37.7749, -122.4194), // San Francisco
           zoom: 12,
         ),
-        rotateGesturesEnabled: false,
+        rotateGesturesEnabled: true,
         zoomControlsEnabled: false,
         mapToolbarEnabled: true,
 

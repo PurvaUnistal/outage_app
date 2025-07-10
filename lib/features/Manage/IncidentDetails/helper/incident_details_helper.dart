@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentActionModel.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/model/IncidentActionProgressModel.dart';
@@ -11,16 +12,15 @@ import 'package:outage_app/service/api_server_dio.dart';
 
 class IncidentDetailHelper{
 
-  static Future<IncidentActionModel?> getIncidentActionApi(
-      {required BuildContext context, required String incidentTypeId}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
-    String gaId =  await AppConfig.instanceInit()?.gaId ?? "";
-    Map<String, String> para = {
-      "schema": schema ?? "",
-      "incident_type_id": incidentTypeId,
-    };
-    String json = Uri(queryParameters: para).query;
+  static Future<IncidentActionModel?> getIncidentActionApi({required BuildContext context,required String incidentTypeId}) async {
+    final ctx = UserContext.getUserContext();
+
     try {
+      Map<String, String> para = {
+        "schema": ctx.schema ,
+        "incident_type_id": incidentTypeId,
+      };
+      String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getIncidentAction + json, context: context);
       if(res != null){
         IncidentActionModel response = IncidentActionModel.fromJson(res);
@@ -33,18 +33,21 @@ class IncidentDetailHelper{
   }
 
   static Future<IncidentTypeActionModel?> getIncidentTypeActionApi({
-    required BuildContext context,
+        required BuildContext context,
         required String incidentTypeId,
         required String incidentId,
   }) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
-    Map<String, String> para = {
-      "schema": schema ?? "",
-      "incident_type_id": incidentTypeId,
-      "incident_id": incidentId,
-    };
-    String json = Uri(queryParameters: para).query;
+    final ctx = UserContext.getUserContext();
+
     try {
+      Map<String, String> para = {
+        "schema": ctx.schema,
+        "incident_type_id": incidentTypeId,
+        "incident_id": incidentId,
+      };
+
+      String json = Uri(queryParameters: para).query;
+      print("Apis.getIncidentTypeAction + json-->${Apis.getIncidentTypeAction + json}");
       var res = await ApiHelper.getData(urlEndPoint: Apis.getIncidentTypeAction + json, context: context);
       if(res != null){
         IncidentTypeActionModel response = IncidentTypeActionModel.fromJson(res);
@@ -60,15 +63,17 @@ class IncidentDetailHelper{
     required BuildContext context,
     required String incidentId,
   }) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
-    String gaId =  await AppConfig.instanceInit()?.gaId ?? "";
-    Map<String, String> para = {
-      "schema": schema ?? "",
-      "incidentId": incidentId,
-      "district_id": gaId,
-    };
-    String json = Uri(queryParameters: para).query;
+
     try {
+      final ctx = UserContext.getUserContext();
+
+      Map<String, String> para = {
+        "schema": ctx.schema,
+        "incidentId": incidentId,
+        "district_id": ctx.gaId,
+      };
+      String json = Uri(queryParameters: para).query;
+      print("Apis.getIncidentTypeAction + json-->${Apis.getValveConsumerAffect + json}");
       var res = await ApiHelper.getData(urlEndPoint: Apis.getValveConsumerAffect + json, context: context);
       if(res != null){
         ConsumerAffectModel response = ConsumerAffectModel.fromJson(res);
@@ -89,21 +94,22 @@ class IncidentDetailHelper{
     required String row,
   }) async {
     String userId = await AppConfig.instanceInit()?.loginData.user?.id ?? "";
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
-    Map<String, String> body = {
-      "schema": schema ?? "",
-      "user_id": userId,
-      "incident_id": incidentId.isEmpty ? "" :incidentId.toString(),
-      "incident_type_id": incidentTypeId.isEmpty ? "" :incidentTypeId.toString(),
-      "incident_action_id": incidentActionId.isEmpty ? "" : incidentActionId.toString(),
-      "status": status.isEmpty ? "" : status.toString(),
-      "row": row.isEmpty ? "" : row.toString(),
+    final ctx = UserContext.getUserContext();
 
-    };
-    log("jsonBody-->${body}");
-    log("Apis.incidentActionProgress-->${Apis.incidentActionProgress}");
     try {
-      var res = await ApiHelper.postData(urlEndPoint: "${Apis.incidentActionProgress}", formData: body, context: context,);
+      Map<String, String> body = {
+        "schema": ctx.schema,
+        "user_id": userId,
+        "incident_id": incidentId.isEmpty ? "" :incidentId.toString(),
+        "incident_type_id": incidentTypeId.isEmpty ? "" :incidentTypeId.toString(),
+        "incident_action_id": incidentActionId.isEmpty ? "" : incidentActionId.toString(),
+        "status": status.isEmpty ? "" : status.toString(),
+        "row": row.isEmpty ? "" : row.toString(),
+
+      };
+      log("jsonBody-->${body}");
+      log("Apis.incidentActionProgress-->${Apis.incidentActionProgress}");
+      var res = await ApiHelper.postData(urlEndPoint: "${Apis.incidentActionProgress}", formData: body, context: context);
       if(res != null){
         return IncidentActionProgressModel.fromJson(res);
       }

@@ -36,13 +36,13 @@ class ApiHelper {
       log("ApiServer-->${e.toString()}");
       if (e is SocketException) {
         log("SocketException : ${e.toString()}");
-        Utils.errorSnackBar(msg: "No Internet", context: context);
+        Utils.errorSnackBar(msg: "No Internet", context: context!);
       } else if (e is TimeoutException) {
         log("TimeoutException : ${e.toString()}");
-        Utils.errorSnackBar(msg: "Timeout, Please try again", context: context);
+        Utils.errorSnackBar(msg: "Timeout, Please try again", context: context!);
       } else {
         log("Unhandled exception : ${e.toString()}");
-        Utils.errorSnackBar(msg: e.toString(), context: context);
+        Utils.errorSnackBar(msg: e.toString(), context: context!);
       }
       return null;
     }
@@ -68,7 +68,7 @@ class ApiHelper {
       }
     } catch (e) {
       print("catch--->" + e.toString());
-      Utils.errorSnackBar(msg: e.toString(), context: context);
+      Utils.errorSnackBar(msg: e.toString(), context: context!);
       return null;
     }
   }
@@ -113,7 +113,7 @@ class ApiHelper {
         log("result-->${result.toString()}");
         return result;
       } else if (response.statusCode == 415) {
-        Utils.errorSnackBar(msg: result['data'].toString(), context:context);
+        Utils.errorSnackBar(msg: result['data'].toString(), context: context!);
         log(result['data'].toString());
         return null;
       } else if (response.statusCode == 400) {

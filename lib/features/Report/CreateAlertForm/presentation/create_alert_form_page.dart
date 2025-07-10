@@ -48,14 +48,18 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
           title: AppString.createAlertForm,
           boolLeading: true,
         ),
-        body: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
-          builder: (context, state) {
-            if (state is FetchCreateAlertFormDataState) {
-              return _itemBuilder(dataState: state);
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
+        body: SafeArea(
+          child: BackgroundInfoWidget(
+            child: BlocBuilder<CreateAlertFormBloc, CreateAlertFormState>(
+              builder: (context, state) {
+                if (state is FetchCreateAlertFormDataState) {
+                  return _itemBuilder(dataState: state);
+                } else {
+                  return const Center(child: SpinLoader());
+                }
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -134,7 +138,7 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
         star: AppString.star,
         label: AppString.currentLat,
         hintText: AppString.currentLat,
-        enabled: true,
+        enabled: false,
         controller: dataState.currentLatitudeController);
   }
 
@@ -144,7 +148,7 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
         star: AppString.star,
         label: AppString.currentLong,
         hintText: AppString.currentLong,
-        enabled: true,
+        enabled: false,
         controller: dataState.currentLongitudeController);
   }
 

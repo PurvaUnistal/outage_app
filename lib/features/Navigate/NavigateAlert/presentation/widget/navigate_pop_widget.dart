@@ -204,7 +204,6 @@ class NavigatePopWidget extends StatelessWidget {
         label: AppString.commercial,
         hintText: AppString.commercial,
         enabled: dataState.checkCommercial == true ? true : false,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         keyboardType: TextInputType.number,
         controller: dataState.commercialController,
         suggestions: dataState.listOfCommercialId,

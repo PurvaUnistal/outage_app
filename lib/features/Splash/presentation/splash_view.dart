@@ -78,13 +78,12 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
           if(AppConfig.instanceInit()?.loginData.user?.isHo == "1"){
             Navigator.pushReplacementNamed(
               context,
-              RoutesName.hogaHome,
+              RoutesName.disDashboard,
             );
           }else{
-         //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => GoogleMapExample()));
             Navigator.pushReplacementNamed(
               context,
-              RoutesName.gisApp,
+              RoutesName.inChargeDashboard
             );
           }
 

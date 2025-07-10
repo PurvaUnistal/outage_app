@@ -45,4 +45,8 @@ class Apis {
   static get getValveConsumerAffect =>"outage/get-valve-consumer-affect?";
   static get incidentActionProgress =>"outage/get-incident-action-progress";
   static get diaColor =>"outage/nominaldiacolor?";
+  static get districtData =>"outage/get-district-data?";
+  static get gridData => "outage/get-grid-data?";
+  static get inChargeData => "outage/get-grid-incharge-data?";
+  static get emergencySearch => "outage/get-emergency-search?";
 }

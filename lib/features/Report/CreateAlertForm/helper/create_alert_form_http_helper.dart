@@ -1,23 +1,20 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/Prefs_Value.dart';
-import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_helper.dart';
-
 import '../domain/model/GetAreaModel.dart';
 import '../domain/model/GetChargeAreaModel.dart';
 
 class CreateAlertFormHttpHelper{
   static Future<List<GetChargeAreaModel>?> getChargeAreaListApi({required BuildContext context}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
-    Map<String, String> para = {
-      "schema": schema ?? "",
-    };
-    String json = Uri(queryParameters: para).query;
+    final ctx = UserContext.getUserContext();
     try {
+
+      Map<String, String> para = {
+        "schema": ctx.schema,
+      };
+      String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getChargeAreaList +json, context: context);
       return getChargeAreaListModelFromJson(res);
     } catch (e) {
@@ -27,14 +24,14 @@ class CreateAlertFormHttpHelper{
   }
 
   static Future<List<GetAreaModel>?> getAllAreaApi({required BuildContext context, required String gid}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
-    Map<String, String> para = {
-      "schema": schema ?? "",
-      "gid": gid,
-    };
-    String json = Uri(queryParameters: para).query;
+    final ctx = UserContext.getUserContext();
     try {
-      var res = await ApiHelper.getData(urlEndPoint: Apis.getAllArea +json, context: context);
+      Map<String, String> para = {
+        "schema": ctx.schema,
+        "gid": ctx.gaId,
+      };
+      String json = Uri(queryParameters: para).query;
+      var res = await ApiHelper.getData(urlEndPoint: Apis.getAllArea +json,context: context);
       if(res != null ){
         return getAreaListModelFromJson(res);
       }

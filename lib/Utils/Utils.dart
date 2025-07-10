@@ -1,47 +1,56 @@
 import 'package:flutter/material.dart';
-
 import 'common_widgets/res/app_color.dart';
-
 
 class Utils {
 
-  static Future<void> successSnackBar({ required String msg,  required BuildContext context}) async {
+  static Future<void> successSnackBar({
+    required BuildContext context,
+    required String msg,
+  }) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(child: Text(msg)),
-            Icon(Icons.check_circle, color: AppColor.white,size: 36),
+            const Icon(Icons.check_circle, color: Colors.white, size: 36),
           ],
         ),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.green,
-        padding: EdgeInsets.all(8),
-        duration: Duration(seconds: 3),
+        padding: const EdgeInsets.all(8),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
 
-  static Future<void> warningSnackBar({ required String msg,  required BuildContext context}) async {
+  /// Show a warning snackbar
+  static Future<void> warningSnackBar({
+    required BuildContext context,
+    required String msg,
+  }) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(child: Text(msg)),
-            Icon(Icons.warning_amber_rounded, color: AppColor.white,size: 36),
+            const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 36),
           ],
         ),
+        behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.orangeAccent.shade200,
-        padding: EdgeInsets.all(8),
-        duration: Duration(seconds: 3),
+        padding: const EdgeInsets.all(8),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
 
-
-  static  Future<void> errorSnackBar({ required String msg,  required BuildContext context}) async {
+  /// Show an error snackbar
+  static Future<void> errorSnackBar({
+    required BuildContext context,
+    required String msg,
+  }) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -49,19 +58,20 @@ class Utils {
           children: [
             Flexible(child: Text(msg)),
             IconButton(
-                icon: Icon(Icons.clear, color: AppColor.white,size: 36,),
-                onPressed: ()=>  ScaffoldMessenger.of(context).hideCurrentSnackBar()
+              icon: const Icon(Icons.clear, color: Colors.white, size: 36),
+              onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
             )
           ],
         ),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.red,
-        padding: EdgeInsets.all(8),
-        duration: Duration(seconds: 4),
+        padding: const EdgeInsets.all(8),
+        duration: const Duration(seconds: 4),
       ),
     );
   }
 
+  /// Change focus to next field
   static void fieldFocusChange(
       BuildContext context, FocusNode current, FocusNode nextFocus) {
     current.unfocus();

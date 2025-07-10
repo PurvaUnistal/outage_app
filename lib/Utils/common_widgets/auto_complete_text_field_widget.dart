@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'res/app_color.dart';
-import 'res/app_styles.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:substring_highlight/substring_highlight.dart';
-
-import 'res/common_style.dart';
-import 'res/environment_config.dart';
 
 class AutoCompleteTextFieldWidget extends StatelessWidget {
   final List<String> suggestions;
@@ -20,7 +18,6 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final TextEditingController? controller;
-  final List<TextInputFormatter>? inputFormatters;
 
   AutoCompleteTextFieldWidget({
     super.key,
@@ -36,7 +33,6 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.controller,
-    this.inputFormatters,
   });
 
   @override
@@ -48,8 +44,8 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
           return const Iterable<String>.empty();
         } else {
           return suggestions.where((word) {
-            String startsFilter = word.toLowerCase().toString();
-            return startsFilter.startsWith(textEditingValue.text.toLowerCase());
+            String filter = word.toLowerCase();
+            return filter.contains(textEditingValue.text.toLowerCase());
           });
         }
       },
@@ -68,8 +64,8 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
                   textStyleHighlight: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize:18 ),
                 ),
                 onTap: () {
-                 onSelectedOption(option.toString());
-                 this.onSelected!(option.toString());
+                  onSelectedOption(option.toString());
+                  this.onSelected!(option.toString());
                 },
               );
             },
@@ -91,8 +87,6 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
           validator: validator,
           style: Styles.texts,
           onChanged: onChanged,
-          inputFormatters: inputFormatters,
-          textInputAction: TextInputAction.done,
           decoration: InputDecoration(
             counterText: "",
             prefixIcon: prefixIcon,
@@ -113,7 +107,6 @@ class AutoCompleteTextFieldWidget extends StatelessWidget {
             filled: true,
             fillColor: AppColor.white,
             isDense: true,
-            enabled: enabled ?? false,
             contentPadding: EdgeInsets.symmetric(horizontal: 5.0, vertical: prefixIcon != null || suffixIcon != null ? 10 : 10),
             border: enabled == false ? CommonStyle.borderGrey : CommonStyle.border,
             focusedBorder: enabled == false ? CommonStyle.borderGrey : CommonStyle.border,

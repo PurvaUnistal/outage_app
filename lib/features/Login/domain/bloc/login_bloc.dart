@@ -60,7 +60,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         var res = await LoginHelper.loginData(
           emailId: emailController.text,
           password: passwordController.text,
-          context: event.context,
+            context: event.context
         );
         if (res != null) {
           isPageLoader = false;
@@ -81,13 +81,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               if (res.user?.isHo == "1") {
                 Navigator.pushReplacementNamed(
                   event.context,
-                  RoutesName.hogaHome,
+                  RoutesName.disDashboard,
                 );
               } else {
                 await AppConfig.instanceInit()?.setGaId(gaId: loginModel.user!.gaId!);
                 Navigator.pushReplacementNamed(
                   event.context,
-                  RoutesName.gisApp,
+                  RoutesName.inChargeDashboard,
                 );
               }
             }

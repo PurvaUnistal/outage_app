@@ -6,7 +6,7 @@ import 'res/app_styles.dart';
 import 'res/common_style.dart';
 
 class DropDownSearchWidget extends StatelessWidget {
-  final List<dynamic> items;
+  final List<String> items;
   final ValueChanged<dynamic>? onChanged;
   final DropdownSearchItemAsString<dynamic>? itemAsString;
   final String hint;
@@ -35,22 +35,16 @@ class DropDownSearchWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.054,
-      child: DropdownSearch<dynamic>(
-        items:  items,
+      child: DropdownSearch<String>(
+        items: (filter, infiniteScrollProps) =>  items,
         enabled : true,
-      /*  clearButtonProps: ClearButtonProps(
-          isVisible: true,
-            icon: CircleAvatar(child: Icon(Icons.close_rounded,color: AppColor.white,),
-              backgroundColor: AppColor.red,
-
-            )),*/
         itemAsString: itemAsString,
         onChanged: onChanged,
         selectedItem: dropdownValue,
-        dropdownDecoratorProps: DropDownDecoratorProps(
+        decoratorProps: DropDownDecoratorProps(
           textAlign: TextAlign.start,
           textAlignVertical: TextAlignVertical.center,
-          dropdownSearchDecoration:InputDecoration(
+          decoration:InputDecoration(
             filled: true,
             fillColor: AppColor.white,
             isDense: true,

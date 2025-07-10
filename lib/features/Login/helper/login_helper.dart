@@ -10,26 +10,28 @@ import 'package:outage_app/service/Apis.dart';
 import 'package:outage_app/service/api_server_dio.dart';
 
 class LoginHelper {
+
+
+
   static Future<dynamic> textFieldValidation({
     required String email,
     required String password,
-    required BuildContext context,
+    required BuildContext context
   }) async {
     try {
       if (email.isEmpty) {
-        Utils.errorSnackBar(msg: AppString.emailValidation, context: context);
+        Utils.errorSnackBar(msg: AppString.emailValidation,context: context);
         return false;
       } else if (password.isEmpty) {
         Utils.errorSnackBar(
-          msg: AppString.passwordValidation,
-          context: context,
+          msg: AppString.passwordValidation,context: context
         );
         return false;
       }
       return true;
     } catch (e) {
       log(e.toString());
-      Utils.errorSnackBar(msg: e.toString(), context: context);
+      Utils.errorSnackBar(msg: e.toString(),context: context);
       return false;
     }
   }
@@ -49,7 +51,7 @@ class LoginHelper {
   static Future<LoginModel?> loginData({
     required String emailId,
     required String password,
-    required BuildContext context,
+    required BuildContext context
   }) async {
     var deviceId = await getUniqueDeviceId();
     Map<String, String> para = {
@@ -67,22 +69,21 @@ class LoginHelper {
         if (res["user"]["role"] == "outage management" ||
             res["user"]["role"] == "incident" ||
             res["user"]["role"] == "Manager") {
-          await Utils.successSnackBar(msg: res["messages"], context: context);
+          await Utils.successSnackBar(msg: res["messages"],context: context);
           String baseUrl = Apis.loginUrl.replaceAll("api/auth", "");
           AppConfig.instanceInit()?.setBaseURL(baseURL: baseUrl);
           print(baseUrl);
           return LoginModel.fromJson(res);
         } else {
           await Utils.errorSnackBar(
-            msg: "Invalid role ID. Please check your credentials.",
-            context: context,
+            msg: "Invalid role ID. Please check your credentials.",context: context
           );
         }
       } else if (res != null && res["error"] == true) {
         await Utils.errorSnackBar(msg: res["messages"], context: context);
         return null;
       } else {
-        await Utils.errorSnackBar(msg: res["messages"], context: context);
+        await Utils.errorSnackBar(msg: res["messages"],context: context);
         return null;
       }
     } catch (e) {

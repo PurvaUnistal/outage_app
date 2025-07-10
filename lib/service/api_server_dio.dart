@@ -8,6 +8,8 @@ import 'package:outage_app/Utils/common_widgets/connectivity_helper.dart';
 import 'package:outage_app/service/Apis.dart';
 
 class ApiHelper {
+
+
   static Future<dynamic> getData({
     required String urlEndPoint,
     required BuildContext context,
@@ -17,6 +19,7 @@ class ApiHelper {
         return null;
       }
       String url = Apis.baseUrl + urlEndPoint;
+      log("URL :- ${url}");
       final response = await Dio().get(Uri.parse(url).toString());
       log("URL --> $url");
       log("Response Data --> ${response.data}");
@@ -125,7 +128,7 @@ class ApiHelper {
       return await _handleError(statusCode :statusCode, errorMessage: errorMessage,context: context);
     } catch (e) {
       debugPrint("Multipart Error --> $e");
-      await Utils.errorSnackBar(msg: "Something Went Wrong", context: context);
+      await Utils.errorSnackBar(msg: "Something Went Wrong",context: context);
       throw 'Something Went Wrong';
     }
   }
@@ -133,7 +136,8 @@ class ApiHelper {
   static Future<void> _handleError(
       {int? statusCode, Response? errorMessage, required BuildContext context}) async {
     if(statusCode == 400){
-      return errorMessage!.data;
+      await Utils.errorSnackBar(msg: errorMessage!.data.toString(), context: context);
+      return errorMessage.data;
     }else if(statusCode == 401){
       log("errorStatus(401)-->${errorMessage.toString()}");
       return await Utils.errorSnackBar(msg: errorMessage!.data.toString(), context: context);

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:outage_app/features/Report/CreateAlertForm/domain/model/GetIncidentTypeModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/GetGasGISModel.dart';
 import '../model/GetAssetModel.dart';
 import '../model/GetIncidentIndicationModel.dart';
 

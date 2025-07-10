@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
-import 'package:outage_app/features/Report/CreateAlertForm/presentation/create_alert_form_page.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
 
 class AlertDialogDetailsWidgetWidget extends StatelessWidget {
   final BuildContext mContext;
@@ -31,68 +29,109 @@ class AlertDialogDetailsWidgetWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (pipelineData != null) ...[
-                if(pipelineData.bpName != null && pipelineData.bpName != "" )...[
-                  buildInfoRow("BP Name", pipelineData.bpName ?? "NA"),
+                if (pipelineData.bpName != null &&
+                    pipelineData.bpName != "") ...[
+                  buildInfoRow("Customer Name", pipelineData.bpName ?? "NA"),
                   buildInfoRow("Latitude", pipelineData.latitude ?? "NA"),
                   buildInfoRow("Longitude", pipelineData.longitude ?? "NA"),
-                  buildInfoRow("Dia", pipelineData.nominaldia ?? "NA"),
-                  (pipelineData.imagePath != null && pipelineData.imagePath.isNotEmpty && pipelineData.housePhoto != null && pipelineData.housePhoto.isNotEmpty)
-                      ? IconButton(
-                      icon: Icon(Icons.image,size: 23,color: EnvironmentConfig.of(context)?.primaryTheme,),
-                      onPressed: () {
-                        showCupertinoModalPopup(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Material(
-                              color: Colors.black.withOpacity(0.5),
-                              child: SafeArea(
-                                child: Container(
-                                  width: double.infinity,
-                                  height: MediaQuery.of(context).size.height * 0.8,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      const Text(
-                                        "House Image",
-                                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.center,
+                  (pipelineData.imagePath != null &&
+                          pipelineData.imagePath.isNotEmpty &&
+                          pipelineData.housePhoto != null &&
+                          pipelineData.housePhoto.isNotEmpty)
+                      ? InkWell(
+                        onTap: () {
+                          showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Material(
+                                color: Colors.black.withOpacity(0.5),
+                                child: SafeArea(
+                                  child: Center(
+                                    child: Container(
+                                      width:
+                                          MediaQuery.of(context).size.width *
+                                          0.9,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                          0.75,
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(16),
                                       ),
-                                      const SizedBox(height: 16),
-                                      Expanded(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: Image.network(
-                                            pipelineData.imagePath,
-                                            fit: BoxFit.cover,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          const Text(
+                                            "House Image",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
-                                        ),
+                                          const SizedBox(height: 16),
+                                          Expanded(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: Image.network(
+                                                pipelineData.imagePath,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (
+                                                  context,
+                                                  error,
+                                                  stackTrace,
+                                                ) {
+                                                  return const Center(
+                                                    child: Text(
+                                                      "Image not available",
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          CupertinoButton.filled(
+                                            child: const Text("Close"),
+                                            onPressed:
+                                                () =>
+                                                    Navigator.of(context).pop(),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(height: 16),
-                                      CupertinoButton.filled(
-                                        child: Text("Close"),
-                                        onPressed: () => Navigator.of(context).pop(),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
+                              );
+                            },
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            const Text(
+                              "House Photo",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
-                            );
-                          },
-                        );
-
-
-                      })
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.image,
+                              size: 24,
+                              color:
+                                  EnvironmentConfig.of(context)?.primaryTheme,
+                            ),
+                          ],
+                        ),
+                      )
                       : Container(),
-                ]else...[
-                  // buildInfoRow("Name", pipelineData.name ?? ""),
+                ] else ...[
                   buildInfoRow("Grid", pipelineData.location ?? "NA"),
                   buildInfoRow("District", pipelineData.district ?? "NA"),
-                  buildInfoRow("Dia", pipelineData.nominaldia ?? "NA"),
                 ],
                 const SizedBox(height: 8),
               ],
@@ -117,10 +156,7 @@ class AlertDialogDetailsWidgetWidget extends StatelessWidget {
         children: [
           Text(
             "$title: ",
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
           ),
           Expanded(
             child: Text(

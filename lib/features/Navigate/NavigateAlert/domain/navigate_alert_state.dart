@@ -23,7 +23,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final String nameofLocation;
   final String role;
   final String baseUrl;
-  final CameraPosition position;
   final Completer<GoogleMapController> googleMapController;
   final bool isPipelineLoader;
   final bool checkTf;
@@ -61,7 +60,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.nameofLocation,
     required this.role,
     required this.baseUrl,
-    required this.position,
     required this.googleMapController,
     required this.isPipelineLoader,
     required this.checkTf,
@@ -101,7 +99,6 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     nameofLocation,
     role,
     baseUrl,
-    position,
     googleMapController,
     isPipelineLoader,
     checkTf,

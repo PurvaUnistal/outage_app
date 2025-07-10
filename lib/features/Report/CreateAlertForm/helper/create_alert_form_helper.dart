@@ -17,9 +17,12 @@ import '../domain/model/GetCustomerLocationModel.dart';
 import '../domain/model/GetIncidentIndicationModel.dart';
 
 class CreateAlertFormHelper {
-  static Future<GetModuleTypeModel?> getOutageModuleApi(
-      {required BuildContext context}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+  
+  static Future<GetModuleTypeModel?> getOutageModuleApi({required BuildContext context}) async {
+    
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?
+    AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
+    
     Map<String, String> para = {
       "schema": schema ?? "",
     };
@@ -35,9 +38,10 @@ class CreateAlertFormHelper {
     return null;
   }
 
-  static Future<GetIncidentTypeModel?> getIncidentTypeApi(
-      {required BuildContext context, required String moduleId}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+  static Future<GetIncidentTypeModel?> getIncidentTypeApi({required String moduleId, required BuildContext context}) async {
+    String? schema =
+    AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?
+    AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
       "schema": schema ?? "",
       "module_id": moduleId,
@@ -45,7 +49,7 @@ class CreateAlertFormHelper {
     String json = Uri(queryParameters: para).query;
     try {
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getIncidentType + json, context: context);
+          urlEndPoint: Apis.getIncidentType + json,context: context);
       GetIncidentTypeModel response = GetIncidentTypeModel.fromJson(res);
       return response;
     } catch (e) {
@@ -55,8 +59,9 @@ class CreateAlertFormHelper {
   }
 
   static Future<GetPriorityTypeModel?> getIncidentPriorityApi(
-      {required BuildContext context, required String moduleId}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+      { required String moduleId, required BuildContext context}) async {
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" 
+        ?  AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
       "schema": schema ?? "",
       "module_id": moduleId,
@@ -64,7 +69,7 @@ class CreateAlertFormHelper {
     String json = Uri(queryParameters: para).query;
     try {
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getIncidentPriority + json, context: context);
+          urlEndPoint: Apis.getIncidentPriority + json,context: context);
       GetPriorityTypeModel response = GetPriorityTypeModel.fromJson(res);
       return response;
     } catch (e) {
@@ -73,8 +78,7 @@ class CreateAlertFormHelper {
     return null;
   }
 
-  static Future<List<GetLocationSourceModel>?> getLocationSourceApi(
-      {required BuildContext context}) async {
+  static Future<List<GetLocationSourceModel>?> getLocationSourceApi({required BuildContext context}) async {
     try {
       var res = await ApiHelper.getData(
           urlEndPoint: Apis.getLocationSource, context: context);
@@ -85,16 +89,15 @@ class CreateAlertFormHelper {
     return null;
   }
 
-  static Future<GetPriorityTypeModel?> getInformationSourceApi(
-      {required BuildContext context}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+  static Future<GetPriorityTypeModel?> getInformationSourceApi({required BuildContext context}) async {
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
       "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getInformationSource + json, context: context);
+          urlEndPoint: Apis.getInformationSource + json,context: context );
       GetPriorityTypeModel response = GetPriorityTypeModel.fromJson(res);
       return response;
     } catch (e) {
@@ -103,16 +106,15 @@ class CreateAlertFormHelper {
     return null;
   }
 
-  static Future<GetIncidentIndicationModel?> getIncidentIndicationApi(
-      {required BuildContext context}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+  static Future<GetIncidentIndicationModel?> getIncidentIndicationApi({required BuildContext context}) async {
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
       "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getIncidentIndication + json, context: context);
+          urlEndPoint: Apis.getIncidentIndication + json,context: context );
       GetIncidentIndicationModel response =
           GetIncidentIndicationModel.fromJson(res);
       return response;
@@ -122,11 +124,10 @@ class CreateAlertFormHelper {
     return null;
   }
 
-  static Future<List<GetLocationSourceModel>?> getCustomerLocationSourceApi(
-      {required BuildContext context}) async {
+  static Future<List<GetLocationSourceModel>?> getCustomerLocationSourceApi({required BuildContext context}) async {
     try {
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getCustomerLocationSource, context: context);
+          urlEndPoint: Apis.getCustomerLocationSource,context: context);
       return GetLocationSourceModel.mapToList(res["data"]);
     } catch (e) {
       log("getCustomerLocationSource-->${e.toString()}");
@@ -134,16 +135,15 @@ class CreateAlertFormHelper {
     return null;
   }
 
-  static Future<GetAssetModel?> getAssetLocationSourceApi(
-      {required BuildContext context}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+  static Future<GetAssetModel?> getAssetLocationSourceApi({required BuildContext context}) async {
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
       "schema": schema ?? "",
     };
     String json = Uri(queryParameters: para).query;
     try {
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getAssetLocationSource + json, context: context);
+          urlEndPoint: Apis.getAssetLocationSource + json,context: context);
       GetAssetModel response = GetAssetModel.fromJson(res);
       return response;
     } catch (e) {
@@ -152,11 +152,11 @@ class CreateAlertFormHelper {
     return null;
   }
 
-  static Future<GetCustomerLocationModel?> getCustomerDetailByLocationApi(
-      {required BuildContext context,
+  static Future<GetCustomerLocationModel?> getCustomerDetailByLocationApi({
+      required BuildContext context,
       required String locationSource,
       required String search}) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
       "schema": schema ?? "",
       "location_source": locationSource,
@@ -165,8 +165,7 @@ class CreateAlertFormHelper {
     String json = Uri(queryParameters: para).query;
     try {
       var res = await ApiHelper.getData(
-          urlEndPoint: Apis.getCustomerDetailByLocation + json,
-          context: context);
+          urlEndPoint: Apis.getCustomerDetailByLocation + json,context: context);
       GetCustomerLocationModel response =
           GetCustomerLocationModel.fromJson(res);
       return response;
@@ -180,7 +179,7 @@ class CreateAlertFormHelper {
     required BuildContext context,
     required String areaId,
   }) async {
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> para = {
       "schema": schema ?? "",
       "area_id": areaId,
@@ -209,26 +208,25 @@ class CreateAlertFormHelper {
   }) async {
     try {
       if (incidentType.id == null) {
-        Utils.errorSnackBar(
-            msg: "The Incident Type field is required.", context: context);
+        Utils.errorSnackBar(context: context,
+            msg: "The Incident Type field is required.");
         return false;
       } else if (incidentIndication.id == null) {
         Utils.errorSnackBar(
-            msg: "The Incident Indication Type field is required.",
-            context: context);
+            msg: "The Incident Indication Type field is required.",context: context,);
         return false;
       }
    /*   else if (assetTypeId.isEmpty) {
         Utils.errorSnackBar(
-            msg: "The Asset Type Id is required.", context: context);
+            msg: "The Asset Type Id is required.");
         return false;
       } else if (landmark.isEmpty) {
         Utils.errorSnackBar(
-            msg: "The Landmark field is required.", context: context);
+            msg: "The Landmark field is required.");
         return false;
       } else if (address.isEmpty) {
         Utils.errorSnackBar(
-            msg: "The Address field is required.", context: context);
+            msg: "The Address field is required.",);
         return false;
       }*/
       return true;
@@ -257,7 +255,7 @@ class CreateAlertFormHelper {
     required File photo,
   }) async {
     String userId = await AppConfig.instanceInit()?.loginData.user?.id ?? "";
-    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema;
+    String? schema =  AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? AppConfig.instanceInit()?.districtData.schema : AppConfig.instanceInit()?.loginData.user!.schema;
     Map<String, String> body = {
       "schema": schema ?? "",
       "user_id": userId,
@@ -294,13 +292,13 @@ class CreateAlertFormHelper {
     log("jsonBody-->${body}");
     try {
       var res = await ApiHelper.postDataWithFile(
+        context: context,
         urlEndPoint: "${Apis.addIncident}",
         body: body,
         imageRequestObject: [
           ImageRequestObject(
               "attach_file", photo.path.isEmpty ? "" : photo.path.toString()),
         ],
-        context: context,
       );
       if (res != null && res["error"] == false) {
         return AddIncidentModel.fromJson(res);
@@ -308,10 +306,10 @@ class CreateAlertFormHelper {
           res['success'] != null &&
           res['success'] == 415 &&
           res['data'] != null) {
-        Utils.errorSnackBar(msg: res["data"].toString(), context: context);
+        Utils.errorSnackBar(msg: res["data"].toString(),context: context);
         return null;
       } else if (res != null && res["error"] == true) {
-        Utils.errorSnackBar(msg: res["data"].toString(), context: context);
+        Utils.errorSnackBar(msg: res["data"].toString(),context: context);
         return null;
       }
     } catch (e) {

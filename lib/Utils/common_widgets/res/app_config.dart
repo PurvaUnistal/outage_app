@@ -1,7 +1,9 @@
-
 import 'package:outage_app/Utils/common_widgets/res/enums.dart';
+import 'package:outage_app/features/HoDistrictDashboard/domain/model/DistrictDataModel.dart';
+import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
-import 'package:outage_app/features/Manage/ManageAlert/domain/model/ViewIncidentModel.dart';
+import 'package:outage_app/features/Manage/IncidentDetails/domain/model/filter_key_enum.dart';
+import 'package:outage_app/features/Manage/IncidentManage/domain/model/ViewIncidentModel.dart';
 
 class AppConfig {
   static AppConfig? instance;
@@ -9,6 +11,8 @@ class AppConfig {
   Client? client;
   LoginModel loginData = LoginModel();
   ViewIncidentData viewIncidentData = ViewIncidentData();
+  DistrictData districtData = DistrictData();
+  GridData gridData = GridData();
 
   String _baseURL = "";
   String get baseURL => _baseURL;
@@ -16,8 +20,7 @@ class AppConfig {
   String _gaId = "";
   String get gaId => _gaId;
 
-  String _hoSchema = "";
-  String get hoSchema => _hoSchema;
+
 
 
   String _emailId = "";
@@ -36,7 +39,7 @@ class AppConfig {
   String get packageName => _packageName;
 
   dynamic data = "";
-
+  FilterKey? filterKey;
 
   String _markerLat = "";
   String get markerLat => _markerLat;
@@ -54,6 +57,13 @@ class AppConfig {
     this.client = client;
   }
 
+  setDistrictData({required DistrictData districtData}) {
+    this.districtData = districtData;
+  }
+
+  setGridData({required GridData gridData}) {
+    this.gridData = gridData;
+  }
   void setBaseURL({required String baseURL}) {
     _baseURL = baseURL;
     print("_baseURL : $_baseURL");
@@ -78,10 +88,7 @@ class AppConfig {
     print("gaId : $gaId");
   }
 
-  setHoSchema({required String hoSchema}) {
-    _hoSchema = hoSchema;
-    print("_hoSchema : $_hoSchema");
-  }
+
   void setToken({required String token}) {
     _password = password;
     print("password : $token");
@@ -102,6 +109,9 @@ class AppConfig {
     print("newData : $newData");
   }
 
+  void setFilterByKey({required FilterKey filterByKey}) {
+    filterKey = filterByKey;
+  }
 
 
 

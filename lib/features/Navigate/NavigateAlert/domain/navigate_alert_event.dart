@@ -17,14 +17,6 @@ class SelectMapTypeButtonEvent extends NavigateAlertEvent {
   List<Object> get props => [];
 }
 
-class SelectCurrentMarkerButtonEvent extends NavigateAlertEvent {
-  final BuildContext context;
-  SelectCurrentMarkerButtonEvent({required this.context});
-  @override
-  // TODO: implement props
-  List<Object> get props => [context];
-}
-
 class SelectGoogleMapButtonEvent extends NavigateAlertEvent {
   final LatLng latLngOnTap;
   final BuildContext context;
@@ -172,4 +164,53 @@ class ResetFilterEvent extends NavigateAlertEvent {
   @override
   // TODO: implement props
   List<Object> get props => [context];
+}
+
+
+class UpdateStartAddress extends NavigateAlertEvent {
+  UpdateStartAddress();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props =>[];
+}
+
+class UpdateDestinationAddress extends NavigateAlertEvent {
+  final String destinationAddress;
+  UpdateDestinationAddress(this.destinationAddress);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [destinationAddress];
+}
+
+class ShowRouteButtonEvent extends NavigateAlertEvent{
+  final BuildContext context;
+  ShowRouteButtonEvent({required this.context});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [context];
+}
+
+class SearchDesEvent extends NavigateAlertEvent{
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
+class SelectEmergencyEvent extends NavigateAlertEvent {
+  final BuildContext context;
+  SelectEmergencyEvent({required this.context});
+  @override
+  // TODO: implement props
+  List<Object> get props => [context];
+}
+
+class SelectSearchEmergencyEvent extends NavigateAlertEvent {
+  final String searchEmergency;
+  SelectSearchEmergencyEvent({required this.searchEmergency});
+  @override
+  // TODO: implement props
+  List<Object> get props => [searchEmergency];
 }

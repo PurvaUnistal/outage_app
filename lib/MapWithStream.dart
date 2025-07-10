@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
-import 'features/Report/ReportOutageAlert/helper/decodePolyline.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/helper/decodePolyline.dart';
+import 'package:outage_app/features/Report/ReportOutage/helper/incident_report_helper.dart';
 
 class DynamicPolylineMap extends StatefulWidget {
   @override
@@ -61,7 +61,7 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
   Completer<GoogleMapController> googleMapController = Completer();
 
   _fetchGasPipelineGisApi() async {
-    var res = await ReportAlertHelper.getPipelineApi(
+    var res = await IncidentReportHelper.getPipelineApi(
       context: context,
       latitude: loginPosition.latitude.toString(),
       longitude: loginPosition.longitude.toString(),
@@ -133,6 +133,7 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
               target: loginPosition,
               zoom: AppString.zoom,
             ),
+            rotateGesturesEnabled: true,
             onMapCreated: (GoogleMapController controller) {
               googleMapController.complete(controller);
             },

@@ -12,11 +12,13 @@ class BackgroundWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appConfig = AppConfig.instanceInit();
+    final user = appConfig?.loginData.user;
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
-          height: double.infinity,
+          constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage(AssetPath.pipeback),
@@ -24,67 +26,35 @@ class BackgroundWidget extends StatelessWidget {
             ),
           ),
         ),
-        Opacity(
-          opacity: 0.7,
+        Opacity(opacity: 0.7, child: Container(color: Colors.white)),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
           child: Container(
-            height: double.infinity,
-            decoration: BoxDecoration(color: Colors.white),
+            color: EnvironmentConfig.of(context)!.primaryTheme,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (user != null)
+                  Text(user.name ?? "", style: Styles.rel),
+              ],
+            ),
           ),
         ),
-        child,
+        Padding(padding: const EdgeInsets.only(top: 8.0), child: child),
         Positioned(
           bottom: 0,
           left: 0,
           right: 0,
           child: Container(
-            decoration: BoxDecoration(
-              color: EnvironmentConfig.of(context)!.primaryTheme,
-            ),
+            color: EnvironmentConfig.of(context)!.primaryTheme,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
-                  child: Text(
-                    AppString.companyName,
-                    textAlign: TextAlign.start,
-                    style: Styles.rel,
-                  ),
-                ),
-                Flexible(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      AppConfig.instanceInit()?.loginData.user == null
-                          ? SizedBox.shrink()
-                          : Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                AppConfig.instanceInit()
-                                        ?.loginData
-                                        .user!
-                                        .name! ??
-                                    "",
-                                textAlign: TextAlign.start,
-                                style: Styles.rel,
-                              ),
-                              Text(
-                                " (${AppConfig.instanceInit()?.loginData.user!.isHo == "1" ?  AppConfig.instanceInit()?.hoSchema : AppConfig.instanceInit()?.loginData.user!.schema! ?? ""})",
-                                textAlign: TextAlign.start,
-                                style: Styles.rel,
-                              ),
-                            ],
-                          ),
-                      Text(
-                        AppString.version,
-                        textAlign: TextAlign.start,
-                        style: Styles.rel,
-                      ),
-                    ],
-                  ),
-                ),
+                Text(AppString.companyName, style: Styles.rel),
+                Text(AppString.version, style: Styles.rel),
               ],
             ),
           ),

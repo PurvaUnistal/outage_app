@@ -32,7 +32,7 @@ class _LoginViewState extends State<PhoneLoginView> {
     return GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
-          body: BackgroundInfoWidget(
+          body: Center(
             child: BlocBuilder<LoginBloc, LoginState>(
               builder: (context, state) {
                 if (state is LoginFetchDataState) {
@@ -146,7 +146,8 @@ class _LoginViewState extends State<PhoneLoginView> {
       hintText: AppString.emailLabel,
       autofillHints: [AutofillHints.email],
       keyboardType: TextInputType.emailAddress,
-      prefixIcon: IconButtonWidget(iconData: Icons.email, onPressed: () {}),
+      textCapitalization: TextCapitalization.none,
+      prefixIcon: Icon(Icons.email,color : EnvironmentConfig.of(context)!.primaryTheme,),
       controller: dataState.emailController,
     );
   }
@@ -157,7 +158,7 @@ class _LoginViewState extends State<PhoneLoginView> {
       hintText: AppString.passwordLabel,
       autofillHints: [AutofillHints.password],
       keyboardType: TextInputType.visiblePassword,
-      prefixIcon: IconButtonWidget(iconData: Icons.lock, onPressed: () {}),
+      prefixIcon: Icon(Icons.lock, color: EnvironmentConfig.of(context)!.primaryTheme,),
       controller: dataState.passwordController,
       obscureText: dataState.isPassword,
       suffixIcon: IconButtonWidget(

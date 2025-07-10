@@ -14,9 +14,10 @@ import 'package:outage_app/features/Manage/IncidentDetails/domain/model/Incident
 import 'package:outage_app/features/Manage/IncidentDetails/domain/model/consumer_affect_model.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/helper/incident_details_helper.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/helper/navigate_alert_helper.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/PipelineModel.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/helper/decodePolyline.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/helper/report_alert_helper.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/PipelineModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/helper/decodePolyline.dart';
+import 'package:outage_app/features/Report/ReportOutage/helper/incident_report_helper.dart';
+import 'package:outage_app/features/Report/ReportOutage/helper/report_marker_polyline.dart';
 import '../model/IncidentActionModel.dart';
 
 class IncidentDetailBloc
@@ -109,6 +110,8 @@ class IncidentDetailBloc
   Set<Polyline> finalPolyline = {};
   List<LatLng> points = [];
   List<String> listOfDiaColor = [];
+
+
   bool isBlinkMarker = true;
   Timer timer = Timer(Duration.zero, () {});
   Completer<GoogleMapController> googleMapController = Completer();
@@ -147,10 +150,12 @@ class IncidentDetailBloc
     print("incidentTypeId-->${incidentTypeId}");
     role = await AppConfig.instanceInit()?.loginData.user?.role ?? "";
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
-    var res = await ReportAlertHelper.getDiaColorApi(context: event.context);
+    var res = await IncidentReportHelper.getDiaColorApi(context: event.context);
     if (res != null) {
       listOfDiaColor = res;
     }
+
+
     await _fetchIncidentTypeActionApi(
       context: event.context,
       incidentTypeId: incidentTypeId,
@@ -170,10 +175,9 @@ class IncidentDetailBloc
     await _fetchGasPipelineGisApi(context: event.context, emit: emit);
     _eventCompleted(emit);
   }
-
   _fetchGasPipelineGisApi({required BuildContext context, emit}) async {
     if (await HiveDataBase.pipelineDataBox!.values.isEmpty) {
-      var res = await ReportAlertHelper.getPipelineApi(
+      var res = await IncidentReportHelper.getPipelineApi(
         context: context,
         latitude:
             AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
@@ -194,11 +198,11 @@ class IncidentDetailBloc
         if (data.geomencode != null && data.geomencode!.isNotEmpty) {
           try {
             points = await DecodePolyline.decodePolyline(data.geomencode!);
-            final color = ReportAlertHelper.getPolylineColor(
+            final color = ReportMarkerPolyline.getPolylineColor(
               value: int.tryParse(data.nominaldia ?? '0') ?? 0,
               color: listOfDiaColor,
             );
-            Set<Polyline> polyline = ReportAlertHelper.polylinePoint(
+            Set<Polyline> polyline = ReportMarkerPolyline.polylinePoint(
               i: i,
               color: color,
               position: points,
@@ -275,7 +279,7 @@ class IncidentDetailBloc
     required BuildContext context,
     required String incidentId,
   }) async {
-    // try {
+     try {
     var res = await IncidentDetailHelper.getValveConsumerAffectApi(
       context: context,
       incidentId: incidentId,
@@ -356,16 +360,16 @@ class IncidentDetailBloc
       }
       return res;
     }
-    /*} catch (e) {
+    } catch (e) {
       print("Error in _fetchValveConsumerAffectApi: $e");
-    }*/
+    }
   }
 
   Future<void> _handleConsumerMarkers({
     required BuildContext context,
     required List<LatLng> listOfConsumer,
   }) async {
-    final BitmapDescriptor iconBytes = await ReportAlertHelper.markerAsset(
+    final BitmapDescriptor iconBytes = await ReportMarkerPolyline.markerAsset(
       path:AssetPath.consumerBlink,
     );
     consumerMarkers = await NavigateAlertHelper.markerIncident(
@@ -380,7 +384,7 @@ class IncidentDetailBloc
     required BuildContext context,
     required List<LatLng> listOfValve,
   }) async {
-    final BitmapDescriptor iconBytes = await ReportAlertHelper.markerAsset(
+    final BitmapDescriptor iconBytes = await ReportMarkerPolyline.markerAsset(
       path:AssetPath.valveBlink,
     );
     valveMarkers = await NavigateAlertHelper.markerIncident(
@@ -444,7 +448,7 @@ class IncidentDetailBloc
   }
 
   _onCameraIdleEvent(IncidentDetailOnCameraIdleEvent event, emit) async {
-    await ReportAlertHelper.clearCache();
+    await IncidentReportHelper.clearCache();
     _filterVisiblePolyline();
     _eventCompleted(emit);
   }
@@ -469,7 +473,7 @@ class IncidentDetailBloc
           incidentTypeId: incidentTypeId,
           incidentId: incidentId,
         );
-        Utils.successSnackBar(msg: "Successful update", context: event.context);
+        Utils.successSnackBar(msg: "Successful update",context: event.context);
         isBtnLoader = false;
         currentActionStatus = event.actionStatus;
         _eventCompleted(emit);

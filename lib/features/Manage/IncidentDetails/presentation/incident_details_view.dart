@@ -7,7 +7,6 @@ import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_bloc.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_event.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_state.dart';
-import 'package:outage_app/features/Manage/ManageAlert/presentation/widget/button_border_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
@@ -15,6 +14,7 @@ import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart'
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:outage_app/features/Manage/IncidentManage/presentation/widget/button_border_widget.dart';
 import 'widget/GoogleMapWidget.dart';
 
 class IncidentDetailView extends StatefulWidget {
@@ -46,15 +46,17 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWidget(title: "Report", boolLeading: true),
-      body: BackgroundInfoWidget(
-        child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
-          builder: (context, state) {
-            if (state is FetchIncidentDetailDataState) {
-              return _itemBuilder(dataState: state);
-            } else {
-              return const Center(child: SpinLoader());
-            }
-          },
+      body: SafeArea(
+        child: BackgroundInfoWidget(
+          child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
+            builder: (context, state) {
+              if (state is FetchIncidentDetailDataState) {
+                return _itemBuilder(dataState: state);
+              } else {
+                return const Center(child: SpinLoader());
+              }
+            },
+          ),
         ),
       ),
     );
@@ -74,7 +76,7 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
   }
 
   Widget _itemBuilder({required FetchIncidentDetailDataState dataState}) {
-    return Column(
+    return ListView(
       children: [
         _googleMap(dataState: dataState),
         Padding(
@@ -253,6 +255,7 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
         children: [
           GoogleMap(
             zoomControlsEnabled: false,
+            rotateGesturesEnabled: true,
             markers: dataState.markersPointList,
             polylines: dataState.polylinePointList,
             initialCameraPosition: CameraPosition(

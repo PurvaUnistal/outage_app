@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:outage_app/features/Report/ReportOutageAlert/domain/model/GetGasGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/GetGasGISModel.dart';
 import '../model/GetAssetModel.dart';
 import '../model/GetIncidentIndicationModel.dart';
 import '../model/GetIncidentTypeModel.dart';

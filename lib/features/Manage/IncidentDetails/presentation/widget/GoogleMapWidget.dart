@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
@@ -11,14 +12,13 @@ import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_state.dart';
 
 class FullGoogleMapWidget extends StatefulWidget {
-  const FullGoogleMapWidget({super.key,});
+  const FullGoogleMapWidget({super.key});
 
   @override
   State<FullGoogleMapWidget> createState() => _FullGoogleMapWidgetState();
 }
 
 class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
-
   @override
   void initState() {
     BlocProvider.of<IncidentDetailBloc>(
@@ -30,15 +30,20 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundInfoWidget(
-      child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
-        builder: (context, state) {
-          if (state is FetchIncidentDetailDataState) {
-            return _itemBuilder(dataState: state);
-          } else {
-            return const Center(child: SpinLoader());
-          }
-        },
+    return Scaffold(
+      appBar: AppBarWidget(title: "Report", boolLeading: true),
+      body: SafeArea(
+        child: BackgroundInfoWidget(
+          child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
+            builder: (context, state) {
+              if (state is FetchIncidentDetailDataState) {
+                return _itemBuilder(dataState: state);
+              } else {
+                return const Center(child: SpinLoader());
+              }
+            },
+          ),
+        ),
       ),
     );
   }
@@ -50,18 +55,21 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
           GoogleMap(
             myLocationButtonEnabled: true,
             zoomControlsEnabled: false,
+            rotateGesturesEnabled: true,
             minMaxZoomPreference: MinMaxZoomPreference(AppString.zoom, null),
-            initialCameraPosition:
-                CameraPosition(target: dataState.incidentLocation, zoom: AppString.zoom),
+            initialCameraPosition: CameraPosition(
+              target: dataState.incidentLocation,
+              zoom: AppString.zoom,
+            ),
             markers: Set<Marker>.of(dataState.markersPointList),
             polylines: dataState.polylinePointList,
             onCameraIdle: () {
-              BlocProvider.of<IncidentDetailBloc>(context).add(IncidentDetailOnCameraIdleEvent(
-                context: context,
-              ));
+              BlocProvider.of<IncidentDetailBloc>(
+                context,
+              ).add(IncidentDetailOnCameraIdleEvent(context: context));
             },
             onMapCreated: (GoogleMapController controller) {
-              if (! dataState.googleMapController.isCompleted) {
+              if (!dataState.googleMapController.isCompleted) {
                 dataState.googleMapController.complete(controller);
               }
             },
@@ -86,12 +94,12 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
                   backgroundColor: AppColor.white,
                   child: Icon(
                     Icons.fullscreen_exit_rounded,
-                    color:EnvironmentConfig.of(context)!.primaryTheme,
+                    color: EnvironmentConfig.of(context)!.primaryTheme,
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
