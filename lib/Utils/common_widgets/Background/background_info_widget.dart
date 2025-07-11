@@ -27,10 +27,17 @@ class BackgroundInfoWidget extends StatelessWidget {
           child:
               ctx.user.name?.isNotEmpty == true
                   ? Text(
-                    "${ctx.user.name!.toUpperCase()} ${ctx.schema == "" ? "" : "(${ctx.schema.toUpperCase()}${ctx.gaId == "" ? "" : " (${ctx.gridData.gridName!.toUpperCase()})"})"}",
-                    style: Styles.rel,
-                    overflow: TextOverflow.ellipsis,
-                  )
+                "${ctx.user.name?.toUpperCase() ?? ""} "
+                    "${ctx.schema.isEmpty ? "" :
+                "(${ctx.schema.toUpperCase()}${ctx.gaId.isEmpty
+                    ? ""
+                    : (ctx.gridData.gridName != null && ctx.gridData.gridName!.isNotEmpty
+                    ? " (${ctx.gridData.gridName!.toUpperCase()})"
+                    : "")})"}",
+                style: Styles.rel,
+                overflow: TextOverflow.ellipsis,
+              )
+
                   : Container(),
         ),
         Expanded(child: child),
