@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:outage_app/curr_des/domain/bloc/curr_des_bloc.dart';
 import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashboard_bloc.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_bloc.dart';
 import 'package:outage_app/features/InChargeDashboard/domain/bloc/in_charge_dashboard_bloc.dart';
@@ -23,5 +24,6 @@ MultiBlocProvider multiBlocProvider({required Widget child}) {
     BlocProvider(create: (BuildContext context) => NavigateAlertBloc()),
     BlocProvider(create: (BuildContext context) => IncidentReportBloc()),
     BlocProvider(create: (BuildContext context) => IncidentDetailBloc()),
+    BlocProvider(create: (BuildContext context) => CurrDesBloc()),
   ], child: child);
 }

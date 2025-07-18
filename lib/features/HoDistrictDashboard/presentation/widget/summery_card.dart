@@ -59,7 +59,6 @@ class SummeryCard extends StatelessWidget {
 
 
 class IncidentCard extends StatelessWidget {
-  final String subtitle;
   final String title;
   final String value;
   final IconData icon;
@@ -67,7 +66,6 @@ class IncidentCard extends StatelessWidget {
 
   const IncidentCard({
     Key? key,
-    required this.subtitle,
     required this.title,
     required this.value,
     required this.icon,
@@ -77,43 +75,38 @@ class IncidentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-            Text(
-              subtitle,
+          Flexible(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(child: Icon(icon, size: 30)),
+              Flexible(child: Icon(icon, size: MediaQuery.of(context).size.height * 0.03)),
               const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),

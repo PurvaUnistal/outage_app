@@ -87,16 +87,17 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
           CommonStyle.vertical(context: context),
           /*  _tfValveIdController(dataState: dataState),
           CommonStyle.vertical(context: context),*/
-          _incidentTypeDropdown(dataState: dataState),
-          CommonStyle.vertical(context: context),
-          _incidentIndicationDropdown(dataState: dataState),
-          CommonStyle.vertical(context: context),
+
           if (dataState.assetTypeIdController.text.isNotEmpty) ...[
             _assetIdController(dataState: dataState),
             CommonStyle.vertical(context: context),
             _assetTypeIdController(dataState: dataState),
             CommonStyle.vertical(context: context),
           ],
+          _incidentTypeDropdown(dataState: dataState),
+          CommonStyle.vertical(context: context),
+          _incidentIndicationDropdown(dataState: dataState),
+          CommonStyle.vertical(context: context),
           _landmarkController(dataState: dataState),
           CommonStyle.vertical(context: context),
           _addressController(dataState: dataState),

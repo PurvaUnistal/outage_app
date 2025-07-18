@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 
+import 'UserContext.dart';
 import 'app_asset.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
@@ -17,6 +18,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ctx = UserContext.getUserContext();
     return AppBar(
       systemOverlayStyle: SystemUiOverlayStyle.light,
       automaticallyImplyLeading: boolLeading ?? false,
@@ -27,17 +29,52 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       leading: leadingWidget,
       title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          /// Left icon
-          Image.asset(
-            AssetPath.smartgasnetLog,
-            width: MediaQuery.of(context).size.width * 0.1,
-            height: MediaQuery.of(context).size.height * 0.05,
-            fit: BoxFit.contain,
+          Flexible(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.2,
+              // height: MediaQuery.of(context).size.height * 0.05,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.network(
+                    ctx.user.projectLogo ?? "",
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
           ),
-
-          /// Spacer between left icon and title
-          Expanded(
+          SizedBox(width: MediaQuery.of(context).size.width * 0.05,),
+          Flexible(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.2,
+              // height: MediaQuery.of(context).size.height * 0.05,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.network(
+                    ctx.user.smartLogo ?? "",
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: MediaQuery.of(context).size.width * 0.05,),
+          Flexible(
             child: Center(
               child: Text(
                 title ?? "",
@@ -45,14 +82,6 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                 style: Styles.appTitle,
               ),
             ),
-          ),
-
-          /// Right icon
-          Image.asset(
-            AssetPath.agclLogo,
-            width: MediaQuery.of(context).size.width * 0.1,
-            height: MediaQuery.of(context).size.height * 0.05,
-            fit: BoxFit.contain,
           ),
         ],
       ),

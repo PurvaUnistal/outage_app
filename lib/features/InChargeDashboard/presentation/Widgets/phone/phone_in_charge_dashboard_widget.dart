@@ -6,6 +6,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/features/HoDistrictDashboard/presentation/widget/summery_card.dart';
 import 'package:outage_app/features/InChargeDashboard/domain/bloc/in_charge_dashboard_bloc.dart';
 import 'package:outage_app/features/InChargeDashboard/domain/bloc/in_charge_dashboard_state.dart';
@@ -47,7 +48,7 @@ class _PhoneInChargeDashboardWidgetState
 
   AppBarWidget _appBarWidget() {
     return AppBarWidget(
-      title: "GIS App",
+   //   title: "GIS App",
       boolLeading:
           AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? true : false,
       actions: [
@@ -71,7 +72,7 @@ class _PhoneInChargeDashboardWidgetState
         children: [
           GridView.count(
             crossAxisCount: 2,
-            childAspectRatio: 2,
+            childAspectRatio:  2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 12,
@@ -101,30 +102,38 @@ class _PhoneInChargeDashboardWidgetState
                 icon: Icons.factory,
                 color: Colors.orange.shade100,
               ),
+
+            ],
+          ),
+         CommonStyle.vertical(context: context),
+          GridView.count(
+            crossAxisCount: 3,
+            childAspectRatio: 1.2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            children: [
               IncidentCard(
-                title: "New",
-                subtitle: "Incident",
+                title: "Incident New",
                 value: "${dataState.dashboard.totalPendingIncident}",
                 icon: Icons.warning,
                 color: Colors.red.shade100,
               ),
               IncidentCard(
-                title: "In Progress",
-                subtitle: "Incident",
+                title: "Incident In Progress",
                 value: "${dataState.dashboard.totalInprogressIncident}",
                 icon: Icons.sync,
                 color: Colors.yellow.shade100,
               ),
               IncidentCard(
-                title: "Completed",
-                subtitle: "Incident",
+                title: "Incident Completed",
                 value: "${dataState.dashboard.totalCompletedIncident}",
                 icon: Icons.check_circle,
                 color: Colors.green.shade200,
               ),
             ],
           ),
-
           const SizedBox(height: 24),
 
           const Text(
@@ -145,12 +154,12 @@ class _PhoneInChargeDashboardWidgetState
                 ),
               )
               : GridView.count(
-                crossAxisCount: 2,
+                crossAxisCount: 3,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 2,
+            childAspectRatio: 1.05,
                 children:
                     dataState.listOfInChargeData
                         .expand(

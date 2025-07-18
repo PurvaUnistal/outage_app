@@ -33,40 +33,37 @@ class CardWidget extends StatelessWidget {
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
                 blurRadius: 8,
-                spreadRadius: 0,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+
             children: [
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.asset(
-                      path,
-                      width: 100,
-                      height: 100,
-                      errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.broken_image, size: 80),
-                    ),
-                  ),
+              /// Image part
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+                child: Image.asset(
+                  path,height: MediaQuery.of(context).size.height * 0.08,
+                  fit: BoxFit.contain, // no cropping
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, size: 80),
                 ),
               ),
-              const SizedBox(height: 8),
-              Flexible(
-                child: Text(
-                  text,
-                  style: textStyle ??
-                      const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                  textAlign: TextAlign.center,
-                ),
+
+              /// Text part
+              Text(
+                text,
+                style: textStyle ??
+                    const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

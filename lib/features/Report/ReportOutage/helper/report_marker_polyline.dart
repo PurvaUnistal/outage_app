@@ -64,7 +64,7 @@ class ReportMarkerPolyline {
                 ),
           );
         },
-        markerId: MarkerId('${data.assetid}--${data.id}'),
+        markerId: MarkerId(data.id.toString()),
         position: position,
         infoWindow: InfoWindow(
           title:

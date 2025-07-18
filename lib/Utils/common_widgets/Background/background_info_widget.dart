@@ -34,7 +34,11 @@ class BackgroundInfoWidget extends StatelessWidget {
                     : (ctx.gridData.gridName != null && ctx.gridData.gridName!.isNotEmpty
                     ? " (${ctx.gridData.gridName!.toUpperCase()})"
                     : "")})"}",
-                style: Styles.rel,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    decoration: TextDecoration.none),
                 overflow: TextOverflow.ellipsis,
               )
 

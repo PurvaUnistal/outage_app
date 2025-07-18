@@ -133,7 +133,7 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
               const Divider(),
               Center(
                 child: Text(
-                  "Do you want to create Report Incident?",
+                  "Do you want to Report Incident?",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
