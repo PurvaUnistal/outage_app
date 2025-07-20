@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:core';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,6 +24,8 @@ import 'package:outage_app/features/Report/ReportOutage/presentation/widget/MapS
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/alert_dialog_widget.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/filter_report.dart';
+import 'package:uuid/uuid.dart';
+
 import '../../../../Manage/IncidentDetails/domain/model/filter_key_enum.dart';
 import 'incident_report_event.dart';
 import 'incident_report_state.dart';
@@ -124,6 +127,7 @@ class IncidentReportBloc
   List<String> listOfEmergencyId = [];
 
   List<String> listOfDiaColor = [];
+  List<dynamic> placeList = [];
 
   PipelineData pipelineData = PipelineData();
   List<PipelineData> listOfPipeline = [];
@@ -151,7 +155,6 @@ class IncidentReportBloc
   MapType currentMapType = MapType.normal;
 
   Completer<GoogleMapController> googleMapController = Completer();
-
 
   bool isBlinkMarker = true;
   Timer blinkTimer = Timer(Duration.zero, () {});
@@ -217,11 +220,15 @@ class IncidentReportBloc
     listOfEmergencyId = [];
 
     listOfDiaColor = [];
+    placeList = [];
 
     pipelineData = PipelineData();
     listOfPipeline = [];
     final ctx = UserContext.getUserContext();
-    currentPosition = LatLng(double.parse(ctx.user.gaLatitude!), double.parse(ctx.user.gaLongitude!));
+    currentPosition = LatLng(
+      double.parse(ctx.user.gaLatitude!),
+      double.parse(ctx.user.gaLongitude!),
+    );
     latLngOnTap = LatLng(0, 0);
     points = [];
 
@@ -271,7 +278,7 @@ class IncidentReportBloc
     var res = await IncidentReportHelper.getEmergencySearchApi(
       context: context,
     );
-    if (res != null && res.data != null) {
+    if (res != null && res.data != null && res.data!.isNotEmpty) {
       listOfEmergencyData = res.data!;
       listOfEmergencyId =
           listOfEmergencyData.map((e) => e.emergencyName).toList();
@@ -287,7 +294,7 @@ class IncidentReportBloc
         longitude:
             AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
       );
-      if (res != null && res.data != null) {
+      if (res != null && res.data != null && res.data!.isNotEmpty) {
         listOfPipeline = res.data!;
       }
     } else {
@@ -326,12 +333,12 @@ class IncidentReportBloc
     }
   }
 
-  _fetchTFGisApi({required BuildContext context}) async {
+  _fetchTFGisApi({required BuildContext context, emit}) async {
     if (checkTf == true) {
       try {
         if (await HiveDataBase.tfGISBox!.isEmpty) {
           var res = await IncidentReportHelper.getTFGisApi(context: context);
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfTF = res.data!;
           }
         } else {
@@ -353,16 +360,17 @@ class IncidentReportBloc
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchGasValueGisApi({required BuildContext context}) async {
+  _fetchGasValueGisApi({required BuildContext context, emit}) async {
     if (checkValve == true) {
       try {
         if (await HiveDataBase.valveGISBox!.isEmpty) {
           var res = await IncidentReportHelper.getGasValueGisApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfValue = res.data!;
           }
         } else {
@@ -384,16 +392,17 @@ class IncidentReportBloc
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchGasRegulatorGisApi({required BuildContext context}) async {
+  _fetchGasRegulatorGisApi({required BuildContext context, emit}) async {
     if (checkRegulator == true) {
       try {
         if (await HiveDataBase.regulatorGISBox!.isEmpty) {
           var res = await IncidentReportHelper.getRegulatorGisApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfRegulator = res.data!;
           }
         } else {
@@ -415,16 +424,17 @@ class IncidentReportBloc
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchCommercialApi({required BuildContext context}) async {
+  _fetchCommercialApi({required BuildContext context, emit}) async {
     if (checkCommercial == true) {
       try {
         if (await HiveDataBase.commercialDataBox!.isEmpty) {
           var res = await IncidentReportHelper.getCommercialApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfCommercial = res.data!;
           }
         } else {
@@ -448,13 +458,14 @@ class IncidentReportBloc
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchDomesticApi({required BuildContext context}) async {
+  _fetchDomesticApi({required BuildContext context, emit}) async {
     if (checkDomestic == true) {
       if (await HiveDataBase.domesticDataBox!.isEmpty) {
         var res = await IncidentReportHelper.getDomesticApi(context: context);
-        if (res != null && res.data != null && res.data!.hasListData) {
+        if (res != null && res.data != null && res.data!.isNotEmpty) {
           listOfDomestic = res.data!;
         }
       } else {
@@ -473,16 +484,17 @@ class IncidentReportBloc
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchIndustrialApi({required BuildContext context}) async {
+  _fetchIndustrialApi({required BuildContext context, emit}) async {
     if (checkIndustrial == true) {
       try {
         if (await HiveDataBase.industrialDataBox!.isEmpty) {
           var res = await IncidentReportHelper.getIndustrialApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfIndustrial = res.data!;
           }
         } else {
@@ -506,6 +518,7 @@ class IncidentReportBloc
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
   _selectTFGisValue(SelectTFGisEvent event, emit) async {
@@ -612,12 +625,11 @@ class IncidentReportBloc
   }
 
   _selectCheckBoxTFGis(SelectCheckBoxTFGisEvent event, emit) async {
-    await _clearPopTextField();
     checkTf = event.checkBoxTf;
     if (checkTf == true) {
       isTFLoader = true;
       _eventCompleted(emit);
-      await _fetchTFGisApi(context: event.context);
+      await _fetchTFGisApi(context: event.context, emit: emit);
       isTFLoader = false;
       _eventCompleted(emit);
     } else {
@@ -628,12 +640,11 @@ class IncidentReportBloc
   }
 
   _selectCheckBoxValveGis(SelectCheckBoxValveGisEvent event, emit) async {
-    await _clearPopTextField();
     checkValve = event.checkBoxValve;
     if (checkValve == true) {
       isValveLoader = true;
       _eventCompleted(emit);
-      await _fetchGasValueGisApi(context: event.context);
+      await _fetchGasValueGisApi(context: event.context, emit: emit);
       isValveLoader = false;
       _eventCompleted(emit);
     } else {
@@ -647,12 +658,11 @@ class IncidentReportBloc
     SelectCheckBoxRegulatorGisEvent event,
     emit,
   ) async {
-    await _clearPopTextField();
     checkRegulator = event.checkBoxRegulator;
     if (checkRegulator == true) {
       isRegulatorLoader = true;
       _eventCompleted(emit);
-      await _fetchGasRegulatorGisApi(context: event.context);
+      await _fetchGasRegulatorGisApi(context: event.context, emit: emit);
       isRegulatorLoader = false;
       _eventCompleted(emit);
     } else {
@@ -663,12 +673,11 @@ class IncidentReportBloc
   }
 
   _selectCheckCommercial(SelectCheckCommercialEvent event, emit) async {
-    await _clearPopTextField();
     checkCommercial = event.checkCommercial;
     if (checkCommercial == true) {
       isCommercialLoader = true;
       _eventCompleted(emit);
-      await _fetchCommercialApi(context: event.context);
+      await _fetchCommercialApi(context: event.context, emit: emit);
       isCommercialLoader = false;
       _eventCompleted(emit);
     } else {
@@ -679,12 +688,11 @@ class IncidentReportBloc
   }
 
   _selectCheckDomestic(SelectCheckDomesticEvent event, emit) async {
-    await _clearPopTextField();
     checkDomestic = event.checkDomestic;
     if (checkDomestic == true) {
       isDomesticLoader = true;
       _eventCompleted(emit);
-      await _fetchDomesticApi(context: event.context);
+      await _fetchDomesticApi(context: event.context, emit: emit);
       isDomesticLoader = false;
       _eventCompleted(emit);
     } else {
@@ -695,12 +703,11 @@ class IncidentReportBloc
   }
 
   _selectCheckIndustrial(SelectCheckIndustrialEvent event, emit) async {
-    await _clearPopTextField();
     checkIndustrial = event.checkIndustrial;
     if (checkIndustrial == true) {
       isIndustrialLoader = true;
       _eventCompleted(emit);
-      await _fetchIndustrialApi(context: event.context);
+      await _fetchIndustrialApi(context: event.context, emit: emit);
       isIndustrialLoader = false;
       _eventCompleted(emit);
     } else {
@@ -869,7 +876,9 @@ class IncidentReportBloc
   _gotoInitialPosition(LatLng location) async {
     CameraPosition cameraPosition = CameraPosition(target: location);
     final GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    await controller.animateCamera(
+      CameraUpdate.newCameraPosition(cameraPosition),
+    );
   }
 
   _onCameraIdleEvent(OnCameraIdleEvent event, emit) async {
@@ -883,8 +892,20 @@ class IncidentReportBloc
     _eventCompleted(emit);
   }
 
-  _updateDestinationAddress(UpdateDestinationAddress event, emit) {
+  _updateDestinationAddress(UpdateDestinationAddress event, emit) async {
+    String _sessionToken = '1234567890';
+    var uuid = const Uuid();
     destinationAddress = event.destinationAddress;
+    if (_sessionToken.isEmpty) {
+      _sessionToken = uuid.v4();
+    }
+    var res = await IncidentReportHelper.getSuggestion(
+      input: destinationAddressController.text,
+      sessionToken: _sessionToken,
+    );
+    if (res != null) {
+      placeList = res;
+    }
     _eventCompleted(emit);
   }
 
@@ -1133,6 +1154,7 @@ class IncidentReportBloc
           listOfDomesticId: listOfDomesticId,
           listOfIndustrialId: listOfIndustrialId,
           listOfEmergencyId: listOfEmergencyId,
+          placeList: placeList,
         ),
       );
     });
@@ -1186,6 +1208,7 @@ class IncidentReportBloc
         listOfDomesticId: listOfDomesticId,
         listOfIndustrialId: listOfIndustrialId,
         listOfEmergencyId: listOfEmergencyId,
+        placeList: placeList,
       ),
     );
   }

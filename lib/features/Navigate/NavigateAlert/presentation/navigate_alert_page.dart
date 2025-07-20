@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -105,6 +106,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
 
   Widget _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
     return GoogleMap(
+      buildingsEnabled: false,
       mapType: dataState.currentMapType,
       rotateGesturesEnabled: true,
       zoomControlsEnabled: false,
@@ -145,7 +147,6 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
             SelectGoogleMapButtonEvent(context: context, latLngOnTap: latLng),
           );
         }
-
       },
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -93,7 +94,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   final TextEditingController industrialController = TextEditingController();
   final TextEditingController startAddressController = TextEditingController();
   final TextEditingController destinationAddressController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController emergencyController = TextEditingController();
 
   List<TFGISData> listOfTF = [];
@@ -146,12 +147,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   Completer<GoogleMapController> googleMapController = Completer();
 
-
   bool isBlinkMarker = true;
   Timer blinkTimer = Timer(Duration.zero, () {});
 
   final mapService = MapService();
-
 
   _pageLoad(NavigateAlertLoadEvent event, emit) async {
     emit(NavigateAlertPageLoadState());
@@ -216,7 +215,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     pipelineData = PipelineData();
     listOfPipeline = [];
     final ctx = UserContext.getUserContext();
-    currentPosition = LatLng(double.parse(ctx.user.gaLatitude!), double.parse(ctx.user.gaLongitude!));
+    currentPosition = LatLng(
+      double.parse(ctx.user.gaLatitude!),
+      double.parse(ctx.user.gaLongitude!),
+    );
     latLngOnTap = LatLng(0, 0);
     points = [];
 
@@ -263,12 +265,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
-
   _fetchEmergency({required BuildContext context}) async {
     var res = await IncidentReportHelper.getEmergencySearchApi(
       context: context,
     );
-    if (res != null && res.data != null) {
+    if (res != null && res.data != null && res.data!.isNotEmpty) {
       listOfEmergencyData = res.data!;
       listOfEmergencyId =
           listOfEmergencyData.map((e) => e.emergencyName).toList();
@@ -280,11 +281,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       var res = await IncidentReportHelper.getPipelineApi(
         context: context,
         latitude:
-        AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+            AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
         longitude:
-        AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+            AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
       );
-      if (res != null && res.data != null) {
+      if (res != null && res.data != null && res.data!.isNotEmpty) {
         listOfPipeline = res.data!;
       }
     } else {
@@ -323,13 +324,12 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     }
   }
 
-
-  _fetchTFGisApi({required BuildContext context}) async {
+  _fetchTFGisApi({required BuildContext context, emit}) async {
     if (checkTf == true) {
       try {
         if (await HiveDataBase.tfGISBox!.isEmpty) {
           var res = await IncidentReportHelper.getTFGisApi(context: context);
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfTF = res.data!;
           }
         } else {
@@ -351,16 +351,17 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchGasValueGisApi({required BuildContext context}) async {
+  _fetchGasValueGisApi({required BuildContext context, emit}) async {
     if (checkValve == true) {
       try {
         if (await HiveDataBase.valveGISBox!.isEmpty) {
           var res = await IncidentReportHelper.getGasValueGisApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfValue = res.data!;
           }
         } else {
@@ -382,16 +383,17 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchGasRegulatorGisApi({required BuildContext context}) async {
+  _fetchGasRegulatorGisApi({required BuildContext context, emit}) async {
     if (checkRegulator == true) {
       try {
         if (await HiveDataBase.regulatorGISBox!.isEmpty) {
           var res = await IncidentReportHelper.getRegulatorGisApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfRegulator = res.data!;
           }
         } else {
@@ -413,16 +415,17 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchCommercialApi({required BuildContext context}) async {
+  _fetchCommercialApi({required BuildContext context, emit}) async {
     if (checkCommercial == true) {
       try {
         if (await HiveDataBase.commercialDataBox!.isEmpty) {
           var res = await IncidentReportHelper.getCommercialApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfCommercial = res.data!;
           }
         } else {
@@ -446,14 +449,15 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchDomesticApi({required BuildContext context}) async {
+  _fetchDomesticApi({required BuildContext context, emit}) async {
     if (checkDomestic == true) {
       try {
         if (await HiveDataBase.domesticDataBox!.isEmpty) {
           var res = await IncidentReportHelper.getDomesticApi(context: context);
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfDomestic = res.data!;
           }
         } else {
@@ -476,16 +480,17 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
-  _fetchIndustrialApi({required BuildContext context}) async {
+  _fetchIndustrialApi({required BuildContext context, emit}) async {
     if (checkIndustrial == true) {
       try {
         if (await HiveDataBase.industrialDataBox!.isEmpty) {
           var res = await IncidentReportHelper.getIndustrialApi(
             context: context,
           );
-          if (res != null && res.data != null) {
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfIndustrial = res.data!;
           }
         } else {
@@ -509,6 +514,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       }
     }
     _filterVisiblePolyline();
+    _eventCompleted(emit);
   }
 
   _selectTFGisValue(SelectTFGisEvent event, emit) async {
@@ -620,7 +626,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkTf == true) {
       isTFLoader = true;
       _eventCompleted(emit);
-      await _fetchTFGisApi(context: event.context);
+      await _fetchTFGisApi(context: event.context, emit: emit);
       isTFLoader = false;
       _eventCompleted(emit);
     } else {
@@ -636,7 +642,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkValve == true) {
       isValveLoader = true;
       _eventCompleted(emit);
-      await _fetchGasValueGisApi(context: event.context);
+      await _fetchGasValueGisApi(context: event.context, emit: emit);
       isValveLoader = false;
       _eventCompleted(emit);
     } else {
@@ -655,7 +661,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkRegulator == true) {
       isRegulatorLoader = true;
       _eventCompleted(emit);
-      await _fetchGasRegulatorGisApi(context: event.context);
+      await _fetchGasRegulatorGisApi(context: event.context, emit: emit);
       isRegulatorLoader = false;
       _eventCompleted(emit);
     } else {
@@ -671,7 +677,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkCommercial == true) {
       isCommercialLoader = true;
       _eventCompleted(emit);
-      await _fetchCommercialApi(context: event.context);
+      await _fetchCommercialApi(context: event.context, emit: emit);
       isCommercialLoader = false;
       _eventCompleted(emit);
     } else {
@@ -687,7 +693,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkDomestic == true) {
       isDomesticLoader = true;
       _eventCompleted(emit);
-      await _fetchDomesticApi(context: event.context);
+      await _fetchDomesticApi(context: event.context, emit: emit);
       isDomesticLoader = false;
       _eventCompleted(emit);
     } else {
@@ -703,7 +709,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     if (checkIndustrial == true) {
       isIndustrialLoader = true;
       _eventCompleted(emit);
-      await _fetchIndustrialApi(context: event.context);
+      await _fetchIndustrialApi(context: event.context, emit: emit);
       isIndustrialLoader = false;
       _eventCompleted(emit);
     } else {
@@ -943,9 +949,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   _gotoInitialPosition(LatLng location) async {
     CameraPosition cameraPosition = CameraPosition(target: location);
     final GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    await controller.animateCamera(
+      CameraUpdate.newCameraPosition(cameraPosition),
+    );
   }
-
 
   _onResetFilterEvent(ResetFilterEvent event, emit) async {
     tempMarker = {};
@@ -1025,11 +1032,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     );
     _eventCompleted(emit);
   }
+
   @override
   Future<void> close() {
     blinkTimer.cancel();
     return super.close();
   }
+
   void _restartBlinking() {
     if (blinkTimer.isActive == true) {
       blinkTimer.cancel();
@@ -1037,7 +1046,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     isBlinkMarker = true;
     _startBlinking();
   }
-
 
   _startBlinking() {
     blinkTimer.cancel();
@@ -1047,7 +1055,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       } else {
         for (Marker m in blinkMarkerList) {
           markersPointList.removeWhere(
-                (element) => element.markerId == m.markerId,
+            (element) => element.markerId == m.markerId,
           );
         }
       }

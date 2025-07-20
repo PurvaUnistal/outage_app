@@ -17,99 +17,119 @@ class SearchDestination extends StatelessWidget {
     return BlocBuilder<IncidentReportBloc, IncidentReportState>(
       builder: (context, state) {
         if (state is FetchIncidentReportDataState) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            ),
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 8.0, left: 8, bottom: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  CommonStyle.vertical(context: context),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'Places',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
+          return Flexible(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white70,
+                borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              ),
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0, left: 8, bottom: 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    CommonStyle.vertical(context: context),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              'Places',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                              () => BlocProvider.of<IncidentReportBloc>(
-                            context,
-                          ).add(SearchHideShowEvent());
-                        },
-                        icon: Icon(Icons.cancel_outlined, color: Colors.red),
-                      ),
-                    ],
-                  ),
-
-                  TextFieldWidget(
-                    label: 'Current Location',
-                    hintText: 'Choose starting point',
-                    controller: state.startAddressController,
-                    prefixIcon: Icon(
-                      Icons.looks_one,
-                      color: EnvironmentConfig.of(context)!.primaryTheme,
+                        IconButton(
+                          onPressed: () {
+                            () => BlocProvider.of<IncidentReportBloc>(
+                              context,
+                            ).add(SearchHideShowEvent());
+                          },
+                          icon: Icon(Icons.cancel_outlined, color: Colors.red),
+                        ),
+                      ],
                     ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        Icons.my_location,
+
+                    TextFieldWidget(
+                      label: 'Current Location',
+                      hintText: 'Choose starting point',
+                      controller: state.startAddressController,
+                      prefixIcon: Icon(
+                        Icons.looks_one,
                         color: EnvironmentConfig.of(context)!.primaryTheme,
                       ),
-                      onPressed:
-                          () => BlocProvider.of<IncidentReportBloc>(
-                            context,
-                          ).add(UpdateStartAddress()),
-                    ),
-                  ),
-                  CommonStyle.vertical(context: context),
-                  TextFieldWidget(
-                    label: 'Destination',
-                    hintText: 'Choose destination',
-                    controller: state.destinationAddressController,
-                    prefixIcon: Icon(
-                      Icons.looks_two,
-                      color: EnvironmentConfig.of(context)!.primaryTheme,
-                    ),
-                    onChanged: (val) => BlocProvider.of<IncidentReportBloc>(
-                          context,
-                        ).add(UpdateDestinationAddress(val)),
-                  ),
-
-                  CommonStyle.vertical(context: context),
-
-                  Visibility(
-                    visible: state.placeDistance == '' ? false : true,
-                    child: Text(
-                      'DISTANCE: ${state.placeDistance} km',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          Icons.my_location,
+                          color: EnvironmentConfig.of(context)!.primaryTheme,
+                        ),
+                        onPressed:
+                            () => BlocProvider.of<IncidentReportBloc>(
+                              context,
+                            ).add(UpdateStartAddress()),
                       ),
                     ),
-                  ),
-                  ButtonWidget(
-                    text: "Show Route",
-                    onPressed: () {
-                      BlocProvider.of<IncidentReportBloc>(
-                        context,
-                      ).add(ShowRouteButtonEvent(context: context));
-                    },
-                  ),
-                  CommonStyle.vertical(context: context),
-                  CommonStyle.vertical(context: context),
-                ],
+                    CommonStyle.vertical(context: context),
+                    TextFieldWidget(
+                      label: 'Destination',
+                      hintText: 'Choose destination',
+                      controller: state.destinationAddressController,
+                      prefixIcon: Icon(
+                        Icons.looks_two,
+                        color: EnvironmentConfig.of(context)!.primaryTheme,
+                      ),
+                      onChanged:
+                          (val) => BlocProvider.of<IncidentReportBloc>(
+                            context,
+                          ).add(UpdateDestinationAddress(val)),
+                    ),
+
+                    CommonStyle.vertical(context: context),
+                    Expanded(
+                      child: ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: state.placeList.length,
+                        itemBuilder: (context, index) {
+                          final place = state.placeList[index];
+                          return GestureDetector(
+                            onTap: () async {},
+                            child: ListTile(
+                              title: Text(place["description"] ?? ''),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    CommonStyle.vertical(context: context),
+
+                    Visibility(
+                      visible: state.placeDistance == '' ? false : true,
+                      child: Text(
+                        'DISTANCE: ${state.placeDistance} km',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    ButtonWidget(
+                      text: "Show Route",
+                      onPressed: () {
+                        BlocProvider.of<IncidentReportBloc>(
+                          context,
+                        ).add(ShowRouteButtonEvent(context: context));
+                      },
+                    ),
+                    CommonStyle.vertical(context: context),
+                    CommonStyle.vertical(context: context),
+                  ],
+                ),
               ),
             ),
           );

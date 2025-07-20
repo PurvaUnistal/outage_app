@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -59,6 +60,7 @@ class FetchIncidentReportDataState extends IncidentReportState {
   final List<String> listOfDomesticId;
   final List<String> listOfIndustrialId;
   final List<String> listOfEmergencyId;
+  final List<dynamic> placeList;
 
   FetchIncidentReportDataState({
     required this.isLoader,
@@ -104,6 +106,7 @@ class FetchIncidentReportDataState extends IncidentReportState {
     required this.listOfDomesticId,
     required this.listOfIndustrialId,
     required this.listOfEmergencyId,
+    required this.placeList,
   });
 
   @override
@@ -151,5 +154,6 @@ class FetchIncidentReportDataState extends IncidentReportState {
     listOfDomesticId,
     listOfIndustrialId,
     listOfEmergencyId,
+    placeList,
   ];
 }

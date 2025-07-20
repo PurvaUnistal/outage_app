@@ -1,10 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
-import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
@@ -14,6 +15,7 @@ import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_bloc.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_event.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_state.dart';
+
 import 'widget/circle_button.dart';
 import 'widget/legend_widget.dart';
 import 'widget/search_destination.dart';
@@ -68,7 +70,6 @@ class _IncidentReportViewState extends State<IncidentReportView> {
         false;
   }
 
-
   Widget _itemBuilder({required FetchIncidentReportDataState dataState}) {
     return Stack(
       children: <Widget>[
@@ -78,10 +79,10 @@ class _IncidentReportViewState extends State<IncidentReportView> {
           bottom: 0,
           left: 0,
           right: 0,
-          child:Visibility(
-          visible: dataState.isVisible,
-          child: SearchDestination(),
-          )
+          child: Visibility(
+            visible: dataState.isVisible,
+            child: SearchDestination(),
+          ),
         ),
         dataState.isPipelineLoader
             ? const WaveLoaderWidget()
@@ -117,6 +118,7 @@ class _IncidentReportViewState extends State<IncidentReportView> {
 
   _googleMapWidget({required FetchIncidentReportDataState dataState}) {
     return GoogleMap(
+      buildingsEnabled: false,
       mapType: dataState.currentMapType,
       myLocationEnabled: true,
       rotateGesturesEnabled: true,
@@ -160,6 +162,7 @@ class _IncidentReportViewState extends State<IncidentReportView> {
         ? const MinMaxZoomPreference(15, null)
         : const MinMaxZoomPreference(17, null);
   }
+
   _mapTypeButtonWidget({required FetchIncidentReportDataState dataState}) {
     return CircleButton(
       onTap:
@@ -170,7 +173,9 @@ class _IncidentReportViewState extends State<IncidentReportView> {
     );
   }
 
-  Widget _legendButtonWidget({required FetchIncidentReportDataState dataState}) {
+  Widget _legendButtonWidget({
+    required FetchIncidentReportDataState dataState,
+  }) {
     return CircleButton(
       iconData: Icons.info_outline,
       onTap: () async {
@@ -184,7 +189,9 @@ class _IncidentReportViewState extends State<IncidentReportView> {
     );
   }
 
-  _currentLocationButtonWidget({required FetchIncidentReportDataState dataState}) {
+  _currentLocationButtonWidget({
+    required FetchIncidentReportDataState dataState,
+  }) {
     return CircleButton(
       iconData: Icons.my_location_rounded,
       onTap:
@@ -216,14 +223,17 @@ class _IncidentReportViewState extends State<IncidentReportView> {
 
   _searchButtonWidget({required FetchIncidentReportDataState dataState}) {
     return CircleButton(
-      iconData:  Icons.search,
-        onTap:  () => BlocProvider.of<IncidentReportBloc>(
-        context,
-    ).add(SearchHideShowEvent()),
+      iconData: Icons.search,
+      onTap:
+          () => BlocProvider.of<IncidentReportBloc>(
+            context,
+          ).add(SearchHideShowEvent()),
     );
   }
 
-  Widget _routeDirButtonWidget({required FetchIncidentReportDataState dataState}) {
+  Widget _routeDirButtonWidget({
+    required FetchIncidentReportDataState dataState,
+  }) {
     return dataState.isMapDir == true
         ? FloatingActionButton(
           heroTag: UniqueKey(),

@@ -1,5 +1,6 @@
-import 'dart:ui' as ui;
 import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -93,6 +94,10 @@ class ReportMarkerPolyline {
         polylineId: PolylineId("polyline_$i"),
         points: position,
         color: color,
+        zIndex: 10,
+        jointType: JointType.round,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
         width: 4,
         onTap: () {
           print("-------------------------------->polyline_$i");
