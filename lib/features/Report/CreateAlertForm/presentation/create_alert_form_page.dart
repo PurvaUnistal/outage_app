@@ -85,6 +85,8 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
               widget1: _currentLatController(dataState: dataState),
               widget2: _currentLongController(dataState: dataState)),
           CommonStyle.vertical(context: context),
+          _addressController(dataState: dataState),
+          CommonStyle.vertical(context: context),
           /*  _tfValveIdController(dataState: dataState),
           CommonStyle.vertical(context: context),*/
 
@@ -99,8 +101,6 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
           _incidentIndicationDropdown(dataState: dataState),
           CommonStyle.vertical(context: context),
           _landmarkController(dataState: dataState),
-          CommonStyle.vertical(context: context),
-          _addressController(dataState: dataState),
           CommonStyle.vertical(context: context),
           _descriptionController(dataState: dataState),
           CommonStyle.vertical(context: context),
@@ -132,7 +132,15 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
             ? dataState.valveGisIdController
             : dataState.tfGisIdController);
   }
-
+  Widget _addressController(
+      {required FetchCreateAlertFormDataState dataState}) {
+    return TextFieldWidget(
+        star: AppString.star,
+        label: AppString.cuAddress,
+        hintText: AppString.cuAddress,
+        enabled: false,
+        controller: dataState.addressController);
+  }
   Widget _currentLatController(
       {required FetchCreateAlertFormDataState dataState}) {
     return TextFieldWidget(
@@ -206,15 +214,6 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
       enabled: false,
       controller: dataState.assetTypeIdController,
     );
-  }
-
-  Widget _addressController(
-      {required FetchCreateAlertFormDataState dataState}) {
-    return TextFieldWidget(
-        //   star: AppString.star,
-        label: AppString.address,
-        hintText: AppString.address,
-        controller: dataState.addressController);
   }
 
   Widget _landmarkController(

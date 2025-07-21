@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -94,7 +93,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   final TextEditingController industrialController = TextEditingController();
   final TextEditingController startAddressController = TextEditingController();
   final TextEditingController destinationAddressController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController emergencyController = TextEditingController();
 
   List<TFGISData> listOfTF = [];
@@ -147,10 +146,12 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   Completer<GoogleMapController> googleMapController = Completer();
 
+
   bool isBlinkMarker = true;
   Timer blinkTimer = Timer(Duration.zero, () {});
 
   final mapService = MapService();
+
 
   _pageLoad(NavigateAlertLoadEvent event, emit) async {
     emit(NavigateAlertPageLoadState());
@@ -215,10 +216,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     pipelineData = PipelineData();
     listOfPipeline = [];
     final ctx = UserContext.getUserContext();
-    currentPosition = LatLng(
-      double.parse(ctx.user.gaLatitude!),
-      double.parse(ctx.user.gaLongitude!),
-    );
+    currentPosition = LatLng(double.parse(ctx.user.gaLatitude!), double.parse(ctx.user.gaLongitude!));
     latLngOnTap = LatLng(0, 0);
     points = [];
 
@@ -262,8 +260,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     await _fetchEmergency(context: event.context);
     await _filerPipe(context: event.context, emit: emit);
     _eventCompleted(emit);
-    _eventCompleted(emit);
   }
+
 
   _fetchEmergency({required BuildContext context}) async {
     var res = await IncidentReportHelper.getEmergencySearchApi(
@@ -281,9 +279,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       var res = await IncidentReportHelper.getPipelineApi(
         context: context,
         latitude:
-            AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+        AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
         longitude:
-            AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+        AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
       );
       if (res != null && res.data != null && res.data!.isNotEmpty) {
         listOfPipeline = res.data!;
@@ -323,6 +321,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       await _gotoInitialPosition(points[0]);
     }
   }
+
 
   _fetchTFGisApi({required BuildContext context, emit}) async {
     if (checkTf == true) {
@@ -621,7 +620,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckBoxTFGis(SelectCheckBoxTFGisEvent event, emit) async {
-    await _clearPopTextField();
     checkTf = event.checkTf;
     if (checkTf == true) {
       isTFLoader = true;
@@ -637,7 +635,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckBoxValveGis(SelectCheckBoxValveGisEvent event, emit) async {
-    await _clearPopTextField();
     checkValve = event.checkBoxValve;
     if (checkValve == true) {
       isValveLoader = true;
@@ -656,7 +653,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     SelectCheckBoxRegulatorGisEvent event,
     emit,
   ) async {
-    await _clearPopTextField();
     checkRegulator = event.checkBoxRegulator;
     if (checkRegulator == true) {
       isRegulatorLoader = true;
@@ -672,7 +668,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckCommercial(SelectCheckCommercialEvent event, emit) async {
-    await _clearPopTextField();
     checkCommercial = event.checkCommercial;
     if (checkCommercial == true) {
       isCommercialLoader = true;
@@ -688,7 +683,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckDomestic(SelectCheckDomesticEvent event, emit) async {
-    await _clearPopTextField();
     checkDomestic = event.checkDomestic;
     if (checkDomestic == true) {
       isDomesticLoader = true;
@@ -704,7 +698,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectCheckIndustrial(SelectCheckIndustrialEvent event, emit) async {
-    await _clearPopTextField();
     checkIndustrial = event.checkIndustrial;
     if (checkIndustrial == true) {
       isIndustrialLoader = true;
@@ -949,10 +942,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   _gotoInitialPosition(LatLng location) async {
     CameraPosition cameraPosition = CameraPosition(target: location);
     final GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(
-      CameraUpdate.newCameraPosition(cameraPosition),
-    );
+    await controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
+
 
   _onResetFilterEvent(ResetFilterEvent event, emit) async {
     tempMarker = {};
@@ -1032,13 +1024,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     );
     _eventCompleted(emit);
   }
-
   @override
   Future<void> close() {
     blinkTimer.cancel();
     return super.close();
   }
-
   void _restartBlinking() {
     if (blinkTimer.isActive == true) {
       blinkTimer.cancel();
@@ -1046,6 +1036,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     isBlinkMarker = true;
     _startBlinking();
   }
+
 
   _startBlinking() {
     blinkTimer.cancel();
@@ -1055,7 +1046,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       } else {
         for (Marker m in blinkMarkerList) {
           markersPointList.removeWhere(
-            (element) => element.markerId == m.markerId,
+                (element) => element.markerId == m.markerId,
           );
         }
       }

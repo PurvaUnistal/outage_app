@@ -45,6 +45,7 @@ class CreateAlertFormBloc
   String assetId = '';
   String assetTypeId = '';
   String locationSource = '';
+  String address = '';
   dynamic assetData = '';
 
   TextEditingController assetIdController = TextEditingController();
@@ -90,6 +91,7 @@ class CreateAlertFormBloc
     isBtnLoader = false;
     locationSource = "";
     assetTypeId = "";
+    address = "";
 
 
     incidentTypeModel = GetIncidentTypeModel();
@@ -154,9 +156,11 @@ class CreateAlertFormBloc
 
   _getCurrentPosition() async {
     Position? currentPoint = await CurrentLocation.getCurrentLocation();
-    if (currentPoint != null) {
+    String address = (await CurrentLocation.getAddress())!;
+    if (currentPoint != null && address.isNotEmpty) {
       currentLatitudeController.text = currentPoint.latitude.toString();
       currentLongitudeController.text = currentPoint.longitude.toString();
+      addressController.text = address;
     }
   }
 

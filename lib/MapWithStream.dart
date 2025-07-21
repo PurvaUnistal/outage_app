@@ -129,6 +129,7 @@ class _DynamicPolylineMapState extends State<DynamicPolylineMap> {
     return Scaffold(
         appBar: AppBar(title: Text("Current Location in Google Maps")),
         body: GoogleMap(
+            buildingsEnabled: false,
             initialCameraPosition: CameraPosition(
               target: loginPosition,
               zoom: AppString.zoom,

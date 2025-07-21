@@ -53,6 +53,7 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
       child: Stack(
         children: [
           GoogleMap(
+            buildingsEnabled: false,
             myLocationButtonEnabled: true,
             zoomControlsEnabled: false,
             rotateGesturesEnabled: true,

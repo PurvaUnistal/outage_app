@@ -35,6 +35,9 @@ class _IncidentReportViewState extends State<IncidentReportView> {
     BlocProvider.of<IncidentReportBloc>(
       context,
     ).add(IncidentReportLoadEvent(context: context));
+    BlocProvider.of<IncidentReportBloc>(
+      context,
+    ).add(OnCameraIdleEvent(context: context));
   }
 
   @override
@@ -103,8 +106,8 @@ class _IncidentReportViewState extends State<IncidentReportView> {
                     _filterButtonWidget(dataState: dataState),
                     SizedBox(height: 16.0),
                     _emergencyButtonWidget(dataState: dataState),
-                    // SizedBox(height: 16.0),
-                    // _searchButtonWidget(dataState: dataState),
+                    SizedBox(height: 16.0),
+                    _searchButtonWidget(dataState: dataState),
                     Spacer(),
                     _routeDirButtonWidget(dataState: dataState),
                     Spacer(),
@@ -124,6 +127,7 @@ class _IncidentReportViewState extends State<IncidentReportView> {
       rotateGesturesEnabled: true,
       zoomControlsEnabled: false,
       mapToolbarEnabled: true,
+      buildingsEnabled: false,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
       initialCameraPosition: CameraPosition(target: dataState.currentPosition),
@@ -197,7 +201,7 @@ class _IncidentReportViewState extends State<IncidentReportView> {
       onTap:
           () => BlocProvider.of<IncidentReportBloc>(
             context,
-          ).add(UpdateStartAddress()),
+          ).add(CurrentLocationEvent()),
     );
   }
 

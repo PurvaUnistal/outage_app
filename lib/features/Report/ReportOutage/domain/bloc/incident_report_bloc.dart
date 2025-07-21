@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:core';
-
+import 'dart:math' show cos, sqrt, asin;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/secrets.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/CommercialModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/DomesticModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/EmergencyModel.dart';
@@ -24,8 +27,6 @@ import 'package:outage_app/features/Report/ReportOutage/presentation/widget/MapS
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/alert_dialog_widget.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/filter_report.dart';
-import 'package:uuid/uuid.dart';
-
 import '../../../../Manage/IncidentDetails/domain/model/filter_key_enum.dart';
 import 'incident_report_event.dart';
 import 'incident_report_state.dart';
@@ -61,8 +62,11 @@ class IncidentReportBloc
     on<OnCameraIdleEvent>(_onCameraIdleEvent);
     on<ResetFilterEvent>(_onResetFilterEvent);
 
-    on<UpdateStartAddress>(_updateStartAddress);
-    on<UpdateDestinationAddress>(_updateDestinationAddress);
+    on<CurrentLocationEvent>(_currentLocationEvent);
+    on<UpdateStartAddressEvent>(_updateStartAddress);
+    on<SelectCurrentSuggestionEvent>(_selectCurrentSuggestion);
+    on<UpdateDestinationAddressEvent>(_updateDestinationAddress);
+    on<SelectDestinationSuggestionEvent>(_selectDestinationSuggestion);
     on<ShowRouteButtonEvent>(_showRouteButtonEvent);
     on<SearchHideShowEvent>(_searchHideShowEvent);
     on<SelectEmergencyEvent>(_selectEmergency);
@@ -127,7 +131,8 @@ class IncidentReportBloc
   List<String> listOfEmergencyId = [];
 
   List<String> listOfDiaColor = [];
-  List<dynamic> placeList = [];
+  List<dynamic> curPlaceList = [];
+  List<dynamic> desPlaceList = [];
 
   PipelineData pipelineData = PipelineData();
   List<PipelineData> listOfPipeline = [];
@@ -220,7 +225,8 @@ class IncidentReportBloc
     listOfEmergencyId = [];
 
     listOfDiaColor = [];
-    placeList = [];
+    curPlaceList = [];
+    desPlaceList = [];
 
     pipelineData = PipelineData();
     listOfPipeline = [];
@@ -887,25 +893,51 @@ class IncidentReportBloc
     _eventCompleted(emit);
   }
 
-  _updateStartAddress(UpdateStartAddress event, emit) async {
+  _currentLocationEvent(CurrentLocationEvent event, emit) async {
     await _currentPointMarker();
     _eventCompleted(emit);
   }
 
-  _updateDestinationAddress(UpdateDestinationAddress event, emit) async {
-    String _sessionToken = '1234567890';
-    var uuid = const Uuid();
-    destinationAddress = event.destinationAddress;
-    if (_sessionToken.isEmpty) {
-      _sessionToken = uuid.v4();
+  _updateStartAddress(UpdateStartAddressEvent event, emit) async {
+    startAddressController.text = event.startAddress;
+    curPlaceList = [];
+    if (startAddressController.text.isNotEmpty) {
+      print("=============================${startAddressController.text}");
+      final res = await IncidentReportHelper.getSuggestion(
+        input: event.startAddress,
+      );
+      curPlaceList = res;
     }
-    var res = await IncidentReportHelper.getSuggestion(
-      input: destinationAddressController.text,
-      sessionToken: _sessionToken,
-    );
-    if (res != null) {
-      placeList = res;
+    _eventCompleted(emit);
+  }
+
+  _selectCurrentSuggestion(SelectCurrentSuggestionEvent event, emit) async {
+    startAddressController.text = event.selectedCurrent;
+    curPlaceList = [];
+    _eventCompleted(emit);
+  }
+
+  _updateDestinationAddress(UpdateDestinationAddressEvent event, emit) async {
+    destinationAddressController.text = event.destinationAddress;
+    desPlaceList = [];
+    if (destinationAddressController.text.isNotEmpty) {
+      print(
+        "=============================${destinationAddressController.text}",
+      );
+      final res = await IncidentReportHelper.getSuggestion(
+        input: event.destinationAddress,
+      );
+      desPlaceList = res;
     }
+    _eventCompleted(emit);
+  }
+
+  _selectDestinationSuggestion(
+    SelectDestinationSuggestionEvent event,
+    emit,
+  ) async {
+    destinationAddressController.text = event.selectedDescription;
+    desPlaceList = [];
     _eventCompleted(emit);
   }
 
@@ -917,31 +949,86 @@ class IncidentReportBloc
 
   _showRouteButtonEvent(ShowRouteButtonEvent event, emit) async {
     final controller = await googleMapController.future;
-
+    Set<Marker> makeMarkers = Set.from(markersPointList);
+    Set<Polyline> makePolyline = Set.from(polylinePointList);
     if (startAddressController.text.isNotEmpty &&
         destinationAddressController.text.isNotEmpty) {
-      final result = await mapService.calculateAndDisplayRoute(
-        startAddress: startAddressController.text,
-        destinationAddress: destinationAddressController.text,
-        currentPosition: currentPosition,
-        startAddressController: startAddressController,
-        markers: markersPointList,
-        polylines: polylinePointList,
-        controller: controller,
-        polylineCoordinates: polylineCoordinates,
+      List<Location> startPlacemark = await locationFromAddress(
+        startAddressController.text,
+      );
+      List<Location> destPlacemark = await locationFromAddress(
+        destinationAddressController.text,
       );
 
-      if (result != null) {
-        placeDistance = result.toString();
-
-        print("Start Address: ${startAddressController.text}");
-        print("Destination Address: ${destinationAddressController.text}");
-        print("Current Position: $currentPosition");
-        print("Place Distance: $placeDistance");
+      double startLat = startPlacemark[0].latitude;
+      double startLng = startPlacemark[0].longitude;
+      double destLat = destPlacemark[0].latitude;
+      double destLng = destPlacemark[0].longitude;
+      double minLat = startLat < destLat ? startLat : destLat;
+      double minLng = startLng < destLng ? startLng : destLng;
+      double maxLat = startLat > destLat ? startLat : destLat;
+      double maxLng = startLng > destLng ? startLng : destLng;
+      // Add markers
+      makeMarkers.add(
+        Marker(
+          markerId: const MarkerId('start'),
+          position: LatLng(startLat, startLng),
+          infoWindow: InfoWindow(
+            title: 'Start',
+            snippet: startAddressController.text,
+          ),
+        ),
+      );
+      makeMarkers.add(
+        Marker(
+          markerId: const MarkerId('destination'),
+          position: LatLng(destLat, destLng),
+          infoWindow: InfoWindow(
+            title: 'Destination',
+            snippet: destinationAddressController.text,
+          ),
+        ),
+      );
+      markersPointList = makeMarkers;
+      // Calculate route & polyline
+      final result = await MapService.createPolylines(
+        startLat: startLat,
+        startLng: startLng,
+        destLat: destLat,
+        destLng: destLng,
+        polylines: makePolyline,
+        polylineCoordinates: polylineCoordinates,
+      );
+      polylinePointList = makePolyline;
+      // Optional: calculate distance based on polyline points
+      double totalDistance = 0.0;
+      for (int i = 0; i < polylineCoordinates.length - 1; i++) {
+        totalDistance += _coordinateDistance(
+          polylineCoordinates[i].latitude,
+          polylineCoordinates[i].longitude,
+          polylineCoordinates[i + 1].latitude,
+          polylineCoordinates[i + 1].longitude,
+        );
       }
-    }
 
-    _eventCompleted(emit);
+      LatLngBounds bounds = LatLngBounds(
+        southwest: LatLng(minLat, minLng),
+        northeast: LatLng(maxLat, maxLng),
+      );
+      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 25));
+      isVisible = false;
+      _eventCompleted(emit);
+    }
+  }
+
+  double _coordinateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a =
+        0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
   }
 
   Future<void> _filterVisiblePolyline() async {
@@ -1154,7 +1241,8 @@ class IncidentReportBloc
           listOfDomesticId: listOfDomesticId,
           listOfIndustrialId: listOfIndustrialId,
           listOfEmergencyId: listOfEmergencyId,
-          placeList: placeList,
+          curPlaceList: curPlaceList,
+          desPlaceList: desPlaceList,
         ),
       );
     });
@@ -1208,7 +1296,8 @@ class IncidentReportBloc
         listOfDomesticId: listOfDomesticId,
         listOfIndustrialId: listOfIndustrialId,
         listOfEmergencyId: listOfEmergencyId,
-        placeList: placeList,
+        curPlaceList: curPlaceList,
+        desPlaceList: desPlaceList,
       ),
     );
   }

@@ -27,6 +27,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       ),
       elevation: 0,
       centerTitle: true,
+      titleSpacing: 0,
       leading: leadingWidget,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -52,7 +53,6 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
-          SizedBox(width: MediaQuery.of(context).size.width * 0.05,),
           Flexible(
             child: Container(
               width: MediaQuery.of(context).size.width * 0.2,
@@ -73,16 +73,13 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
-          SizedBox(width: MediaQuery.of(context).size.width * 0.05,),
           Flexible(
-            child: Center(
-              child: Text(
-                title ?? "",
-                textAlign: TextAlign.center,
-                style: Styles.appTitle,
-              ),
+            child: Text(
+              title ?? "",
+              style: Styles.appTitle,
             ),
           ),
+          SizedBox(width: MediaQuery.of(context).size.width * 0.05,),
         ],
       ),
 

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:uuid/uuid.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +26,7 @@ import 'package:outage_app/service/api_server_dio.dart';
 import 'package:path_provider/path_provider.dart';
 
 class IncidentReportHelper {
+
   static Future<void> clearCache() async {
     try {
       Directory pathIGL1 = Directory(
@@ -68,27 +69,21 @@ class IncidentReportHelper {
         "buffer": "3",
       };
       String json = Uri(queryParameters: para).query;
-      var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getPipeline + json,
-        context: context,
-      );
-      if (res != null && res["data"] != null && res["data"] is List) {
+      var res = await ApiHelper.getData(urlEndPoint: Apis.getPipeline + json, context: context);
+      if (res != null && res["data"] != null &&  res["data"] is List) {
         PipelineModel response = PipelineModel.fromJson(res);
-        if (ctx.isHo) {
+        if(ctx.isHo){
           await HiveDataBase.pipelineDataBox!.clear();
           return response;
-        } else {
+        }else{
           if (await HiveDataBase.pipelineDataBox!.isOpen) {
             await HiveDataBase.pipelineDataBox!.clear();
             await HiveDataBase.pipelineDataBox!.addAll(response.data!);
           }
           return response;
         }
-      } else if (res != null && res["data"] != null && res["data"] is String) {
-        await Utils.errorSnackBar(
-          msg: res["data"].toString(),
-          context: context,
-        );
+      }else if(res != null && res["data"] != null &&  res["data"] is String){
+        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
     } catch (e) {
@@ -97,34 +92,26 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<TFGISModel?> getTFGisApi({
-    required BuildContext context,
-  }) async {
+
+  static Future<TFGISModel?> getTFGisApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      final query =
-          Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
-      final res = await ApiHelper.getData(
-        urlEndPoint: Apis.getTFGis + query,
-        context: context,
-      );
-      if (res != null && res["data"] != null && res["data"] is List) {
+      final query = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
+      final res = await ApiHelper.getData(urlEndPoint: Apis.getTFGis + query,context: context);
+      if(res != null && res["data"] != null &&  res["data"] is List){
         final response = TFGISModel.fromJson(res);
-        if (ctx.isHo) {
-          await HiveDataBase.tfGISBox!.clear();
-          return response;
-        } else {
-          if (await HiveDataBase.tfGISBox?.isOpen ?? false) {
-            await HiveDataBase.tfGISBox!.clear();
-            await HiveDataBase.tfGISBox!.addAll(response.data);
-            return response;
-          }
-        }
-      } else if (res != null && res["data"] != null && res["data"] is String) {
-        await Utils.errorSnackBar(
-          msg: res["data"].toString(),
-          context: context,
-        );
+       if (ctx.isHo) {
+         await HiveDataBase.tfGISBox!.clear();
+         return response;
+       } else {
+         if (await HiveDataBase.tfGISBox?.isOpen ?? false) {
+           await HiveDataBase.tfGISBox!.clear();
+           await HiveDataBase.tfGISBox!.addAll(response.data);
+           return response;
+         }
+       }
+     } else if(res != null && res["data"] != null &&  res["data"] is String){
+        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
     } catch (e) {
@@ -134,18 +121,14 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<ValveGISModel?> getGasValueGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<ValveGISModel?> getGasValueGisApi({ required BuildContext context,}) async {
     final ctx = UserContext.getUserContext();
     try {
-      String json =
-          Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
+      String json = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getGasValueGis + json,
-        context: context,
+        urlEndPoint: Apis.getGasValueGis + json,context: context
       );
-      if (res != null && res["data"] != null && res["data"] is List) {
+      if (res != null && res["data"] != null &&  res["data"] is List) {
         ValveGISModel response = ValveGISModel.fromJson(res);
         if (ctx.isHo) {
           await HiveDataBase.valveGISBox!.clear();
@@ -157,11 +140,8 @@ class IncidentReportHelper {
           }
           return response;
         }
-      } else if (res != null && res["data"] != null && res["data"] is String) {
-        await Utils.errorSnackBar(
-          msg: res["data"].toString(),
-          context: context,
-        );
+      }else if(res != null && res["data"] != null &&  res["data"] is String){
+        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
     } catch (e) {
@@ -170,18 +150,12 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<RegulatorGISModel?> getRegulatorGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<RegulatorGISModel?> getRegulatorGisApi({ required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      String json =
-          Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
-      var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getRegulatorGis + json,
-        context: context,
-      );
-      if (res != null && res["data"] != null && res["data"] is List) {
+      String json = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
+      var res = await ApiHelper.getData(urlEndPoint: Apis.getRegulatorGis + json,context: context);
+      if (res != null && res["data"] != null &&  res["data"] is List) {
         RegulatorGISModel response = RegulatorGISModel.fromJson(res);
         if (ctx.isHo) {
           await HiveDataBase.regulatorGISBox!.clear();
@@ -193,11 +167,8 @@ class IncidentReportHelper {
           }
           return response;
         }
-      } else if (res != null && res["data"] != null && res["data"] is String) {
-        await Utils.errorSnackBar(
-          msg: res["data"].toString(),
-          context: context,
-        );
+      }else if(res != null && res["data"] != null &&  res["data"] is String){
+        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
     } catch (e) {
@@ -206,9 +177,7 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<CommercialModel?> getCommercialApi({
-    required BuildContext context,
-  }) async {
+  static Future<CommercialModel?> getCommercialApi({ required BuildContext context,}) async {
     final ctx = UserContext.getUserContext();
     try {
       Map<String, String> para = {
@@ -218,11 +187,8 @@ class IncidentReportHelper {
         "type": "1",
       };
       String json = Uri(queryParameters: para).query;
-      var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getConsumerGis + json,
-        context: context,
-      );
-      if (res != null && res["data"] != null && res["data"] is List) {
+      var res = await ApiHelper.getData(urlEndPoint: Apis.getConsumerGis + json,context: context);
+      if (res != null && res["data"] != null &&  res["data"] is List) {
         CommercialModel response = CommercialModel.fromJson(res);
         if (ctx.isHo == "1") {
           await HiveDataBase.commercialDataBox!.clear();
@@ -234,11 +200,8 @@ class IncidentReportHelper {
           }
           return response;
         }
-      } else if (res != null && res["data"] != null && res["data"] is String) {
-        await Utils.errorSnackBar(
-          msg: res["data"].toString(),
-          context: context,
-        );
+      }else if(res != null && res["data"] != null &&  res["data"] is String){
+        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
     } catch (e) {
@@ -247,11 +210,9 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<DomesticModel?> getDomesticApi({
-    required BuildContext context,
-  }) async {
+  static Future<DomesticModel?> getDomesticApi({ required BuildContext context,}) async {
     final ctx = UserContext.getUserContext();
-    try {
+      try {
       Map<String, String> para = {
         "schema": ctx.schema,
         "ga_id": ctx.gaId,
@@ -260,10 +221,9 @@ class IncidentReportHelper {
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getConsumerGis + json,
-        context: context,
+        urlEndPoint: Apis.getConsumerGis + json,context: context
       );
-      if (res != null && res["data"] != null && res["data"] is List) {
+      if (res != null && res["data"] != null &&  res["data"] is List) {
         DomesticModel response = DomesticModel.fromJson(res);
         if (ctx.isHo == "1") {
           await HiveDataBase.domesticDataBox!.clear();
@@ -275,11 +235,8 @@ class IncidentReportHelper {
           }
           return response;
         }
-      } else if (res != null && res["data"] != null && res["data"] is String) {
-        await Utils.errorSnackBar(
-          msg: res["data"].toString(),
-          context: context,
-        );
+      }else if(res != null && res["data"] != null &&  res["data"] is String){
+        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
     } catch (e) {
@@ -288,9 +245,7 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<IndustrialModel?> getIndustrialApi({
-    required BuildContext context,
-  }) async {
+  static Future<IndustrialModel?> getIndustrialApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
       Map<String, String> para = {
@@ -301,10 +256,9 @@ class IncidentReportHelper {
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getConsumerGis + json,
-        context: context,
+        urlEndPoint: Apis.getConsumerGis + json,context: context
       );
-      if (res != null && res["data"] != null && res["data"] is List) {
+      if (res != null && res["data"] != null &&  res["data"] is List) {
         IndustrialModel response = IndustrialModel.fromJson(res);
         if (ctx.isHo == "1") {
           await HiveDataBase.industrialDataBox!.clear();
@@ -315,11 +269,8 @@ class IncidentReportHelper {
           }
           return response;
         }
-      } else if (res != null && res["data"] != null && res["data"] is String) {
-        await Utils.errorSnackBar(
-          msg: res["data"].toString(),
-          context: context,
-        );
+      } else if(res != null && res["data"] != null &&  res["data"] is String){
+        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
     } catch (e) {
@@ -328,18 +279,13 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<GetGasValueGISModel?> getFittingGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<GetGasValueGISModel?> getFittingGisApi({ required BuildContext context,}) async {
     try {
       final ctx = UserContext.getUserContext();
 
       Map<String, String> para = {"ga_id": ctx.gaId, "areas": ctx.areas};
       String json = Uri(queryParameters: para).query;
-      var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getFittingGis + json,
-        context: context,
-      );
+      var res = await ApiHelper.getData(urlEndPoint: Apis.getFittingGis + json,context: context);
       if (res != null) {
         GetGasValueGISModel response = GetGasValueGISModel.fromJson(res);
         return response;
@@ -350,20 +296,13 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getTeeGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<GetGasGisModel?> getTeeGisApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      Map<String, String> para = {
-        "type": "Tee",
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
-      };
+      Map<String, String> para = {"type": "Tee", "ga_id": ctx.gaId, "areas": ctx.areas};
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getNonControllableFittingGis + json,
-        context: context,
+        urlEndPoint: Apis.getNonControllableFittingGis + json,context: context
       );
       if (res != null) {
         GetGasGisModel response = GetGasGisModel.fromJson(res);
@@ -375,9 +314,7 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getElbowGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<GetGasGisModel?> getElbowGisApi({ required BuildContext context,}) async {
     final ctx = UserContext.getUserContext();
     try {
       Map<String, String> para = {
@@ -387,8 +324,7 @@ class IncidentReportHelper {
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getNonControllableFittingGis + json,
-        context: context,
+        urlEndPoint: Apis.getNonControllableFittingGis + json,context: context
       );
       if (res != null) {
         GetGasGisModel response = GetGasGisModel.fromJson(res);
@@ -400,9 +336,7 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getCouplerGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<GetGasGisModel?> getCouplerGisApi({ required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
 
     try {
@@ -413,8 +347,7 @@ class IncidentReportHelper {
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getNonControllableFittingGis + json,
-        context: context,
+        urlEndPoint: Apis.getNonControllableFittingGis + json,context: context
       );
       if (res != null) {
         GetGasGisModel response = GetGasGisModel.fromJson(res);
@@ -426,9 +359,7 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getReducerGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<GetGasGisModel?> getReducerGisApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
 
     try {
@@ -439,8 +370,7 @@ class IncidentReportHelper {
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getNonControllableFittingGis + json,
-        context: context,
+        urlEndPoint: Apis.getNonControllableFittingGis + json, context: context
       );
       if (res != null) {
         GetGasGisModel response = GetGasGisModel.fromJson(res);
@@ -452,9 +382,7 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<GetGasGisModel?> getEndCapGisApi({
-    required BuildContext context,
-  }) async {
+  static Future<GetGasGisModel?> getEndCapGisApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
       Map<String, String> para = {
@@ -464,8 +392,7 @@ class IncidentReportHelper {
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getNonControllableFittingGis + json,
-        context: context,
+        urlEndPoint: Apis.getNonControllableFittingGis + json,context: context
       );
       if (res != null) {
         GetGasGisModel response = GetGasGisModel.fromJson(res);
@@ -495,8 +422,7 @@ class IncidentReportHelper {
     try {
       log(Apis.getPipelineNetwork + json);
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.getPipelineNetwork + json,
-        context: context,
+        urlEndPoint: Apis.getPipelineNetwork + json,context: context
       );
       if (res != null) {
         GetPipelineNetworkModel response = GetPipelineNetworkModel.fromJson(
@@ -510,16 +436,12 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<List<String>?> getDiaColorApi({
-    required BuildContext context,
-  }) async {
+
+  static Future<List<String>?> getDiaColorApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
 
     String query = Uri(queryParameters: {"schema": ctx.schema}).query;
-    var res = await ApiHelper.getData(
-      urlEndPoint: Apis.diaColor + query,
-      context: context,
-    );
+    var res = await ApiHelper.getData(urlEndPoint: Apis.diaColor + query,context: context);
     if (res != null && res["data"] != null) {
       final data = res["data"];
       if (data is Map<String, dynamic>) {
@@ -529,20 +451,14 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future<EmergencyModel?> getEmergencySearchApi({
-    required BuildContext context,
-  }) async {
+  static Future<EmergencyModel?> getEmergencySearchApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
 
     try {
-      Map<String, String> para = {
-        "district_id": ctx.areas,
-        "search": "Hospital",
-      };
+      Map<String, String> para = {"district_id": ctx.areas, "search": "Hospital"};
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
-        urlEndPoint: Apis.emergencySearch + json,
-        context: context,
+        urlEndPoint: Apis.emergencySearch + json, context: context
       );
       if (res != null) {
         EmergencyModel response = EmergencyModel.fromJson(res);
@@ -554,30 +470,23 @@ class IncidentReportHelper {
     return null;
   }
 
-  static Future getSuggestion({
-    required String input,
-    required String sessionToken,
-  }) async {
-    final String PLACES_API_KEY = Secrets.API_KEY;
-
-    try {
-      String baseURL =
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-      String request =
-          '$baseURL?input=$input&key=$PLACES_API_KEY&sessiontoken=$sessionToken';
+  static  getSuggestion({required String input,}) async {
+    const String PLACES_API_KEY = Secrets.API_KEY;
+    var uuid = const Uuid();
+    String sessionToken = uuid.v4();
+    try{
+      String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      String request = '$baseURL?input=$input&key=$PLACES_API_KEY&sessiontoken=$sessionToken';
       var response = await http.get(Uri.parse(request));
-      var data = json.decode(response.body);
-      if (kDebugMode) {
-        print('mydata');
-        print(data);
-      }
       if (response.statusCode == 200) {
-        return json.decode(response.body)['predictions'];
+        var data = json.decode(response.body);
+        return data['predictions'] ?? [];
       } else {
         throw Exception('Failed to load predictions');
       }
-    } catch (e) {
+    }catch(e){
       print(e);
     }
+
   }
 }

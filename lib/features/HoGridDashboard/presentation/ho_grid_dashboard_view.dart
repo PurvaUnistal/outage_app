@@ -69,45 +69,58 @@ class _HoGridDashboardViewState extends State<HoGridDashboardView> {
   }
 
   Widget _tabWidget({required FetchHoGridDashboardDataState dataState}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisSpacing = 8 * 1;
+    final padding = 12;
+    final columns = 2;
+    final itemWidth = (screenWidth - crossAxisSpacing - padding) / columns;
+    final itemHeight = MediaQuery.of(context).size.height * 0.09;
+
+    final aspectRatio = itemWidth / itemHeight;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Summary Cards
-          GridView.count(
-            crossAxisCount: 2,
+          GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 2,
-            children: [
-              SummeryCard(
-                title: 'MDPE',
-                value: '${dataState.dashboard.mdpeLength} km',
-                icon: Icons.straighten,
-                color: Colors.blue.shade100,
-              ),
-              SummeryCard(
-                title: 'Steel',
-                value: '${dataState.dashboard.steelLength} km',
-                icon: Icons.construction,
-                color: Colors.grey.shade300,
-              ),
-              SummeryCard(
-                title: 'DPNG',
-                value: '${dataState.dashboard.domesticCount}',
-                icon: Icons.home,
-                color: Colors.green.shade100,
-              ),
-              SummeryCard(
-                title: 'I & C',
-                value: '${dataState.dashboard.industrialCommercialCount}',
-                icon: Icons.apartment,
-                color: Colors.orange.shade100,
-              ),
-            ],
+            itemCount: 4,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 4,
+              childAspectRatio: aspectRatio,
+            ),
+            itemBuilder: (context, index) {
+              final items = [
+                SummeryCard(
+                  title: "MDPE",
+                  value: "${dataState.dashboard.mdpeLength} km",
+                  icon: Icons.straighten,
+                  color: Colors.blue.shade100,
+                ),
+                SummeryCard(
+                  title: "Steel",
+                  value: "${dataState.dashboard.steelLength} km",
+                  icon: Icons.construction,
+                  color: Colors.grey.shade300,
+                ),
+                SummeryCard(
+                  title: "DPNG",
+                  value: "${dataState.dashboard.domesticCount}",
+                  icon: Icons.home,
+                  color: Colors.green.shade100,
+                ),
+                SummeryCard(
+                  title: "I & C",
+                  value: "${dataState.dashboard.industrialCommercialCount}",
+                  icon: Icons.factory,
+                  color: Colors.orange.shade100,
+                ),
+              ];
+              return items[index];
+            },
           ),
           const SizedBox(height: 20),
 

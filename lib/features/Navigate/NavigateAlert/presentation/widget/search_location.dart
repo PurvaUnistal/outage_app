@@ -239,6 +239,7 @@ class _MapScreenState extends State<MapScreen> {
       body: _currentLocation == null
           ? Center(child: CircularProgressIndicator())
           : GoogleMap(
+        buildingsEnabled: false,
         rotateGesturesEnabled: true,
         initialCameraPosition: CameraPosition(
           target: _currentLocation!,
