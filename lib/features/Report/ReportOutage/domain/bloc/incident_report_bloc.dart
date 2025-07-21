@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:core';
 import 'dart:math' show cos, sqrt, asin;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
@@ -11,7 +11,6 @@ import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart'
 import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
-import 'package:outage_app/Utils/common_widgets/res/secrets.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/CommercialModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/DomesticModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/EmergencyModel.dart';
@@ -27,6 +26,7 @@ import 'package:outage_app/features/Report/ReportOutage/presentation/widget/MapS
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/alert_dialog_widget.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/filter_report.dart';
+
 import '../../../../Manage/IncidentDetails/domain/model/filter_key_enum.dart';
 import 'incident_report_event.dart';
 import 'incident_report_state.dart';
@@ -151,8 +151,10 @@ class IncidentReportBloc
   Set<Marker> domesticMarker = {};
   Set<Marker> industrialMarker = {};
   Set<Marker> markersPointList = {};
+  Set<Marker> routePointList = {};
 
   Set<Polyline> polylinePointList = {};
+  Set<Polyline> routePolyline = {};
   Set<Polyline> pipePolylinePointList = {};
   Set<Polyline> filterPolyline = {};
   Set<Polyline> finalPolyline = {};
@@ -989,7 +991,7 @@ class IncidentReportBloc
           ),
         ),
       );
-      markersPointList = makeMarkers;
+      routePointList = makeMarkers;
       // Calculate route & polyline
       final result = await MapService.createPolylines(
         startLat: startLat,
@@ -999,7 +1001,7 @@ class IncidentReportBloc
         polylines: makePolyline,
         polylineCoordinates: polylineCoordinates,
       );
-      polylinePointList = makePolyline;
+      routePolyline = makePolyline;
       // Optional: calculate distance based on polyline points
       double totalDistance = 0.0;
       for (int i = 0; i < polylineCoordinates.length - 1; i++) {
@@ -1017,6 +1019,7 @@ class IncidentReportBloc
       );
       controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 25));
       isVisible = false;
+      _updateMarkerPolyline();
       _eventCompleted(emit);
     }
   }
@@ -1051,8 +1054,16 @@ class IncidentReportBloc
   }
 
   _updateMarkerPolyline() {
-    polylinePointList = {...pipePolylinePointList, ...filterPolyline};
-    //markersPointList = {...markersPointList, ...filterMarkerList};
+    polylinePointList = {
+      ...pipePolylinePointList,
+      ...filterPolyline,
+      ...routePolyline,
+    };
+    markersPointList = {
+      ...markersPointList,
+      ...filterMarkerList,
+      ...routePointList,
+    };
     print("pipePolylinePointList-->${pipePolylinePointList.length}");
     print("filterPolyline-->${filterPolyline.length}");
     print("markersPointList-->${markersPointList.length}");

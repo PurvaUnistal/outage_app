@@ -127,7 +127,6 @@ class _IncidentReportViewState extends State<IncidentReportView> {
       rotateGesturesEnabled: true,
       zoomControlsEnabled: false,
       mapToolbarEnabled: true,
-      buildingsEnabled: false,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
       initialCameraPosition: CameraPosition(target: dataState.currentPosition),
