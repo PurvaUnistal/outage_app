@@ -254,6 +254,7 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
         clipBehavior: Clip.none,
         children: [
           GoogleMap(
+            buildingsEnabled: false,
             zoomControlsEnabled: false,
             rotateGesturesEnabled: true,
             markers: dataState.markersPointList,

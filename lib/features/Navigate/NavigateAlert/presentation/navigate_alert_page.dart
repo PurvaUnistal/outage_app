@@ -105,6 +105,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
 
   Widget _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
     return GoogleMap(
+      buildingsEnabled: false,
       mapType: dataState.currentMapType,
       rotateGesturesEnabled: true,
       zoomControlsEnabled: false,

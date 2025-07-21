@@ -1,10 +1,15 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:outage_app/Utils/Utils.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/secrets.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/CommercialModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/DomesticModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/EmergencyModel.dart';
@@ -463,5 +468,25 @@ class IncidentReportHelper {
       log("EmergencyModel-->${e.toString()}");
     }
     return null;
+  }
+
+  static  getSuggestion({required String input,}) async {
+    const String PLACES_API_KEY = Secrets.API_KEY;
+    var uuid = const Uuid();
+    String sessionToken = uuid.v4();
+    try{
+      String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      String request = '$baseURL?input=$input&key=$PLACES_API_KEY&sessiontoken=$sessionToken';
+      var response = await http.get(Uri.parse(request));
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        return data['predictions'] ?? [];
+      } else {
+        throw Exception('Failed to load predictions');
+      }
+    }catch(e){
+      print(e);
+    }
+
   }
 }

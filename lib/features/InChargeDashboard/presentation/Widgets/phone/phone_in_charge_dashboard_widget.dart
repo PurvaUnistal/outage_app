@@ -65,75 +65,97 @@ class _PhoneInChargeDashboardWidgetState
   }
 
   Widget _tabWidget({required FetchInChargeDashboardDataState dataState}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisSpacing = 8 * 1;
+    final padding = 12;
+    final columns = 2;
+    final itemWidth = (screenWidth - crossAxisSpacing - padding) / columns;
+    final itemHeight = MediaQuery.of(context).size.height * 0.09;
+
+    final aspectRatio = itemWidth / itemHeight;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GridView.count(
-            crossAxisCount: 2,
-            childAspectRatio:  2,
+          GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            children: [
-              SummeryCard(
-                title: "MDPE",
-                value: "${dataState.dashboard.mdpeLength} km",
-                icon: Icons.straighten,
-                color: Colors.blue.shade100,
-              ),
-              SummeryCard(
-                title: "Steel",
-                value: "${dataState.dashboard.steelLength} km",
-                icon: Icons.construction,
-                color: Colors.grey.shade300,
-              ),
-              SummeryCard(
-                title: "DPNG",
-                value: "${dataState.dashboard.domesticCount}",
-                icon: Icons.home,
-                color: Colors.green.shade100,
-              ),
-              SummeryCard(
-                title: "I & C",
-                value: "${dataState.dashboard.industrialCommercialCount}",
-                icon: Icons.factory,
-                color: Colors.orange.shade100,
-              ),
+            itemCount: 4,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 4,
+              childAspectRatio: aspectRatio,
+            ),
+            itemBuilder: (context, index) {
+              final items = [
+                SummeryCard(
+                  title: "MDPE",
+                  value: "${dataState.dashboard.mdpeLength} km",
+                  icon: Icons.straighten,
+                  color: Colors.blue.shade100,
+                ),
+                SummeryCard(
+                  title: "Steel",
+                  value: "${dataState.dashboard.steelLength} km",
+                  icon: Icons.construction,
+                  color: Colors.grey.shade300,
+                ),
+                SummeryCard(
+                  title: "DPNG",
+                  value: "${dataState.dashboard.domesticCount}",
+                  icon: Icons.home,
+                  color: Colors.green.shade100,
+                ),
+                SummeryCard(
+                  title: "I & C",
+                  value: "${dataState.dashboard.industrialCommercialCount}",
+                  icon: Icons.factory,
+                  color: Colors.orange.shade100,
+                ),
+              ];
+              return items[index];
+            },
+          ),
 
-            ],
-          ),
          CommonStyle.vertical(context: context),
-          GridView.count(
-            crossAxisCount: 3,
-            childAspectRatio: 1.2,
+          GridView.builder(
+            padding: const EdgeInsets.all(12),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            children: [
-              IncidentCard(
-                title: "Incident New",
-                value: "${dataState.dashboard.totalPendingIncident}",
-                icon: Icons.warning,
-                color: Colors.red.shade100,
-              ),
-              IncidentCard(
-                title: "Incident In Progress",
-                value: "${dataState.dashboard.totalInprogressIncident}",
-                icon: Icons.sync,
-                color: Colors.yellow.shade100,
-              ),
-              IncidentCard(
-                title: "Incident Completed",
-                value: "${dataState.dashboard.totalCompletedIncident}",
-                icon: Icons.check_circle,
-                color: Colors.green.shade200,
-              ),
-            ],
+            itemCount: 3,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: MediaQuery.of(context).size.height * 0.13,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.2,
+            ),
+            itemBuilder: (context, index) {
+              final items = [
+                IncidentCard(
+                  title: "Incident New",
+                  value: "${dataState.dashboard.totalPendingIncident}",
+                  icon: Icons.warning,
+                  color: Colors.red.shade100,
+                ),
+                IncidentCard(
+                  title: "Incident In Progress",
+                  value: "${dataState.dashboard.totalInprogressIncident}",
+                  icon: Icons.sync,
+                  color: Colors.yellow.shade100,
+                ),
+                IncidentCard(
+                  title: "Incident Completed",
+                  value: "${dataState.dashboard.totalCompletedIncident}",
+                  icon: Icons.check_circle,
+                  color: Colors.green.shade200,
+                ),
+              ];
+              return items[index];
+            },
           ),
+
           const SizedBox(height: 24),
 
           const Text(
@@ -144,75 +166,87 @@ class _PhoneInChargeDashboardWidgetState
 
           dataState.listOfInChargeData.isEmpty
               ? const Center(
-                child: Text(
-                  'No Modules Found',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
-                ),
-              )
-              : GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-            childAspectRatio: 1.05,
-                children:
-                    dataState.listOfInChargeData
-                        .expand(
-                          (menu) => [
-                            if (menu.navigate == '1')
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => NavigateAlertView(),
-                                    ),
-                                  ); },
-                                child: CardWidget(
-                                  text: 'Navigate',
-                                  path: AssetPath.navigate,
-                                ),
-                              ),
-                            if (menu.add == '1')
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => IncidentReportView(),
-                                    ),
-                                  );
-
-                               },
-                                child: CardWidget(
-                                  text: 'Incident Reports',
-                                  path: AssetPath.reportOutage,
-                                ),
-                              ),
-                            if (menu.manage == '1')
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => IncidentManageView(),
-                                    ),
-                                  );
-                                },
-                                child: CardWidget(
-                                  text: 'Incident Manage',
-                                  path: AssetPath.manage,
-                                ),
-                              ),
-                          ],
-                        )
-                        .toList(),
+            child: Text(
+              'No Modules Found',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
               ),
+            ),
+          )
+              : GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(12),
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: MediaQuery.of(context).size.height * 0.13,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.05,
+            ),
+            itemCount: dataState.listOfInChargeData.fold<int>(0, (prev, menu) {
+              if (menu.navigate == '1') prev++;
+              if (menu.add == '1') prev++;
+              if (menu.manage == '1') prev++;
+              return prev;
+            }),
+            itemBuilder: (context, index) {
+              final menus = <Widget>[];
+              for (var menu in dataState.listOfInChargeData) {
+                if (menu.navigate == '1') {
+                  menus.add(
+                    CardWidget(
+                      text: 'Navigate',
+                      path: AssetPath.navigate,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NavigateAlertView(),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+                if (menu.add == '1') {
+                  menus.add(
+                    CardWidget(
+                      text: 'Reports Incident',
+                      path: AssetPath.reportOutage,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => IncidentReportView(),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+                if (menu.manage == '1') {
+                  menus.add(
+                    CardWidget(
+                      text: 'Manage Incident',
+                      path: AssetPath.manage,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => IncidentManageView(),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              }
+              return menus[index];
+            },
+          ),
+
         ],
       ),
     );

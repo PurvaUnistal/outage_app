@@ -15,6 +15,7 @@ class _GoogleMapExampleState extends State<GoogleMapExample> {
     return Scaffold(
       appBar: AppBar(title: Text('Google Map Tap Example')),
       body: GoogleMap(
+        buildingsEnabled: false,
 
         initialCameraPosition: CameraPosition(
           target: LatLng(37.7749, -122.4194), // San Francisco

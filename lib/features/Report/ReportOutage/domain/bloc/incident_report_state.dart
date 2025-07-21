@@ -59,6 +59,8 @@ class FetchIncidentReportDataState extends IncidentReportState {
   final List<String> listOfDomesticId;
   final List<String> listOfIndustrialId;
   final List<String> listOfEmergencyId;
+  final List<dynamic> curPlaceList;
+  final List<dynamic> desPlaceList;
 
   FetchIncidentReportDataState({
     required this.isLoader,
@@ -104,6 +106,8 @@ class FetchIncidentReportDataState extends IncidentReportState {
     required this.listOfDomesticId,
     required this.listOfIndustrialId,
     required this.listOfEmergencyId,
+    required this.curPlaceList,
+    required this.desPlaceList,
   });
 
   @override
@@ -151,5 +155,7 @@ class FetchIncidentReportDataState extends IncidentReportState {
     listOfDomesticId,
     listOfIndustrialId,
     listOfEmergencyId,
+    curPlaceList,
+    desPlaceList,
   ];
 }

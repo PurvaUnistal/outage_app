@@ -14,7 +14,7 @@ class Styles {
   static TextStyle relB = TextStyle(
       color: AppColor.black, fontWeight: FontWeight.w800, fontSize: 8);
   static TextStyle appTitle =
-      TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12);
+      TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 8);
   static TextStyle btnText = TextStyle(
     color: Colors.white,
     fontWeight: FontWeight.bold,

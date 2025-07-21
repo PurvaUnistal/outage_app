@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
+import 'package:outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
@@ -45,7 +46,7 @@ class SearchDestination extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: () {
-                              () => BlocProvider.of<IncidentReportBloc>(
+                          BlocProvider.of<IncidentReportBloc>(
                             context,
                           ).add(SearchHideShowEvent());
                         },
@@ -53,44 +54,143 @@ class SearchDestination extends StatelessWidget {
                       ),
                     ],
                   ),
-
-                  TextFieldWidget(
-                    label: 'Current Location',
-                    hintText: 'Choose starting point',
-                    controller: state.startAddressController,
-                    prefixIcon: Icon(
-                      Icons.looks_one,
-                      color: EnvironmentConfig.of(context)!.primaryTheme,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        Icons.my_location,
-                        color: EnvironmentConfig.of(context)!.primaryTheme,
-                      ),
-                      onPressed:
-                          () => BlocProvider.of<IncidentReportBloc>(
-                            context,
-                          ).add(UpdateStartAddress()),
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        // AutoCompleteTextFieldWidget(
+                        //   prefixIcon: Icon(
+                        //     Icons.looks_one,
+                        //     color: EnvironmentConfig.of(context)!.primaryTheme,
+                        //   ),
+                        //   suffixIcon: IconButton(
+                        //     icon: Icon(
+                        //       Icons.my_location,
+                        //       color:
+                        //       EnvironmentConfig.of(context)!.primaryTheme,
+                        //     ),
+                        //     onPressed:
+                        //         () => BlocProvider.of<IncidentReportBloc>(
+                        //       context,
+                        //     ).add(CurrentLocationEvent()),
+                        //   ),
+                        //   label: 'Current Location',
+                        //   hintText: 'Choose starting point',
+                        //   controller: state.startAddressController,
+                        //   suggestions: state.curPlaceList,
+                        //   onChanged:
+                        //       (val) => BlocProvider.of<IncidentReportBloc>(
+                        //     context,
+                        //   ).add(UpdateStartAddressEvent(val)),
+                        // ),
+                        //
+                        //
+                        TextFieldWidget(
+                          label: 'Current Location',
+                          hintText: 'Choose starting point',
+                          controller: state.startAddressController,
+                          prefixIcon: Icon(
+                            Icons.looks_one,
+                            color: EnvironmentConfig.of(context)!.primaryTheme,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              Icons.my_location,
+                              color:
+                                  EnvironmentConfig.of(context)!.primaryTheme,
+                            ),
+                            onPressed:
+                                () => BlocProvider.of<IncidentReportBloc>(
+                                  context,
+                                ).add(CurrentLocationEvent()),
+                          ),
+                          onChanged:
+                              (val) => BlocProvider.of<IncidentReportBloc>(
+                                context,
+                              ).add(UpdateStartAddressEvent(val)),
+                        ),
+                        CommonStyle.vertical(context: context),
+                        state.curPlaceList.isEmpty
+                            ? Container()
+                            : SizedBox(
+                              height: 100,
+                              child: ListView.builder(
+                                //   physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: state.curPlaceList.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      BlocProvider.of<IncidentReportBloc>(
+                                        context,
+                                      ).add(
+                                        SelectCurrentSuggestionEvent(
+                                          state
+                                              .curPlaceList[index]["description"],
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Text(
+                                        state
+                                            .curPlaceList[index]["description"],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                        TextFieldWidget(
+                          label: 'Destination',
+                          hintText: 'Choose destination',
+                          controller: state.destinationAddressController,
+                          prefixIcon: Icon(
+                            Icons.looks_two,
+                            color: EnvironmentConfig.of(context)!.primaryTheme,
+                          ),
+                          onChanged:
+                              (val) => BlocProvider.of<IncidentReportBloc>(
+                                context,
+                              ).add(UpdateDestinationAddressEvent(val)),
+                        ),
+                        state.desPlaceList.isEmpty
+                            ? Container()
+                            : SizedBox(
+                              height: 100,
+                              child: ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: state.desPlaceList.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      BlocProvider.of<IncidentReportBloc>(
+                                        context,
+                                      ).add(
+                                        SelectDestinationSuggestionEvent(
+                                          state
+                                              .desPlaceList[index]["description"],
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Text(
+                                        state
+                                            .desPlaceList[index]["description"],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                      ],
                     ),
                   ),
                   CommonStyle.vertical(context: context),
-                  TextFieldWidget(
-                    label: 'Destination',
-                    hintText: 'Choose destination',
-                    controller: state.destinationAddressController,
-                    prefixIcon: Icon(
-                      Icons.looks_two,
-                      color: EnvironmentConfig.of(context)!.primaryTheme,
-                    ),
-                    onChanged: (val) => BlocProvider.of<IncidentReportBloc>(
-                          context,
-                        ).add(UpdateDestinationAddress(val)),
-                  ),
-
-                  CommonStyle.vertical(context: context),
-
                   Visibility(
-                    visible: state.placeDistance == '' ? false : true,
+                    visible: state.placeDistance != '',
                     child: Text(
                       'DISTANCE: ${state.placeDistance} km',
                       style: TextStyle(
@@ -107,7 +207,6 @@ class SearchDestination extends StatelessWidget {
                       ).add(ShowRouteButtonEvent(context: context));
                     },
                   ),
-                  CommonStyle.vertical(context: context),
                   CommonStyle.vertical(context: context),
                 ],
               ),

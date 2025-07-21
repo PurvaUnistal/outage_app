@@ -93,7 +93,6 @@ class MapService {
 
       // 🔷 Step 2: Update markers
       markers
-        ..clear()
         ..addAll([
           Marker(
             markerId: const MarkerId('start'),
@@ -117,7 +116,8 @@ class MapService {
       final bounds = _boundsFromLatLngs([startLatLng, destLatLng]);
       await controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
 
-      // 🔷 Step 4: Draw polyline
+      polylineCoordinates.clear();
+      polylines.clear();
       await createPolylines(
         startLat:startLat ,
           startLng: startLng,destLat: destLat,destLng:  destLng,
@@ -148,7 +148,7 @@ class MapService {
 
 
   /// Create polylines
-  Future<void> createPolylines({
+  static Future<void> createPolylines({
     required double startLat,
     required double startLng,
     required double destLat,
@@ -190,7 +190,7 @@ class MapService {
 
 
   /// Compute distance between two points (Haversine)
-  double _coordinateDistance(lat1, lon1, lat2, lon2) {
+  static double _coordinateDistance(lat1, lon1, lat2, lon2) {
     const p = 0.017453292519943295; // π/180
     const c = cos;
     final a =

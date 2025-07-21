@@ -3,7 +3,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 class AppString {
   static double zoom = 15;
   static String version =
-      "Version : Outage-${AppConfig.instanceInit()?.appVersion}-18/07/2025";
+      "Version : Outage-${AppConfig.instanceInit()?.appVersion}-21/07/2025";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";
@@ -26,12 +26,13 @@ class AppString {
   static const String tpaApp = 'GIS APP';
   static const String photo = 'Photo';
   static const String manageAlert = 'Manage Incident';
-  static const String incidentManage = 'Incident Manage';
-  static const String incidentReport = 'Incident Report';
+  static const String incidentManage = 'Manage Incident';
+  static const String incidentReport = 'Report Incident';
   static const String navigateAlert = 'Navigate';
   static const String maintenanceAlert = 'Maintenance Alert';
   static const String createAlertForm = 'Create Alert Form';
 
+  static const String cuAddress = 'Your Current Location';
   static const String currentLat = 'Current Latitude';
   static const String currentLong = 'Current Longitude';
   static const String markerLat = 'marker Latitude';

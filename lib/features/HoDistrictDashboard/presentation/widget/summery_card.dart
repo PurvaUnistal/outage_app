@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:outage_app/Utils/common_widgets/res/singleton.dart';
 
 class SummeryCard extends StatelessWidget {
   final String title;
@@ -6,7 +7,7 @@ class SummeryCard extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-  const SummeryCard({
+   SummeryCard({
     required this.title,
     required this.value,
     required this.icon,
@@ -14,8 +15,10 @@ class SummeryCard extends StatelessWidget {
     super.key,
   });
 
+
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -24,31 +27,31 @@ class SummeryCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 30),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
+          Flexible(child: Icon(icon, size: 30)),
+          SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
                   "${title}",
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Flexible(
-                  child: Text(
-                    "${value}",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+              ),
+              Flexible(
+                child: Text(
+                  "${value}",
+                  style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

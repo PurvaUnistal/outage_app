@@ -171,23 +171,45 @@ class ResetFilterEvent extends IncidentReportEvent {
   List<Object> get props => [context];
 }
 
-
-
-class UpdateStartAddress extends IncidentReportEvent {
-  UpdateStartAddress();
-
+class CurrentLocationEvent extends IncidentReportEvent {
   @override
   // TODO: implement props
   List<Object?> get props =>[];
 }
 
-class UpdateDestinationAddress extends IncidentReportEvent {
+class UpdateStartAddressEvent extends IncidentReportEvent {
+  final String startAddress;
+  UpdateStartAddressEvent(this.startAddress);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props =>[startAddress];
+}
+
+class UpdateDestinationAddressEvent extends IncidentReportEvent {
   final String destinationAddress;
-  UpdateDestinationAddress(this.destinationAddress);
+  UpdateDestinationAddressEvent(this.destinationAddress);
 
   @override
   // TODO: implement props
   List<Object?> get props => [destinationAddress];
+}
+
+class SelectCurrentSuggestionEvent extends IncidentReportEvent {
+  final String selectedCurrent;
+  SelectCurrentSuggestionEvent(this.selectedCurrent);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [selectedCurrent];
+}
+class SelectDestinationSuggestionEvent extends IncidentReportEvent {
+  final String selectedDescription;
+  SelectDestinationSuggestionEvent(this.selectedDescription);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [selectedDescription];
 }
 
 class ShowRouteButtonEvent extends IncidentReportEvent{

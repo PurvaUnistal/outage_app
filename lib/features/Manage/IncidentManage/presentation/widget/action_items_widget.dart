@@ -89,6 +89,7 @@ class ActionItemsWidget extends StatelessWidget {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.2,
                   child: GoogleMap(
+                    buildingsEnabled: false,
                     rotateGesturesEnabled: true,
                     zoomControlsEnabled: false,
                     markers: markers,
