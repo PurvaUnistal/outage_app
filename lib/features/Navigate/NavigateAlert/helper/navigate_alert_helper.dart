@@ -36,11 +36,12 @@ class NavigateAlertHelper {
         position: position,
         infoWindow: InfoWindow(title:
         filterByKey == FilterKey.BP_NUMBER
-            ? "BP"
-            ": ${data.bpNumber}"
+            ? "BP: ${data.bpNumber}"
             : filterByKey == FilterKey.VALUE_ID
-            ? 'Valve : ${data.valveId}'
-            : 'ID: ${data.id}',),
+            ? "Valve: ${data.valveId}"
+            : filterByKey == FilterKey.RegulatorId
+            ? "RegulatorId: ${data.regulatorId}"
+            : "ID: ${data.id}"),
         icon: icon,
       ),
     );

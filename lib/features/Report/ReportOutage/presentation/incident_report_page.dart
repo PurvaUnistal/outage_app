@@ -106,10 +106,9 @@ class _IncidentReportViewState extends State<IncidentReportView> {
                     _filterButtonWidget(dataState: dataState),
                     SizedBox(height: 16.0),
                     _emergencyButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
-                    _searchButtonWidget(dataState: dataState),
-                    Spacer(),
-                    _routeDirButtonWidget(dataState: dataState),
+                    // SizedBox(height: 16.0),
+                    // _searchButtonWidget(dataState: dataState),
+
                     Spacer(),
                   ],
                 ),
@@ -234,21 +233,5 @@ class _IncidentReportViewState extends State<IncidentReportView> {
     );
   }
 
-  Widget _routeDirButtonWidget({
-    required FetchIncidentReportDataState dataState,
-  }) {
-    return dataState.isMapDir == true
-        ? FloatingActionButton(
-          heroTag: UniqueKey(),
-          backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
-          child: Icon(Icons.alt_route, size: 21.0, color: AppColor.white),
-          shape: CircleBorder(),
-          onPressed: () {
-            BlocProvider.of<IncidentReportBloc>(
-              context,
-            ).add(SelectGoogleRouteDirEvent(context: context));
-          },
-        )
-        : Container();
-  }
+
 }

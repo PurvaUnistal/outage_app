@@ -417,14 +417,14 @@ class IncidentReportBloc
           listOfRegulator = await HiveDataBase.regulatorGISBox!.values.toList();
         }
         if (listOfRegulator.isNotEmpty) {
-          listOfRegulatorId = listOfRegulator.map((e) => e.id ?? "").toList();
+          listOfRegulatorId = listOfRegulator.map((e) => e.regulatorid ?? "").toList();
           await ReportMarkerPolyline.processMarkersInBatches(
             context: context,
             dataList: listOfRegulator,
             assetPath: AssetPath.regulator,
             targetMarkerSet: regularMarker,
             finalMarker: finalMarker,
-            filterByKey: FilterKey.ID,
+            filterByKey: FilterKey.RegulatorId,
           );
         }
       } catch (e) {
@@ -570,7 +570,7 @@ class IncidentReportBloc
       iconBytes: await ReportMarkerPolyline.markerAsset(
         path: AssetPath.regulator,
       ),
-      filterByKey: FilterKey.ID,
+      filterByKey: FilterKey.RegulatorId,
       emit: emit,
     );
     isPipelineLoader = false;
@@ -767,6 +767,8 @@ class IncidentReportBloc
                 return data.bpNumber.toString() == searchText;
               case FilterKey.ID:
                 return data.id.toString() == searchText;
+              case FilterKey.RegulatorId:
+                return data.regulatorid.toString() == searchText;
             }
           }).first;
 
@@ -791,15 +793,12 @@ class IncidentReportBloc
         filterByKey: filterByKey,
         searchText: searchText,
       );
-
       markersPointList.clear();
       blinkMarkerList.clear();
-
-      // markersPointList.addAll(searchMarker);
+   //   markersPointList.addAll(searchMarker);
       blinkMarkerList.addAll(searchMarker);
 
       _restartBlinking();
-      //_eventCompleted(emit);
     } else {
       AppConfig.instanceInit()?.setData(newData: '');
     }
@@ -814,7 +813,7 @@ class IncidentReportBloc
       googleMapsUrl = mapService.buildGoogleMapsUrl(currentPoint, latLngOnTap);
       print("googleMapsUrl --> $googleMapsUrl");
       nameofLocation =
-          (await MapService.getAddress(latLng: event.latLngOnTap))!;
+      (await MapService.getAddress(latLng: event.latLngOnTap))!;
       print("nameofLocation --> $nameofLocation");
       Set<Marker> tempMarker = Set.from(markersPointList);
       if (mapService.isPointNearAnyPolyline(
@@ -845,13 +844,13 @@ class IncidentReportBloc
               showDialog(
                 context: event.context,
                 builder:
-                    (context) => AlertDialog(
+                    (context) =>
+                    AlertDialog(
                       contentPadding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       content: AlertDialogTwoBtnWidget(
-                        mContext: context,
                         pipelineData: pipelineData,
                       ),
                     ),
@@ -860,10 +859,11 @@ class IncidentReportBloc
           ),
         );
       }
-      markersPointList = tempMarker;
+      routePointList = tempMarker;
       _eventCompleted(emit);
     }
   }
+
 
   _selectGoogleRouteDirEvent(SelectGoogleRouteDirEvent event, emit) async {
     if (isMapDir == true) {
@@ -1114,15 +1114,13 @@ class IncidentReportBloc
         CameraPosition(target: targetPosition, zoom: 19),
       ),
     );
-
-    final emergencyMarker = Marker(
+    Set<Marker> emergencyMarker = Set.from(markersPointList);
+    emergencyMarker.add(Marker(
       markerId: MarkerId('selected_emergency'),
       position: targetPosition,
       infoWindow: InfoWindow(title: selected.emergencyName),
-    );
-    markersPointList.add(emergencyMarker);
-    // ..clear()
-    // ..add(emergencyMarker);
+    ));
+    routePointList = emergencyMarker;
     _eventCompleted(emit);
   }
 
@@ -1192,13 +1190,22 @@ class IncidentReportBloc
     _startBlinking();
   }
 
-  _startBlinking() {
+  _startBlinking() async {
+    final controller = await googleMapController.future;
     blinkTimer.cancel();
     blinkTimer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
       if (isBlinkMarker) {
         markersPointList.addAll(blinkMarkerList);
+        for (var m in blinkMarkerList) {
+          Future.delayed(Duration(milliseconds: 300), () {
+            for (var m in blinkMarkerList) {
+              controller.showMarkerInfoWindow(m.markerId);
+            }
+          });
+        }
       } else {
         for (Marker m in blinkMarkerList) {
+          controller.hideMarkerInfoWindow(m.markerId);
           markersPointList.removeWhere(
             (element) => element.markerId == m.markerId,
           );

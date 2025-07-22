@@ -59,8 +59,15 @@ class ReportMarkerPolyline {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   content: AlertDialogTwoBtnWidget(
-                    mContext: context,
                     pipelineData: data,
+                    filterByKey:
+                        filterByKey == FilterKey.BP_NUMBER
+                            ? "BP : ${data.bpNumber}"
+                            : filterByKey == FilterKey.VALUE_ID
+                            ? 'Valve : ${data.valveId}'
+                            : filterByKey == FilterKey.RegulatorId
+                            ? 'Regulator : ${data.regulatorid}'
+                            : 'ID: ${data.id}',
                   ),
                 ),
           );
@@ -74,6 +81,8 @@ class ReportMarkerPolyline {
                       ": ${data.bpNumber}"
                   : filterByKey == FilterKey.VALUE_ID
                   ? 'Valve : ${data.valveId}'
+                  : filterByKey == FilterKey.RegulatorId
+                  ? 'Regulator : ${data.regulatorid}'
                   : 'ID: ${data.id}',
         ),
         icon: icon,

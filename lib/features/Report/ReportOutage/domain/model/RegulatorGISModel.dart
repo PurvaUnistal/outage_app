@@ -63,6 +63,8 @@ class RegulatorGISData {
   String? bpName;
   @HiveField(13)
   String? assetid = "10";
+  @HiveField(14)
+  String? regulatorid;
 
   RegulatorGISData({
     this.id,
@@ -78,6 +80,7 @@ class RegulatorGISData {
     this.attachFile,
     this.bpName,
     this.assetid,
+    this.regulatorid,
   });
 
   RegulatorGISData.fromJson(Map<String, dynamic> json) {
@@ -93,6 +96,7 @@ class RegulatorGISData {
     housePhoto = json['house_photo'] ?? "";
     attachFile = json['attach_file'] ?? "";
     bpName = json['bp_name'] ?? "";
+    regulatorid = json['regulatorid'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -109,12 +113,13 @@ class RegulatorGISData {
     data['house_photo'] = this.housePhoto;
     data['attach_file'] = this.attachFile;
     data['bp_name'] = this.bpName;
+    data['regulatorid'] = this.regulatorid;
     return data;
   }
 
   @override
   String toString() {
     // TODO: implement toString
-    return id.toString();
+    return regulatorid.toString();
   }
 }

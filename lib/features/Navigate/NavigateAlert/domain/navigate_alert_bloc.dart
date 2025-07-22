@@ -399,14 +399,14 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           listOfRegulator = await HiveDataBase.regulatorGISBox!.values.toList();
         }
         if (listOfRegulator.isNotEmpty) {
-          listOfRegulatorId = listOfRegulator.map((e) => e.id ?? "").toList();
+          listOfRegulatorId = listOfRegulator.map((e) => e.regulatorid ?? "").toList();
           await NavigateAlertHelper.processMarkersInBatches(
             context: context,
             dataList: listOfRegulator,
             assetPath: AssetPath.regulator,
             targetMarkerSet: regularMarker,
             finalMarker: finalMarker,
-            filterByKey: FilterKey.ID,
+            filterByKey: FilterKey.RegulatorId,
           );
         }
       } catch (e) {
@@ -557,7 +557,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       iconBytes: await ReportMarkerPolyline.markerAsset(
         path: AssetPath.regulator,
       ),
-      filterByKey: FilterKey.ID,
+      filterByKey: FilterKey.RegulatorId,
       emit: emit,
     );
     isPipelineLoader = false;
@@ -800,6 +800,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
                 return data.bpNumber.toString() == searchText;
               case FilterKey.ID:
                 return data.id.toString() == searchText;
+              case FilterKey.RegulatorId:
+                return data.regulatorid.toString() == searchText;
             }
           }).first;
 
