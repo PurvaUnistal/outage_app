@@ -44,8 +44,6 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
                           if (filterByKey != null && filterByKey!.isNotEmpty)
                             Text(filterByKey ?? "NA"),
                           buildInfoRow("Customer Name", pipelineData.bpName),
-                          buildInfoRow("Latitude", pipelineData.latitude),
-                          buildInfoRow("Longitude", pipelineData.longitude),
                           if (pipelineData.imagePath != null &&
                               pipelineData.imagePath.isNotEmpty &&
                               pipelineData.housePhoto != null &&

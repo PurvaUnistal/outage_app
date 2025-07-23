@@ -216,8 +216,7 @@ class _IncidentReportViewState extends State<IncidentReportView> {
   _emergencyButtonWidget({required FetchIncidentReportDataState dataState}) {
     return CircleButton(
       iconData: Icons.emergency_outlined,
-      onTap:
-          () => BlocProvider.of<IncidentReportBloc>(
+      onTap: () => BlocProvider.of<IncidentReportBloc>(
             context,
           ).add(SelectEmergencyEvent(context: context)),
     );

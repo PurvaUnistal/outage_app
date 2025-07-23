@@ -24,7 +24,7 @@ import 'package:outage_app/features/Report/ReportOutage/helper/incident_report_h
 import 'package:outage_app/features/Report/ReportOutage/helper/report_marker_polyline.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/MapService.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/alert_dialog_widget.dart';
-import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget.dart';
+import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget_report.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/filter_report.dart';
 
 import '../../../../Manage/IncidentDetails/domain/model/filter_key_enum.dart';
@@ -859,7 +859,7 @@ class IncidentReportBloc
           ),
         );
       }
-      routePointList = tempMarker;
+      markersPointList = tempMarker;
       _eventCompleted(emit);
     }
   }
@@ -1090,7 +1090,7 @@ class IncidentReportBloc
       builder: (BuildContext context) {
         return BlocProvider.value(
           value: BlocProvider.of<IncidentReportBloc>(context),
-          child: EmergencyWidget(),
+          child: EmergencyWidgetReport(),
         );
       },
     );
@@ -1120,7 +1120,7 @@ class IncidentReportBloc
       position: targetPosition,
       infoWindow: InfoWindow(title: selected.emergencyName),
     ));
-    routePointList = emergencyMarker;
+    filterMarkerList = emergencyMarker;
     _eventCompleted(emit);
   }
 

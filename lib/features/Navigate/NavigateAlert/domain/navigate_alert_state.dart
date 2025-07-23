@@ -47,12 +47,14 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   final TextEditingController commercialController;
   final TextEditingController domesticController;
   final TextEditingController industrialController;
+  final TextEditingController emergencyController;
   final List<String> listOfTfId;
   final List<String> listOfValveId;
   final List<String> listOfRegulatorId;
   final List<String> listOfCommercialId;
   final List<String> listOfDomesticId;
   final List<String> listOfIndustrialId;
+  final List<String> listOfEmergencyId;
 
   FetchNavigateAlertDataState({
     required this.isLoader,
@@ -84,12 +86,14 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     required this.commercialController,
     required this.domesticController,
     required this.industrialController,
+    required this.emergencyController,
     required this.listOfTfId,
     required this.listOfValveId,
     required this.listOfRegulatorId,
     required this.listOfCommercialId,
     required this.listOfDomesticId,
     required this.listOfIndustrialId,
+    required this.listOfEmergencyId,
 
   });
   @override
@@ -123,11 +127,13 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
     commercialController,
     domesticController,
     industrialController,
+    emergencyController,
     listOfTfId,
     listOfValveId,
     listOfRegulatorId,
     listOfCommercialId,
     listOfDomesticId,
     listOfIndustrialId,
+    listOfEmergencyId,
   ];
 }

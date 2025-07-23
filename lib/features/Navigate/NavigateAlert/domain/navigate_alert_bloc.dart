@@ -12,6 +12,7 @@ import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/helper/navigate_alert_helper.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/presentation/widget/alert_dialog_details_widget.dart';
+import 'package:outage_app/features/Navigate/NavigateAlert/presentation/widget/emergency_widget_navigator.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/presentation/widget/navigate_pop_widget.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/CommercialModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/DomesticModel.dart';
@@ -25,7 +26,7 @@ import 'package:outage_app/features/Report/ReportOutage/helper/decodePolyline.da
 import 'package:outage_app/features/Report/ReportOutage/helper/incident_report_helper.dart';
 import 'package:outage_app/features/Report/ReportOutage/helper/report_marker_polyline.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/MapService.dart';
-import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget.dart';
+import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget_report.dart';
 
 class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   NavigateAlertBloc() : super(NavigateAlertInitialState()) {
@@ -58,7 +59,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     on<ShowRouteButtonEvent>(_showRouteButtonEvent);
     on<SearchDesEvent>(_searchDesEvent);
     on<SelectEmergencyEvent>(_selectEmergency);
-    // on<SelectEmergencyEvent>(_selectEmergency);
+     on<SelectSearchEmergencyEvent>(_searchEmergencyHospital);
   }
   bool isLoader = false;
   bool isMapDir = false;
@@ -136,6 +137,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   Set<Marker> domesticMarker = {};
   Set<Marker> industrialMarker = {};
   Set<Marker> markersPointList = {};
+  Set<Marker> routePointList = {};
 
   Set<Polyline> polylinePointList = {};
   Set<Polyline> pipePolylinePointList = {};
@@ -886,7 +888,6 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       content: AlertDialogDetailsWidgetWidget(
-                        mContext: context,
                         pipelineData: pipelineData,
                       ),
                     ),
@@ -1020,12 +1021,40 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       builder: (BuildContext context) {
         return BlocProvider.value(
           value: BlocProvider.of<NavigateAlertBloc>(context),
-          child: EmergencyWidget(),
+          child: EmergencyWidgetNavigator(),
         );
       },
     );
     _eventCompleted(emit);
   }
+
+  _searchEmergencyHospital(SelectSearchEmergencyEvent event, emit) async {
+    final selected = listOfEmergencyData.firstWhere(
+          (e) => e.emergencyName == event.searchEmergency,
+    );
+
+    final lat = double.tryParse(selected.latitude);
+    final lng = double.tryParse(selected.longitude);
+
+    final targetPosition = LatLng(lat!, lng!);
+
+    GoogleMapController controllerMap = await googleMapController.future;
+
+    await controllerMap.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: targetPosition, zoom: 19),
+      ),
+    );
+    Set<Marker> emergencyMarker = Set.from(markersPointList);
+    emergencyMarker.add(Marker(
+      markerId: MarkerId('selected_emergency'),
+      position: targetPosition,
+      infoWindow: InfoWindow(title: selected.emergencyName),
+    ));
+    filterMarkerList = emergencyMarker;
+    _eventCompleted(emit);
+  }
+
   @override
   Future<void> close() {
     blinkTimer.cancel();
@@ -1040,13 +1069,22 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
 
-  _startBlinking() {
+  _startBlinking() async {
+    final controller = await googleMapController.future;
     blinkTimer.cancel();
     blinkTimer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
       if (isBlinkMarker) {
         markersPointList.addAll(blinkMarkerList);
+        for (var m in blinkMarkerList) {
+          Future.delayed(Duration(milliseconds: 300), () {
+            for (var m in blinkMarkerList) {
+              controller.showMarkerInfoWindow(m.markerId);
+            }
+          });
+        }
       } else {
         for (Marker m in blinkMarkerList) {
+          controller.hideMarkerInfoWindow(m.markerId);
           markersPointList.removeWhere(
                 (element) => element.markerId == m.markerId,
           );
@@ -1086,12 +1124,14 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           commercialController: commercialController,
           domesticController: domesticController,
           industrialController: industrialController,
+          emergencyController: emergencyController,
           listOfTfId: listOfTFId,
           listOfValveId: listOfValveId,
           listOfRegulatorId: listOfRegulatorId,
           listOfCommercialId: listOfCommercialId,
           listOfDomesticId: listOfDomesticId,
           listOfIndustrialId: listOfIndustrialId,
+          listOfEmergencyId: listOfEmergencyId,
         ),
       );
     });
@@ -1130,6 +1170,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         commercialController: commercialController,
         domesticController: domesticController,
         industrialController: industrialController,
+        emergencyController: emergencyController,
 
         listOfTfId: listOfTFId,
         listOfValveId: listOfValveId,
@@ -1137,6 +1178,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         listOfCommercialId: listOfCommercialId,
         listOfDomesticId: listOfDomesticId,
         listOfIndustrialId: listOfIndustrialId,
+        listOfEmergencyId: listOfEmergencyId,
       ),
     );
   }

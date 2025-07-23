@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/Utils/common_widgets/auto_complete_text_field_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
+import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
+import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
+import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_bloc.dart';
-import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_event.dart';
-import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_state.dart';
 
-class EmergencyWidget extends StatelessWidget {
-  const EmergencyWidget({super.key});
+class EmergencyWidgetNavigator extends StatelessWidget {
+  const EmergencyWidgetNavigator({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<IncidentReportBloc, IncidentReportState>(
+    return  BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
       builder: (context, state) {
-        if (state is FetchIncidentReportDataState) {
+        if (state is FetchNavigateAlertDataState) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -42,7 +43,7 @@ class EmergencyWidget extends StatelessWidget {
                   controller: state.emergencyController,
                   suggestions: state.listOfEmergencyId,
                   onSelected: (val) {
-                    BlocProvider.of<IncidentReportBloc>(context)
+                    BlocProvider.of<NavigateAlertBloc>(context)
                         .add(SelectSearchEmergencyEvent(searchEmergency: val));
                     Navigator.pop(context);
                   },
@@ -60,22 +61,6 @@ class EmergencyWidget extends StatelessWidget {
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text("Cancel"),
               ),
-              // ElevatedButton(
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor: Colors.redAccent,
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(8),
-              //     ),
-              //     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              //   ),
-              //   onPressed: () {
-              //     // Do something on submit
-              //   },
-              //   child: const Text(
-              //     "Submit",
-              //     style: TextStyle(color: Colors.white),
-              //   ),
-              // ),
             ],
           );
         } else {

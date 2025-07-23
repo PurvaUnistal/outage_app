@@ -26,10 +26,16 @@ class NavigateAlertHelper {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   content: AlertDialogDetailsWidgetWidget(
-                    mContext: context,
                     pipelineData: data,
+                    filterByKey: filterByKey == FilterKey.BP_NUMBER
+                        ? "BP : ${data.bpNumber}"
+                        : filterByKey == FilterKey.VALUE_ID
+                        ? 'Valve : ${data.valveId}'
+                        : filterByKey == FilterKey.RegulatorId
+                        ? 'Regulator : ${data.regulatorid}'
+                        : 'ID: ${data.id}',
                   ),
-                ),
+                )
           );
         },
         markerId: MarkerId('${position.latitude.toString()}'),
@@ -115,7 +121,7 @@ class NavigateAlertHelper {
           );
 
           targetMarkerSet.addAll(markers);
-          finalMarker.addAll(markers); // Keep if you're combining everything
+          finalMarker.addAll(markers);
         } catch (e) {
           print("Error parsing coordinates: $e");
         }

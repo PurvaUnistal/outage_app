@@ -213,7 +213,7 @@ class _PhoneInChargeDashboardWidgetState
                 if (menu.add == '1') {
                   menus.add(
                     CardWidget(
-                      text: 'Reports Incident',
+                      text: 'Report Incident',
                       path: AssetPath.reportOutage,
                       onTap: () {
                         Navigator.push(
