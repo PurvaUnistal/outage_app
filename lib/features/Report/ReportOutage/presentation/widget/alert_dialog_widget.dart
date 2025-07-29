@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
@@ -135,8 +136,11 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
                   text: "Navigate",
                   icon: Icons.alt_route,
                   onPressed: () {
+                    double lat = double.parse(pipelineData.latitude);
+                    double lng = double.parse(pipelineData.longitude);
+                    LatLng toPoints = LatLng(lat, lng);
                     BlocProvider.of<IncidentReportBloc>(context).add(
-                      SelectGoogleRouteDirEvent(context: context),
+                      SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints),
                     );
                   },
                 ),

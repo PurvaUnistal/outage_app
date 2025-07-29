@@ -34,10 +34,11 @@ class SelectFilterButtonEvent extends NavigateAlertEvent {
 }
 class SelectGoogleRouteDirEvent extends NavigateAlertEvent {
   final BuildContext context;
-  SelectGoogleRouteDirEvent({ required this.context});
+  final LatLng toLatLng;
+  SelectGoogleRouteDirEvent({ required this.context,required this.toLatLng});
   @override
   // TODO: implement props
-  List<Object> get props => [context];
+  List<Object> get props => [context, toLatLng];
 }
 
 class SelectCheckBoxTFGisEvent extends NavigateAlertEvent {
@@ -168,11 +169,12 @@ class ResetFilterEvent extends NavigateAlertEvent {
 
 
 class UpdateStartAddress extends NavigateAlertEvent {
-  UpdateStartAddress();
+  final BuildContext context;
+  UpdateStartAddress({required this.context});
 
   @override
   // TODO: implement props
-  List<Object?> get props =>[];
+  List<Object?> get props =>[context];
 }
 
 class UpdateDestinationAddress extends NavigateAlertEvent {

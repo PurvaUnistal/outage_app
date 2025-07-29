@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/HoDistrictDashboard/domain/model/DistrictDataModel.dart';
 import 'package:outage_app/features/HoDistrictDashboard/helper/ho_dis_dashboard_helper.dart';
+import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.dart';
 import 'ho_dis_dashboard_event.dart';
 import 'ho_dis_dashboard_state.dart';
 
@@ -19,7 +21,12 @@ class HoDistrictDashboardBloc
     isPageLoader = false;
     dashboard = Dashboard();
     listOfDistrictData = [];
-
+    await AppConfig.instanceInit()?.setDistrictData(
+      districtData: DistrictData(),
+    );
+    await AppConfig.instanceInit()?.setGridData(
+      gridData: GridData(),
+    );
     var res = await HoDistrictDashboardHelper.getDistrictDataApi(context: event.context);
     if (res != null && res.dashboard != null && res.data != null) {
       dashboard = res.dashboard!;

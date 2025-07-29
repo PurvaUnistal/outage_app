@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_bloc.dart';
@@ -86,7 +87,6 @@ class AlertDialogDetailsWidgetWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              // Map navigation
               Center(
                 child: Text(
                   "Map GPS navigation",
@@ -104,9 +104,12 @@ class AlertDialogDetailsWidgetWidget extends StatelessWidget {
                   text: "Navigate",
                   icon: Icons.alt_route,
                   onPressed: () {
+                    double lat = double.parse(pipelineData.latitude);
+                    double lng = double.parse(pipelineData.longitude);
+                    LatLng toPoints = LatLng(lat, lng);
                     BlocProvider.of<NavigateAlertBloc>(
                       context,
-                    ).add(SelectGoogleRouteDirEvent(context: context));
+                    ).add(SelectGoogleRouteDirEvent(context: context,toLatLng: toPoints));
                   },
                 ),
               ),

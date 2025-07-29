@@ -149,10 +149,11 @@ class SelectCheckIndustrialEvent extends IncidentReportEvent {
 
 class SelectGoogleRouteDirEvent extends IncidentReportEvent {
   final BuildContext context;
-  SelectGoogleRouteDirEvent({ required this.context});
+  final LatLng toLatLng;
+  SelectGoogleRouteDirEvent({ required this.context,required this.toLatLng});
   @override
   // TODO: implement props
-  List<Object> get props => [context];
+  List<Object> get props => [context, toLatLng];
 }
 
 class OnCameraIdleEvent extends IncidentReportEvent {
@@ -172,9 +173,11 @@ class ResetFilterEvent extends IncidentReportEvent {
 }
 
 class CurrentLocationEvent extends IncidentReportEvent {
+  final BuildContext context;
+  CurrentLocationEvent({required this.context});
   @override
   // TODO: implement props
-  List<Object?> get props =>[];
+  List<Object?> get props =>[context];
 }
 
 class UpdateStartAddressEvent extends IncidentReportEvent {

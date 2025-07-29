@@ -4,6 +4,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:outage_app/Utils/common_widgets/res/secrets.dart';
 import 'package:outage_app/features/Report/ReportOutage/helper/getNearestPoint.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -17,13 +18,16 @@ class MapService {
 
 
   /// Get current location with permission checks
-  Future<LatLng?> getCurrentLocation() async {
+  Future<LatLng?> getCurrentLocation({required BuildContext context}) async {
+    // Check if location services are enabled
     if (!await Geolocator.isLocationServiceEnabled()) {
       debugPrint('Location services are disabled.');
       return null;
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
+
+    // Request permission if denied
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
@@ -32,16 +36,43 @@ class MapService {
       }
     }
 
+    // Handle permanently denied
     if (permission == LocationPermission.deniedForever) {
       debugPrint('Location permission permanently denied.');
+
+      // Show a dialog directing the user to app settings
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text("Permission Required"),
+          content: Text(
+            "Location permission is permanently denied. Please enable it from the app settings.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                await openAppSettings(); // Opens app settings
+              },
+              child: Text("Open Settings"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text("Cancel"),
+            ),
+          ],
+        ),
+      );
+
       return null;
     }
 
-    final position = await CurrentLocation.getCurrentLocation();
-    if (position != null) {
-      return LatLng(position.latitude, position.longitude);
-    }
-    return null;
+    // Get location
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    return LatLng(position.latitude, position.longitude);
   }
 
   static getAddress({required LatLng latLng}) async {

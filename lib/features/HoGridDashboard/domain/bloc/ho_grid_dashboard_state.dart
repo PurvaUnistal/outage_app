@@ -17,7 +17,7 @@ class HoGridDashboardPageLoadState extends HoGridDashboardState {
 
 class FetchHoGridDashboardDataState extends HoGridDashboardState {
   final bool isPageLoader;
-  final Dashboard dashboard;
+  final GDashboard dashboard;
   final List<GridData> listOfGridData;
 
   FetchHoGridDashboardDataState({

@@ -205,22 +205,21 @@ class CreateAlertFormBloc
         print("assetId--->$assetId");
         print("assetTypeIdController--->${assetTypeIdController.text}");
         if (assetId != '') {
-          listOfFilterAsset =
-              listOfAsset
+          listOfFilterAsset = listOfAsset
                   .where((assetIdData) => assetId == assetIdData.id)
                   .toList();
           if (listOfFilterAsset.isNotEmpty) {
             assetIdController.text = listOfFilterAsset[0].assetName!;
-            locationSource = "1";
+            locationSource = "2";
           } else if (assetId == "0") {
             assetIdController.text = "Consumer";
-            locationSource = "2";
+            locationSource = "1";
           } else {
             assetIdController.text = "";
           }
         } else {
           assetTypeId = "";
-          assetIdController.text = "";
+          assetIdController.text = "3";
           assetTypeIdController.text = "";
         }
         return res;
@@ -294,13 +293,13 @@ class CreateAlertFormBloc
           incidentType: incidentTypeValue,
           incidentIndication: incidentIndicationValue,
           locationSource: locationSource,
-          customeId: locationSource == "2"
-                  ? assetTypeId.trim().toString()
-                  : "",
+          customeId: assetTypeId.trim().toString(),
+
           assetTypeId: assetId.toString(),
-          assetInternalId: locationSource == "1"
-                  ? assetTypeId.trim().toString()
-                  : "",
+          // assetInternalId: locationSource == "1"
+          //         ? assetTypeId.trim().toString()
+          //         : "",
+          assetInternalId: assetTypeIdController.text,
           address: addressController.text.trim().toString(),
           landmark: landmarkController.text.trim().toString(),
           photo: photo,

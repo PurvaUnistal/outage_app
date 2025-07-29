@@ -1,7 +1,7 @@
 class GridDataModel {
   int? success;
   bool? error;
-  Dashboard? dashboard;
+  GDashboard? dashboard;
   List<GridData>? data;
 
   GridDataModel({this.success, this.error, this.dashboard, this.data});
@@ -10,7 +10,7 @@ class GridDataModel {
     success = json['success'];
     error = json['error'];
     dashboard = json['dashboard'] != null
-        ? new Dashboard.fromJson(json['dashboard'])
+        ? new GDashboard.fromJson(json['dashboard'])
         : null;
     if (json['data'] != null) {
       data = <GridData>[];
@@ -34,19 +34,19 @@ class GridDataModel {
   }
 }
 
-class Dashboard {
+class GDashboard {
   String? mdpeLength;
   String? steelLength;
   int? domesticCount;
   int? industrialCommercialCount;
 
-  Dashboard(
+  GDashboard(
       {this.mdpeLength,
         this.steelLength,
         this.domesticCount,
         this.industrialCommercialCount});
 
-  Dashboard.fromJson(Map<String, dynamic> json) {
+  GDashboard.fromJson(Map<String, dynamic> json) {
     mdpeLength = json['mdpe_length'];
     steelLength = json['steel_length'];
     domesticCount = json['domestic_count'];

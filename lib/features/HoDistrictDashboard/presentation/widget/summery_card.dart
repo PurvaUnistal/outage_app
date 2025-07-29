@@ -7,60 +7,64 @@ class SummeryCard extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-   SummeryCard({
+  const SummeryCard({
+    Key? key,
     required this.title,
     required this.value,
     required this.icon,
     required this.color,
-    super.key,
-  });
-
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(screenWidth * 0.03),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Flexible(child: Icon(icon, size: 30)),
-          SizedBox(width: MediaQuery.of(context).size.width * 0.02),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  "${title}",
-                  style: const TextStyle(
-                    fontSize: 14,
+          Icon(icon, size: screenWidth * 0.08),
+          SizedBox(width: screenWidth * 0.03),
+
+          /// ✅ Wrap Column in Expanded to prevent overflow
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                /// ✅ Let text wrap naturally within available width
+                Text(
+                  title,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.035,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              Flexible(
-                child: Text(
-                  "${value}",
-                  style: const TextStyle(
-                    fontSize: 21,
+                Text(
+                  value,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.050,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 }
-
-
-
 class IncidentCard extends StatelessWidget {
   final String title;
   final String value;
@@ -77,37 +81,35 @@ class IncidentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
-      padding: const EdgeInsets.all(2),
+      padding: EdgeInsets.all(screenWidth * 0.02),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Flexible(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: screenWidth * 0.035,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          SizedBox(height: screenWidth * 0.01),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(child: Icon(icon, size: MediaQuery.of(context).size.height * 0.03)),
-              const SizedBox(width: 10),
+              Icon(icon, size: screenWidth * 0.07),
+              SizedBox(width: screenWidth * 0.02),
               Text(
                 value,
-                style: const TextStyle(
-                  fontSize: 21,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.055,
                   fontWeight: FontWeight.w600,
                 ),
               ),

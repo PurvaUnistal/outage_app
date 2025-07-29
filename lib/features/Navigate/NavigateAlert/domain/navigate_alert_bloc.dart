@@ -721,7 +721,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _updateStartAddress(UpdateStartAddress event, emit) async {
-    await _currentPointMarker();
+    await _currentPointMarker(context: event.context);
     _eventCompleted(emit);
   }
 
@@ -765,8 +765,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
-  _currentPointMarker() async {
-    LatLng? currentPoint = await mapService.getCurrentLocation();
+  _currentPointMarker({required BuildContext context}) async {
+    LatLng? currentPoint = await mapService.getCurrentLocation(context: context);
     if (currentPoint != null) {
       GoogleMapController controller = await googleMapController.future;
       controller.animateCamera(
@@ -844,7 +844,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
-    final currentPoint = await mapService.getCurrentLocation();
+    final currentPoint = await mapService.getCurrentLocation(context: event.context);
     if (currentPoint != null) {
       latLngOnTap = event.latLngOnTap;
       isMapDir = true;
@@ -902,9 +902,14 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectGoogleRouteDirEvent(SelectGoogleRouteDirEvent event, emit) async {
-    if (isMapDir == true) {
-      await mapService.launchExternalUrl(googleMapsUrl);
+    final currentPoint = await mapService.getCurrentLocation(context: event.context);
+    if (currentPoint != null) {
+      latLngOnTap = event.toLatLng;
+      isMapDir = true;
+      googleMapsUrl = mapService.buildGoogleMapsUrl(currentPoint, latLngOnTap);
+      print("googleMapsUrl--->${googleMapsUrl}");
     }
+    await mapService.launchExternalUrl(googleMapsUrl);
     _eventCompleted(emit);
   }
 
@@ -1077,9 +1082,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         markersPointList.addAll(blinkMarkerList);
         for (var m in blinkMarkerList) {
           Future.delayed(Duration(milliseconds: 300), () {
-            for (var m in blinkMarkerList) {
-              controller.showMarkerInfoWindow(m.markerId);
-            }
+            controller.showMarkerInfoWindow(m.markerId);
           });
         }
       } else {

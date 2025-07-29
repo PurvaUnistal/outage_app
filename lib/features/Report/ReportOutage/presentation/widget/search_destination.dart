@@ -102,7 +102,7 @@ class SearchDestination extends StatelessWidget {
                             onPressed:
                                 () => BlocProvider.of<IncidentReportBloc>(
                                   context,
-                                ).add(CurrentLocationEvent()),
+                                ).add(CurrentLocationEvent(context: context)),
                           ),
                           onChanged:
                               (val) => BlocProvider.of<IncidentReportBloc>(

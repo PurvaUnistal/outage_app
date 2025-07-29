@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:core';
+import 'dart:developer';
 import 'dart:math' show cos, sqrt, asin;
 
 import 'package:flutter/material.dart';
@@ -232,7 +233,8 @@ class IncidentReportBloc
 
     pipelineData = PipelineData();
     listOfPipeline = [];
-    final ctx = UserContext.getUserContext();
+    final ctx = await UserContext.getUserContext();
+    log("HO User: ${ctx.isHo}");
     currentPosition = LatLng(
       double.parse(ctx.user.gaLatitude!),
       double.parse(ctx.user.gaLongitude!),
@@ -731,8 +733,8 @@ class IncidentReportBloc
     _eventCompleted(emit);
   }
 
-  _currentPointMarker() async {
-    LatLng? currentPoint = await mapService.getCurrentLocation();
+  _currentPointMarker({required BuildContext context}) async {
+    LatLng? currentPoint = await mapService.getCurrentLocation(context: context);
     if (currentPoint != null) {
       GoogleMapController controller = await googleMapController.future;
       controller.animateCamera(
@@ -795,7 +797,6 @@ class IncidentReportBloc
       );
       markersPointList.clear();
       blinkMarkerList.clear();
-   //   markersPointList.addAll(searchMarker);
       blinkMarkerList.addAll(searchMarker);
 
       _restartBlinking();
@@ -806,7 +807,7 @@ class IncidentReportBloc
   }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
-    final currentPoint = await mapService.getCurrentLocation();
+    final currentPoint = await mapService.getCurrentLocation(context: event.context);
     if (currentPoint != null) {
       latLngOnTap = event.latLngOnTap;
       isMapDir = true;
@@ -866,9 +867,14 @@ class IncidentReportBloc
 
 
   _selectGoogleRouteDirEvent(SelectGoogleRouteDirEvent event, emit) async {
-    if (isMapDir == true) {
-      await mapService.launchExternalUrl(googleMapsUrl);
+    final currentPoint = await mapService.getCurrentLocation(context: event.context);
+    if (currentPoint != null) {
+      latLngOnTap = event.toLatLng;
+      isMapDir = true;
+      googleMapsUrl = mapService.buildGoogleMapsUrl(currentPoint, latLngOnTap);
+      print("googleMapsUrl--->${googleMapsUrl}");
     }
+      await mapService.launchExternalUrl(googleMapsUrl);
     _eventCompleted(emit);
   }
 
@@ -896,7 +902,7 @@ class IncidentReportBloc
   }
 
   _currentLocationEvent(CurrentLocationEvent event, emit) async {
-    await _currentPointMarker();
+    await _currentPointMarker(context: event.context);
     _eventCompleted(emit);
   }
 
@@ -1176,6 +1182,7 @@ class IncidentReportBloc
     markersPointList = {...markersPointList};
   }
 
+
   @override
   Future<void> close() {
     blinkTimer.cancel();
@@ -1196,13 +1203,12 @@ class IncidentReportBloc
     blinkTimer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
       if (isBlinkMarker) {
         markersPointList.addAll(blinkMarkerList);
-        for (var m in blinkMarkerList) {
           Future.delayed(Duration(milliseconds: 300), () {
             for (var m in blinkMarkerList) {
               controller.showMarkerInfoWindow(m.markerId);
             }
           });
-        }
+
       } else {
         for (Marker m in blinkMarkerList) {
           controller.hideMarkerInfoWindow(m.markerId);

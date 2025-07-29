@@ -196,7 +196,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
       onTap:
           () => BlocProvider.of<NavigateAlertBloc>(
             context,
-          ).add(UpdateStartAddress()),
+          ).add(UpdateStartAddress(context: context)),
     );
   }
 
@@ -233,21 +233,4 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
     );
   }
 
-  Widget _routeDirButtonWidget({
-    required FetchNavigateAlertDataState dataState,
-  }) {
-    return dataState.isMapDir == true
-        ? FloatingActionButton(
-          heroTag: UniqueKey(),
-          backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
-          child: Icon(Icons.alt_route, size: 21.0, color: AppColor.white),
-          shape: CircleBorder(),
-          onPressed: () {
-            BlocProvider.of<NavigateAlertBloc>(
-              context,
-            ).add(SelectGoogleRouteDirEvent(context: context));
-          },
-        )
-        : Container();
-  }
 }

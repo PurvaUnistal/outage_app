@@ -11,22 +11,8 @@ import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_event.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_state.dart';
 
-class FullGoogleMapWidget extends StatefulWidget {
+class FullGoogleMapWidget extends StatelessWidget {
   const FullGoogleMapWidget({super.key});
-
-  @override
-  State<FullGoogleMapWidget> createState() => _FullGoogleMapWidgetState();
-}
-
-class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
-  @override
-  void initState() {
-    BlocProvider.of<IncidentDetailBloc>(
-      context,
-    ).add(IncidentDetailLoadEvent(context: context));
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +23,7 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
           child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
             builder: (context, state) {
               if (state is FetchIncidentDetailDataState) {
-                return _itemBuilder(dataState: state);
+                return _itemBuilder(dataState: state,context: context);
               } else {
                 return const Center(child: SpinLoader());
               }
@@ -48,7 +34,7 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
     );
   }
 
-  _itemBuilder({required FetchIncidentDetailDataState dataState}) {
+  _itemBuilder({required FetchIncidentDetailDataState dataState,required BuildContext context}) {
     return SafeArea(
       child: Stack(
         children: [
@@ -57,7 +43,7 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
             myLocationButtonEnabled: true,
             zoomControlsEnabled: false,
             rotateGesturesEnabled: true,
-            minMaxZoomPreference: MinMaxZoomPreference(AppString.zoom, null),
+            minMaxZoomPreference: _getZoomPreference(dataState),
             initialCameraPosition: CameraPosition(
               target: dataState.incidentLocation,
               zoom: AppString.zoom,
@@ -104,5 +90,11 @@ class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
         ],
       ),
     );
+  }
+
+  MinMaxZoomPreference _getZoomPreference(FetchIncidentDetailDataState state) {
+    return state.polylinePointList.length >= 2000
+        ? const MinMaxZoomPreference(15, null)
+        : const MinMaxZoomPreference(17, null);
   }
 }

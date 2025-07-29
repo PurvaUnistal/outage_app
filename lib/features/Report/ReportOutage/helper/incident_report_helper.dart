@@ -59,29 +59,37 @@ class IncidentReportHelper {
     required String longitude,
   }) async {
     final ctx = UserContext.getUserContext();
-
     try {
       Map<String, String> para = {
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
         "latitude": latitude,
         "longitude": longitude,
         "buffer": "3",
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getPipeline + json, context: context);
+      log("HO User: ${ctx.isHo}");
       if (res != null && res["data"] != null &&  res["data"] is List) {
-        PipelineModel response = PipelineModel.fromJson(res);
-        if(ctx.isHo){
-          await HiveDataBase.pipelineDataBox!.clear();
-          return response;
-        }else{
-          if (await HiveDataBase.pipelineDataBox!.isOpen) {
-            await HiveDataBase.pipelineDataBox!.clear();
-            await HiveDataBase.pipelineDataBox!.addAll(response.data!);
+        final response = PipelineModel.fromJson(res);
+        if (!ctx.isHo) {
+          final box = HiveDataBase.pipelineDataBox;
+          if (box?.isOpen ?? false) {
+            await box!.clear();
+            await box.addAll(response.data!);
           }
-          return response;
         }
+        return response;
+        // if(ctx.isHo){
+        //   await HiveDataBase.pipelineDataBox!.clear();
+        //   return response;
+        // }else{
+        //   if (await HiveDataBase.pipelineDataBox!.isOpen) {
+        //     await HiveDataBase.pipelineDataBox!.clear();
+        //     await HiveDataBase.pipelineDataBox!.addAll(response.data!);
+        //   }
+        //   return response;
+        // }
       }else if(res != null && res["data"] != null &&  res["data"] is String){
         await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
@@ -96,20 +104,23 @@ class IncidentReportHelper {
   static Future<TFGISModel?> getTFGisApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      final query = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
+      log("HO User: ${ctx.isHo}");
+      final query = Uri(queryParameters: {"ga_id": ctx.areas, "areas": ctx.gaId}).query;
       final res = await ApiHelper.getData(urlEndPoint: Apis.getTFGis + query,context: context);
+      print("--------------->${ Apis.getTFGis + query}");
       if(res != null && res["data"] != null &&  res["data"] is List){
+        print("ctx.isHo--->${ctx.isHo}");
         final response = TFGISModel.fromJson(res);
-       if (ctx.isHo) {
-         await HiveDataBase.tfGISBox!.clear();
-         return response;
-       } else {
-         if (await HiveDataBase.tfGISBox?.isOpen ?? false) {
-           await HiveDataBase.tfGISBox!.clear();
-           await HiveDataBase.tfGISBox!.addAll(response.data);
-           return response;
-         }
-       }
+        if (ctx.isHo) {
+          return response;
+        } else {
+          final box = HiveDataBase.tfGISBox;
+          if (box?.isOpen ?? false) {
+            await box!.clear();
+            await box.addAll(response.data);
+          }
+          return response;
+        }
      } else if(res != null && res["data"] != null &&  res["data"] is String){
         await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
@@ -124,7 +135,7 @@ class IncidentReportHelper {
   static Future<ValveGISModel?> getGasValueGisApi({ required BuildContext context,}) async {
     final ctx = UserContext.getUserContext();
     try {
-      String json = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
+      String json = Uri(queryParameters: {"ga_id": ctx.areas, "areas": ctx.gaId}).query;
       var res = await ApiHelper.getData(
         urlEndPoint: Apis.getGasValueGis + json,context: context
       );
@@ -153,7 +164,7 @@ class IncidentReportHelper {
   static Future<RegulatorGISModel?> getRegulatorGisApi({ required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      String json = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
+      String json = Uri(queryParameters: {"ga_id": ctx.areas, "areas": ctx.gaId}).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getRegulatorGis + json,context: context);
       if (res != null && res["data"] != null &&  res["data"] is List) {
         RegulatorGISModel response = RegulatorGISModel.fromJson(res);
@@ -182,21 +193,22 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "schema": ctx.schema,
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
         "type": "1",
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getConsumerGis + json,context: context);
       if (res != null && res["data"] != null &&  res["data"] is List) {
         CommercialModel response = CommercialModel.fromJson(res);
-        if (ctx.isHo == "1") {
-          await HiveDataBase.commercialDataBox!.clear();
+
+        if (ctx.isHo) {
           return response;
         } else {
-          if (await HiveDataBase.commercialDataBox!.isOpen) {
-            await HiveDataBase.commercialDataBox!.clear();
-            await HiveDataBase.commercialDataBox!.addAll(response.data);
+          final box = HiveDataBase.commercialDataBox;
+          if (box?.isOpen ?? false) {
+            await box!.clear();
+            await box.addAll(response.data);
           }
           return response;
         }
@@ -215,8 +227,8 @@ class IncidentReportHelper {
       try {
       Map<String, String> para = {
         "schema": ctx.schema,
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
         "type": "2",
       };
       String json = Uri(queryParameters: para).query;
@@ -225,16 +237,20 @@ class IncidentReportHelper {
       );
       if (res != null && res["data"] != null &&  res["data"] is List) {
         DomesticModel response = DomesticModel.fromJson(res);
-        if (ctx.isHo == "1") {
-          await HiveDataBase.domesticDataBox!.clear();
+        final box = HiveDataBase.domesticDataBox;
+
+        if (ctx.isHo) {
+          await box!.clear();
           return response;
         } else {
-          if (await HiveDataBase.domesticDataBox!.isOpen) {
-            await HiveDataBase.domesticDataBox!.clear();
-            await HiveDataBase.domesticDataBox!.addAll(response.data);
+          if (box?.isOpen ?? false) {
+            await box!.clear();
+            await box.addAll(response.data);
           }
           return response;
         }
+
+
       }else if(res != null && res["data"] != null &&  res["data"] is String){
         await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
@@ -250,8 +266,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "schema": ctx.schema,
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
         "type": "3",
       };
       String json = Uri(queryParameters: para).query;
@@ -260,15 +276,18 @@ class IncidentReportHelper {
       );
       if (res != null && res["data"] != null &&  res["data"] is List) {
         IndustrialModel response = IndustrialModel.fromJson(res);
-        if (ctx.isHo == "1") {
-          await HiveDataBase.industrialDataBox!.clear();
+        final box = HiveDataBase.industrialDataBox;
+        if (ctx.isHo) {
+          await box!.clear();
           return response;
         } else {
-          if (await HiveDataBase.industrialDataBox!.isOpen) {
-            await HiveDataBase.industrialDataBox!.addAll(response.data);
+          if (box?.isOpen ?? false) {
+            await box!.clear();
+            await box.addAll(response.data);
           }
           return response;
         }
+
       } else if(res != null && res["data"] != null &&  res["data"] is String){
         await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
@@ -283,7 +302,7 @@ class IncidentReportHelper {
     try {
       final ctx = UserContext.getUserContext();
 
-      Map<String, String> para = {"ga_id": ctx.gaId, "areas": ctx.areas};
+      Map<String, String> para = {"ga_id": ctx.areas, "areas": ctx.gaId};
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getFittingGis + json,context: context);
       if (res != null) {
@@ -299,7 +318,7 @@ class IncidentReportHelper {
   static Future<GetGasGisModel?> getTeeGisApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      Map<String, String> para = {"type": "Tee", "ga_id": ctx.gaId, "areas": ctx.areas};
+      Map<String, String> para = {"type": "Tee", "ga_id": ctx.areas, "areas": ctx.gaId};
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
         urlEndPoint: Apis.getNonControllableFittingGis + json,context: context
@@ -319,8 +338,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "Elbow",
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -342,8 +361,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "Coupler",
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -365,8 +384,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "Reducer",
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -387,8 +406,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "End Cap",
-        "ga_id": ctx.gaId,
-        "areas": ctx.areas,
+        "ga_id": ctx.areas,
+        "areas": ctx.gaId,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -412,8 +431,8 @@ class IncidentReportHelper {
     final ctx = UserContext.getUserContext();
 
     Map<String, String> para = {
-      "ga_id": ctx.gaId,
-      "areas": ctx.areas,
+      "ga_id": ctx.areas,
+      "areas": ctx.gaId,
       "latitude": latitude,
       "longitude": longitude,
       "buffer": "1.5",
@@ -455,7 +474,7 @@ class IncidentReportHelper {
     final ctx = UserContext.getUserContext();
 
     try {
-      Map<String, String> para = {"district_id": ctx.areas, "search": "Hospital"};
+      Map<String, String> para = {"district_id": ctx.gaId, "search": "Hospital"};
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
         urlEndPoint: Apis.emergencySearch + json, context: context

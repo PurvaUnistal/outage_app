@@ -4,6 +4,7 @@ import 'package:outage_app/Background/wavy_background.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
+import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
@@ -11,6 +12,7 @@ import 'package:outage_app/features/HoDistrictDashboard/presentation/widget/summ
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_bloc.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_event.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_state.dart';
+import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/phone/phone_in_charge_dashboard_widget.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/page/in_charge_dashboard_view.dart';
@@ -25,10 +27,14 @@ class HoGridDashboardView extends StatefulWidget {
 class _HoGridDashboardViewState extends State<HoGridDashboardView> {
   @override
   void initState() {
-    super.initState();
+    AppConfig.instanceInit()?.setGridData(
+      gridData: GridData(),
+    );
+    UserContext.getUserContext();
     BlocProvider.of<HoGridDashboardBloc>(
       context,
     ).add(HoGridDashboardPageLoadEvent(context: context));
+    super.initState();
   }
 
   @override

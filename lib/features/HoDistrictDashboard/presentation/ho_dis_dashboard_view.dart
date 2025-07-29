@@ -68,145 +68,155 @@ class _HoDisDashboardViewState extends State<HoDisDashboardView> {
 
   Widget _tabWidget({required FetchHoDistrictDashboardDataState dataState}) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisSpacing = 8 * 1;
-    final padding = 12;
-    final columns = 2;
-    final itemWidth = (screenWidth - crossAxisSpacing - padding) / columns;
-    final itemHeight = MediaQuery.of(context).size.height * 0.09;
+    final screenHeight = MediaQuery.of(context).size.height;
 
+    // Dynamically change columns based on screen width
+    final columns = screenWidth >= 900
+        ? 4
+        : screenWidth >= 600
+        ? 3
+        : 2;
+
+    final padding = screenWidth * 0.04;
+    final crossAxisSpacing = screenWidth * 0.03;
+    final mainAxisSpacing = screenHeight * 0.015;
+    final itemHeight = screenHeight * 0.12;
+    final itemWidth = (screenWidth - (columns - 1) * crossAxisSpacing - padding) / columns;
     final aspectRatio = itemWidth / itemHeight;
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 4,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 4,
-                childAspectRatio: aspectRatio,
-              ),
-              itemBuilder: (context, index) {
-                final items = [
-                  SummeryCard(
-                    title: "MDPE",
-                    value: "${dataState.dashboard.mdpeLength} km",
-                    icon: Icons.straighten,
-                    color: Colors.blue.shade100,
-                  ),
-                  SummeryCard(
-                    title: "Steel",
-                    value: "${dataState.dashboard.steelLength} km",
-                    icon: Icons.construction,
-                    color: Colors.grey.shade300,
-                  ),
-                  SummeryCard(
-                    title: "DPNG",
-                    value: "${dataState.dashboard.domesticCount}",
-                    icon: Icons.home,
-                    color: Colors.green.shade100,
-                  ),
-                  SummeryCard(
-                    title: "I & C",
-                    value: "${dataState.dashboard.industrialCommercialCount}",
-                    icon: Icons.factory,
-                    color: Colors.orange.shade100,
-                  ),
-                ];
-                return items[index];
-              },
+
+  return SingleChildScrollView(
+    child: Padding(
+      padding: EdgeInsets.all(padding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 4,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+              crossAxisSpacing: crossAxisSpacing,
+              mainAxisSpacing: mainAxisSpacing,
+              childAspectRatio: aspectRatio,
             ),
-            const SizedBox(height: 20),
+            itemBuilder: (context, index) {
+              final items = [
+                SummeryCard(
+                  title: "MDPE",
+                  value: "${dataState.dashboard.mdpeLength} km",
+                  icon: Icons.straighten,
+                  color: Colors.blue.shade100,
+                ),
+                SummeryCard(
+                  title: "Steel",
+                  value: "${dataState.dashboard.steelLength} km",
+                  icon: Icons.construction,
+                  color: Colors.grey.shade300,
+                ),
+                SummeryCard(
+                  title: "DPNG",
+                  value: "${dataState.dashboard.domesticCount}",
+                  icon: Icons.home,
+                  color: Colors.green.shade100,
+                ),
+                SummeryCard(
+                  title: "I & C",
+                  value: "${dataState.dashboard.industrialCommercialCount}",
+                  icon: Icons.factory,
+                  color: Colors.orange.shade100,
+                ),
+              ];
+              return items[index];
+            },
+          ),
+          SizedBox(height: screenHeight * 0.03),
 
-            const Text(
-              'Districts',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            'Districts',
+            style: TextStyle(
+              fontSize: screenWidth * 0.045,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 8),
+          ),
+          SizedBox(height: screenHeight * 0.01),
 
-            ListView.separated(
-              itemCount: dataState.listOfDistrictData.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final location = dataState.listOfDistrictData[index];
+          ListView.separated(
+            itemCount: dataState.listOfDistrictData.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0.015),
+            itemBuilder: (context, index) {
+              final location = dataState.listOfDistrictData[index];
 
-                // Color palette
-                final colors = [
-                  Colors.red.shade100,
-                  Colors.green.shade100,
-                  Colors.orange.shade100,
-                  Colors.blue.shade100,
-                  Colors.purple.shade100,
-                ];
-                final color = colors[index % colors.length];
+              final colors = [
+                Colors.red.shade100,
+                Colors.green.shade100,
+                Colors.orange.shade100,
+                Colors.blue.shade100,
+                Colors.purple.shade100,
+              ];
+              final color = colors[index % colors.length];
 
-                return Container(
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(2, 2),
-                      ),
-                    ],
+              return Container(
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
                   ),
-                  child: ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        (location.name?.isNotEmpty ?? false)
-                            ? location.name![0]
-                            : '',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    title: Text(
-                      location.name ?? '',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.04,
+                    vertical: screenHeight * 0.015,
+                  ),
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      (location.name?.isNotEmpty ?? false)
+                          ? location.name![0]
+                          : '',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: screenWidth * 0.045,
+                        color: Colors.black,
                       ),
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () async {
-                      await AppConfig.instanceInit()?.setDistrictData(
-                        districtData: location,
-                      );
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HoGridDashboardView(),
-                        ),
-                      );
-                    },
                   ),
-                );
-              },
-            ),
-          ],
-        ),
+                  title: Text(
+                    location.name ?? '',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: screenWidth * 0.045,
+                    ),
+                  ),
+                  trailing: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.035),
+                  onTap: () async {
+                    await AppConfig.instanceInit()?.setDistrictData(
+                      districtData: location,
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HoGridDashboardView(),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ],
       ),
-    );
-  }
-
+    ),
+  );
+}
 }

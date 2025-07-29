@@ -14,6 +14,8 @@ import 'package:outage_app/Utils/common_widgets/res/secrets.dart';
 import 'package:outage_app/Utils/common_widgets/res/singleton.dart';
 import 'package:uuid/uuid.dart';
 
+import 'Utils/common_widgets/res/UserContext.dart';
+
 class RootApp extends StatefulWidget {
   final Client client;
 

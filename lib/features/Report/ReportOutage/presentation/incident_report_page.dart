@@ -8,10 +8,8 @@ import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
-import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_bloc.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_event.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_state.dart';
@@ -199,7 +197,7 @@ class _IncidentReportViewState extends State<IncidentReportView> {
       onTap:
           () => BlocProvider.of<IncidentReportBloc>(
             context,
-          ).add(CurrentLocationEvent()),
+          ).add(CurrentLocationEvent(context: context)),
     );
   }
 

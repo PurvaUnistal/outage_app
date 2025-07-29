@@ -28,7 +28,7 @@ class CreateAlertFormHttpHelper{
     try {
       Map<String, String> para = {
         "schema": ctx.schema,
-        "gid": ctx.gaId,
+        "gid": ctx.areas,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getAllArea +json,context: context);

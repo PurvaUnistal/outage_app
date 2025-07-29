@@ -263,7 +263,7 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
               target: dataState.incidentLocation,
               zoom: AppString.zoom,
             ),
-            minMaxZoomPreference: MinMaxZoomPreference(16, null),
+            minMaxZoomPreference: _getZoomPreference(dataState),
             onCameraIdle: () {
               BlocProvider.of<IncidentDetailBloc>(context).add(IncidentDetailOnCameraIdleEvent(
                 context: context,
@@ -298,7 +298,11 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
       ),
     );
   }
-
+  MinMaxZoomPreference _getZoomPreference(FetchIncidentDetailDataState state) {
+    return state.polylinePointList.length >= 2000
+        ? const MinMaxZoomPreference(15, null)
+        : const MinMaxZoomPreference(17, null);
+  }
   Widget _nameWidget({
     required FetchIncidentDetailDataState dataState,
     required int i,
