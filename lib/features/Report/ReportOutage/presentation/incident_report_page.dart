@@ -26,7 +26,8 @@ class IncidentReportView extends StatefulWidget {
 }
 
 class _IncidentReportViewState extends State<IncidentReportView> {
-  double _bearing = 0;
+
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +38,9 @@ class _IncidentReportViewState extends State<IncidentReportView> {
       context,
     ).add(OnCameraIdleEvent(context: context));
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {

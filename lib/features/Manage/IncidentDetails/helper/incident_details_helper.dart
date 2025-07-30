@@ -63,27 +63,36 @@ class IncidentDetailHelper{
     required BuildContext context,
     required String incidentId,
   }) async {
-
     try {
       final ctx = UserContext.getUserContext();
-
       Map<String, String> para = {
         "schema": ctx.schema,
         "incidentId": incidentId,
         "district_id": ctx.gaId,
       };
       String json = Uri(queryParameters: para).query;
-      print("Apis.getIncidentTypeAction + json-->${Apis.getValveConsumerAffect + json}");
-      var res = await ApiHelper.getData(urlEndPoint: Apis.getValveConsumerAffect + json, context: context);
-      if(res != null){
-        ConsumerAffectModel response = ConsumerAffectModel.fromJson(res);
-        return response;
+      print("API URL: ${Apis.getValveConsumerAffect + json}");
+
+      var res = await ApiHelper.getData(
+        urlEndPoint: Apis.getValveConsumerAffect + json,
+        context: context,
+      );
+      if (res is Map<String, dynamic>) {
+        return ConsumerAffectModel.fromJson(res);
+      } else if (res is List && res.isNotEmpty && res[0] is Map<String, dynamic>) {
+        // ✅ API is returning a list instead of a map
+        return ConsumerAffectModel.fromJson(res[0]);
+      } else {
+        log("Unsupported response structure: ${res.runtimeType}");
+        return null;
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
       log("getValveConsumerAffect-->${e.toString()}");
+      log(stacktrace.toString());
+      return null;
     }
-    return null;
   }
+
 
   static Future<IncidentActionProgressModel?> incidentActionProgressApi({
     required BuildContext context,

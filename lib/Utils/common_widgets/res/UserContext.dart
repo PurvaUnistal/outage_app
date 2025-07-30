@@ -24,9 +24,9 @@ class UserContext {
       isHo: isHo,
       user: user!,
       gridData: gridData!,
-      gaId: isHo ? (gridData.id ?? "") : (user.gaId ?? ""),
       schema: isHo ? (districtData?.schema ?? "") : (user.schema ?? ""),
-      areas: isHo ? (districtData?.id ?? "") : (user.areas ?? ""),
+      areas: isHo ? (gridData.id ?? "") : (user.areas ?? ""),
+      gaId: isHo ? (districtData?.id ?? "") : (user.gaId ?? ""),
     );
   }
 

@@ -36,6 +36,7 @@ class ViewIncidentData {
   String? incidentpriority;
   String? indicationname;
   String? incidenttype;
+  String? incident_uniq_id;
   String? informationsource;
   String? priority;
   String? id;
@@ -89,6 +90,7 @@ class ViewIncidentData {
         this.incidentpriority,
         this.indicationname,
         this.incidenttype,
+        this.incident_uniq_id,
         this.informationsource,
         this.priority,
         this.id,
@@ -142,6 +144,7 @@ class ViewIncidentData {
     incidentpriority = json['incidentpriority'] ?? "";
     indicationname = json['indicationname'] ?? "";
     incidenttype = json['incidenttype'] ?? "";
+    incident_uniq_id = json['incident_uniq_id'] ?? "";
     informationsource = json['informationsource'] ?? "";
     priority = json['priority'] ?? "";
     id = json['id'] ?? "";
@@ -204,6 +207,7 @@ class ViewIncidentData {
     data['priority'] = this.priority;
     data['id'] = this.id;
     data['module_id'] = this.moduleId;
+    data['incident_uniq_id'] = this.incident_uniq_id;
     data['incident_type_id'] = this.incidentTypeId;
     data['priority_id'] = this.priorityId;
     data['information_source_id'] = this.informationSourceId;

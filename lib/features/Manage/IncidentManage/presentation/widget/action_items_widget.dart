@@ -63,6 +63,10 @@ class ActionItemsWidget extends StatelessWidget {
           children: [
             Divider(),
             _rowSubtitleWidget(
+              title: "Incident Id : ",
+              subtitle: viewIncidentData.incident_uniq_id.toString(),
+            ),
+            _rowSubtitleWidget(
               title: "Incident Type : ",
               subtitle: viewIncidentData.incidenttype.toString(),
             ),

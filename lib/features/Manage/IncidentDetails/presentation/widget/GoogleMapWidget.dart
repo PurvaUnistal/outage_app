@@ -11,9 +11,22 @@ import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_event.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_state.dart';
 
-class FullGoogleMapWidget extends StatelessWidget {
+class FullGoogleMapWidget extends StatefulWidget {
   const FullGoogleMapWidget({super.key});
 
+  @override
+  State<FullGoogleMapWidget> createState() => _FullGoogleMapWidgetState();
+}
+
+class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
+
+  void initState() {
+    BlocProvider.of<IncidentDetailBloc>(
+      context,
+    ).add(IncidentDetailLoadEvent(context: context));
+
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,32 +74,20 @@ class FullGoogleMapWidget extends StatelessWidget {
               }
             },
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                FloatingActionButton(
-                  heroTag: UniqueKey(),
-                  onPressed: () => Navigator.pop(context),
-                  backgroundColor: AppColor.white,
-                  child: Icon(
-                    Icons.arrow_back_ios_outlined,
-                    color: EnvironmentConfig.of(context)!.primaryTheme,
-                  ),
-                ),
-                FloatingActionButton(
-                  heroTag: UniqueKey(),
-                  onPressed: () => Navigator.pop(context),
-                  backgroundColor: AppColor.white,
-                  child: Icon(
-                    Icons.fullscreen_exit_rounded,
-                    color: EnvironmentConfig.of(context)!.primaryTheme,
-                  ),
-                ),
-              ],
+          Positioned(
+            top: 10,
+            right: 10,
+            child: FloatingActionButton(
+              heroTag: UniqueKey(),
+              onPressed: () => Navigator.pop(context),
+              backgroundColor: AppColor.white,
+              child: Icon(
+                Icons.fullscreen_exit_rounded,
+                color: EnvironmentConfig.of(context)!.primaryTheme,
+              ),
             ),
           ),
+
         ],
       ),
     );

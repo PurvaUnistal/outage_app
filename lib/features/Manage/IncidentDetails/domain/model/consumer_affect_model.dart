@@ -31,8 +31,8 @@ class ConsumerData {
   final String? incidentId;
   final String? latitude;
   final String? longitude;
-  final dynamic valve;
-  final dynamic consumer;
+  final List<ValveData>? valve;
+  final List<ConsumerBPList>? consumer;
 
   ConsumerData({
     this.incidentId,
@@ -43,34 +43,38 @@ class ConsumerData {
   });
 
   factory ConsumerData.fromJson(Map<String, dynamic> json) => ConsumerData(
-    incidentId: json["incidentId"] ?? "",
-    latitude: json["incidentlat"] ?? "",
-    longitude: json["incidentlong"] ?? "",
+    incidentId: json["incidentId"]?.toString(),
+    latitude: json["incidentlat"]?.toString(),
+    longitude: json["incidentlong"]?.toString(),
 
-    valve:
-        json["valve"] == null
-            ? null
-            : json['valve'] is String
-            ? json['valve']
-            : List<ValveData>.from(
-              json["valve"].map((x) => ValveData.fromJson(x)),
-            ),
-    consumer:
-        json["Consumer"] == null
-            ? null
-            : json['Consumer'] is String
-            ? json['Consumer']
-            : List<ConsumerBPList>.from(
-              json["Consumer"].map((x) => ConsumerBPList.fromJson(x)),
-            ),
+    valve: json["valve"] == null || json["valve"] is String
+        ? null
+        : (json["valve"] as List)
+        .where((e) => e != null && e is Map<String, dynamic>)
+        .map((e) => ValveData.fromJson(e))
+        .toList(),
+
+    consumer: json["Consumer"] == null || json["Consumer"] is String
+        ? null
+        : (json["Consumer"] as List)
+        .where((e) => e != null && e is Map<String, dynamic>)
+        .map((e) => ConsumerBPList.fromJson(e))
+        .toList(),
   );
+
 
   Map<String, dynamic> toJson() => {
     "incidentId": incidentId,
     "incidentlat": latitude,
     "incidentlong": longitude,
-    "valve": List<dynamic>.from(valve!.map((x) => x.toJson())),
-    "Consumer": List<dynamic>.from(consumer!.map((x) => x.toJson())),
+    "valve": valve!
+        .where((x) => x != null)
+        .map((x) => x.toJson())
+        .toList(),
+    "Consumer": consumer
+        ?.where((x) => x != null)
+        .map((x) => x.toJson())
+        .toList(),
   };
 }
 

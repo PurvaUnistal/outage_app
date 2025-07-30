@@ -172,19 +172,19 @@ class IncidentDetailBloc
       ),
     );
 
-    await _fetchGasPipelineGisApi(context: event.context, emit: emit);
+    await _filerPipe(context: event.context, emit: emit);
     _eventCompleted(emit);
   }
-  _fetchGasPipelineGisApi({required BuildContext context, emit}) async {
+  _filerPipe({required BuildContext context, emit}) async {
     if (await HiveDataBase.pipelineDataBox!.values.isEmpty) {
       var res = await IncidentReportHelper.getPipelineApi(
         context: context,
         latitude:
-            AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+        AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
         longitude:
-            AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+        AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
       );
-      if (res != null && res.data != null) {
+      if (res != null && res.data != null && res.data!.isNotEmpty) {
         listOfPipeline = res.data!;
       }
     } else {
@@ -194,12 +194,15 @@ class IncidentDetailBloc
       finalPolyline.clear();
       _eventCompleted(emit);
       for (int i = 0; i < listOfPipeline.length; i++) {
-        final data = listOfPipeline[i];
-        if (data.geomencode != null && data.geomencode!.isNotEmpty) {
+        pipelineData = listOfPipeline[i];
+        if (pipelineData.geomencode != null &&
+            pipelineData.geomencode!.isNotEmpty) {
           try {
-            points = await DecodePolyline.decodePolyline(data.geomencode!);
+            points = await DecodePolyline.decodePolyline(
+              pipelineData.geomencode!,
+            );
             final color = ReportMarkerPolyline.getPolylineColor(
-              value: int.tryParse(data.nominaldia ?? '0') ?? 0,
+              value: int.tryParse(pipelineData.nominaldia ?? '0') ?? 0,
               color: listOfDiaColor,
             );
             Set<Polyline> polyline = ReportMarkerPolyline.polylinePoint(
@@ -214,13 +217,12 @@ class IncidentDetailBloc
           }
         }
       }
-      await gotoInitialPosition(points[0]);
-      _filterVisiblePolyline();
-      _eventCompleted(emit);
+      await _filterVisiblePolyline();
+      await _gotoInitialPosition(points[0]);
     }
   }
 
-  gotoInitialPosition(LatLng location) async {
+  _gotoInitialPosition(LatLng location) async {
     GoogleMapController controller = await googleMapController.future;
     controller.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -235,7 +237,7 @@ class IncidentDetailBloc
     pipePolylinePointList =
         finalPolyline.where((polyline) {
           return polyline.points.any(
-            (point) => DecodePolyline.isPointInBounds(point, bounds),
+                (point) => DecodePolyline.isPointInBounds(point, bounds),
           );
         }).toSet();
 
@@ -279,7 +281,7 @@ class IncidentDetailBloc
     required BuildContext context,
     required String incidentId,
   }) async {
-     try {
+  //   try {
     var res = await IncidentDetailHelper.getValveConsumerAffectApi(
       context: context,
       incidentId: incidentId,
@@ -340,16 +342,16 @@ class IncidentDetailBloc
         tempMarker.addAll(incidentMarker);
         markersPointList.addAll(tempMarker);
         print("markersPointList-->${markersPointList.length}");
-        if (consumerData.consumer?.isNotEmpty) {
-          listOfConsumer = consumerData.consumer;
+        if (consumerData.consumer != null && consumerData.consumer!.isNotEmpty) {
+          listOfConsumer = consumerData.consumer!;
           listOfConsumerPoint = _getConLatLngList(listOfConsumer);
           await _handleConsumerMarkers(
             context: context,
             listOfConsumer: listOfConsumerPoint,
           );
         }
-        if (consumerData.valve?.isNotEmpty) {
-          listOfValve = consumerData.valve;
+        if (consumerData.valve != null && consumerData.valve!.isNotEmpty) {
+          listOfValve = consumerData.valve!;
           listOfValvePoint = _getLatLngList(listOfValve);
           await _handleValveMarkers(
             context: context,
@@ -360,9 +362,9 @@ class IncidentDetailBloc
       }
       return res;
     }
-    } catch (e) {
-      print("Error in _fetchValveConsumerAffectApi: $e");
-    }
+    // } catch (e) {
+    //   print("Error in _fetchValveConsumerAffectApi: $e");
+    // }
   }
 
   Future<void> _handleConsumerMarkers({

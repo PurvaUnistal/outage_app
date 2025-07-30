@@ -3,8 +3,12 @@ import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_box_name.dart'
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
+import 'package:outage_app/features/HoDistrictDashboard/domain/model/DistrictDataModel.dart';
+import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.dart';
+import 'package:outage_app/features/Login/domain/model/login_model.dart';
 import 'package:outage_app/features/Login/presentation/page/login_page.dart';
 
 class LogoutWidget extends StatelessWidget {
@@ -44,6 +48,9 @@ class LogoutWidget extends StatelessWidget {
                           onPressed: () async {
                             await clearAndClosePipelineBox();
                             await SharedPref.clearAll();
+                            await  AppConfig.instanceInit()!.setLoginData(newLoginData: LoginModel());
+                            await  AppConfig.instanceInit()!.setDistrictData(districtData: DistrictData());
+                            await  AppConfig.instanceInit()!.setGridData(gridData: GridData());
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(

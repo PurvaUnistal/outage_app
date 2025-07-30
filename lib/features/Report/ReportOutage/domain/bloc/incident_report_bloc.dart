@@ -3,6 +3,7 @@ import 'dart:core';
 import 'dart:developer';
 import 'dart:math' show cos, sqrt, asin;
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -419,7 +420,8 @@ class IncidentReportBloc
           listOfRegulator = await HiveDataBase.regulatorGISBox!.values.toList();
         }
         if (listOfRegulator.isNotEmpty) {
-          listOfRegulatorId = listOfRegulator.map((e) => e.regulatorid ?? "").toList();
+          listOfRegulatorId =
+              listOfRegulator.map((e) => e.regulatorid ?? "").toList();
           await ReportMarkerPolyline.processMarkersInBatches(
             context: context,
             dataList: listOfRegulator,
@@ -734,7 +736,9 @@ class IncidentReportBloc
   }
 
   _currentPointMarker({required BuildContext context}) async {
-    LatLng? currentPoint = await mapService.getCurrentLocation(context: context);
+    LatLng? currentPoint = await mapService.getCurrentLocation(
+      context: context,
+    );
     if (currentPoint != null) {
       GoogleMapController controller = await googleMapController.future;
       controller.animateCamera(
@@ -807,14 +811,16 @@ class IncidentReportBloc
   }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
-    final currentPoint = await mapService.getCurrentLocation(context: event.context);
+    final currentPoint = await mapService.getCurrentLocation(
+      context: event.context,
+    );
     if (currentPoint != null) {
       latLngOnTap = event.latLngOnTap;
       isMapDir = true;
       googleMapsUrl = mapService.buildGoogleMapsUrl(currentPoint, latLngOnTap);
       print("googleMapsUrl --> $googleMapsUrl");
       nameofLocation =
-      (await MapService.getAddress(latLng: event.latLngOnTap))!;
+          (await MapService.getAddress(latLng: event.latLngOnTap))!;
       print("nameofLocation --> $nameofLocation");
       Set<Marker> tempMarker = Set.from(markersPointList);
       if (mapService.isPointNearAnyPolyline(
@@ -845,8 +851,7 @@ class IncidentReportBloc
               showDialog(
                 context: event.context,
                 builder:
-                    (context) =>
-                    AlertDialog(
+                    (context) => AlertDialog(
                       contentPadding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -865,16 +870,17 @@ class IncidentReportBloc
     }
   }
 
-
   _selectGoogleRouteDirEvent(SelectGoogleRouteDirEvent event, emit) async {
-    final currentPoint = await mapService.getCurrentLocation(context: event.context);
+    final currentPoint = await mapService.getCurrentLocation(
+      context: event.context,
+    );
     if (currentPoint != null) {
       latLngOnTap = event.toLatLng;
       isMapDir = true;
       googleMapsUrl = mapService.buildGoogleMapsUrl(currentPoint, latLngOnTap);
       print("googleMapsUrl--->${googleMapsUrl}");
     }
-      await mapService.launchExternalUrl(googleMapsUrl);
+    await mapService.launchExternalUrl(googleMapsUrl);
     _eventCompleted(emit);
   }
 
@@ -1121,11 +1127,13 @@ class IncidentReportBloc
       ),
     );
     Set<Marker> emergencyMarker = Set.from(markersPointList);
-    emergencyMarker.add(Marker(
-      markerId: MarkerId('selected_emergency'),
-      position: targetPosition,
-      infoWindow: InfoWindow(title: selected.emergencyName),
-    ));
+    emergencyMarker.add(
+      Marker(
+        markerId: MarkerId('selected_emergency'),
+        position: targetPosition,
+        infoWindow: InfoWindow(title: selected.emergencyName),
+      ),
+    );
     filterMarkerList = emergencyMarker;
     _eventCompleted(emit);
   }
@@ -1271,6 +1279,8 @@ class IncidentReportBloc
       );
     });
   }
+
+
 
   _eventCompleted(Emitter<IncidentReportState> emit) {
     emit(

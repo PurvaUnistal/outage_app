@@ -61,8 +61,8 @@ class IncidentReportHelper {
     final ctx = UserContext.getUserContext();
     try {
       Map<String, String> para = {
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
         "latitude": latitude,
         "longitude": longitude,
         "buffer": "3",
@@ -105,7 +105,7 @@ class IncidentReportHelper {
     final ctx = UserContext.getUserContext();
     try {
       log("HO User: ${ctx.isHo}");
-      final query = Uri(queryParameters: {"ga_id": ctx.areas, "areas": ctx.gaId}).query;
+      final query = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
       final res = await ApiHelper.getData(urlEndPoint: Apis.getTFGis + query,context: context);
       print("--------------->${ Apis.getTFGis + query}");
       if(res != null && res["data"] != null &&  res["data"] is List){
@@ -135,7 +135,7 @@ class IncidentReportHelper {
   static Future<ValveGISModel?> getGasValueGisApi({ required BuildContext context,}) async {
     final ctx = UserContext.getUserContext();
     try {
-      String json = Uri(queryParameters: {"ga_id": ctx.areas, "areas": ctx.gaId}).query;
+      String json = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
       var res = await ApiHelper.getData(
         urlEndPoint: Apis.getGasValueGis + json,context: context
       );
@@ -164,7 +164,7 @@ class IncidentReportHelper {
   static Future<RegulatorGISModel?> getRegulatorGisApi({ required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      String json = Uri(queryParameters: {"ga_id": ctx.areas, "areas": ctx.gaId}).query;
+      String json = Uri(queryParameters: {"ga_id": ctx.gaId, "areas": ctx.areas}).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getRegulatorGis + json,context: context);
       if (res != null && res["data"] != null &&  res["data"] is List) {
         RegulatorGISModel response = RegulatorGISModel.fromJson(res);
@@ -193,8 +193,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "schema": ctx.schema,
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
         "type": "1",
       };
       String json = Uri(queryParameters: para).query;
@@ -227,8 +227,8 @@ class IncidentReportHelper {
       try {
       Map<String, String> para = {
         "schema": ctx.schema,
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
         "type": "2",
       };
       String json = Uri(queryParameters: para).query;
@@ -266,8 +266,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "schema": ctx.schema,
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
         "type": "3",
       };
       String json = Uri(queryParameters: para).query;
@@ -302,7 +302,7 @@ class IncidentReportHelper {
     try {
       final ctx = UserContext.getUserContext();
 
-      Map<String, String> para = {"ga_id": ctx.areas, "areas": ctx.gaId};
+      Map<String, String> para = {"ga_id": ctx.gaId, "areas": ctx.areas};
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(urlEndPoint: Apis.getFittingGis + json,context: context);
       if (res != null) {
@@ -318,7 +318,7 @@ class IncidentReportHelper {
   static Future<GetGasGisModel?> getTeeGisApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     try {
-      Map<String, String> para = {"type": "Tee", "ga_id": ctx.areas, "areas": ctx.gaId};
+      Map<String, String> para = {"type": "Tee", "ga_id": ctx.gaId, "areas": ctx.areas};
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
         urlEndPoint: Apis.getNonControllableFittingGis + json,context: context
@@ -338,8 +338,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "Elbow",
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -361,8 +361,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "Coupler",
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -384,8 +384,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "Reducer",
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -406,8 +406,8 @@ class IncidentReportHelper {
     try {
       Map<String, String> para = {
         "type": "End Cap",
-        "ga_id": ctx.areas,
-        "areas": ctx.gaId,
+        "ga_id": ctx.gaId,
+        "areas": ctx.areas,
       };
       String json = Uri(queryParameters: para).query;
       var res = await ApiHelper.getData(
@@ -431,8 +431,8 @@ class IncidentReportHelper {
     final ctx = UserContext.getUserContext();
 
     Map<String, String> para = {
-      "ga_id": ctx.areas,
-      "areas": ctx.gaId,
+      "ga_id": ctx.gaId,
+      "areas": ctx.areas,
       "latitude": latitude,
       "longitude": longitude,
       "buffer": "1.5",
