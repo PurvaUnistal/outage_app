@@ -1211,19 +1211,24 @@ class IncidentReportBloc
     blinkTimer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
       if (isBlinkMarker) {
         markersPointList.addAll(blinkMarkerList);
-          Future.delayed(Duration(milliseconds: 300), () {
-            for (var m in blinkMarkerList) {
-              controller.showMarkerInfoWindow(m.markerId);
-            }
+          Future.delayed(Duration(milliseconds: 200), () {
+            final blink = blinkMarkerList.first;
+            controller.showMarkerInfoWindow(blink.markerId);
+            // for (var m in blinkMarkerList) {
+            //   controller.showMarkerInfoWindow(m.markerId);
+            // }
           });
 
       } else {
-        for (Marker m in blinkMarkerList) {
-          controller.hideMarkerInfoWindow(m.markerId);
-          markersPointList.removeWhere(
-            (element) => element.markerId == m.markerId,
-          );
-        }
+        final blink = blinkMarkerList.first;
+        controller.hideMarkerInfoWindow(blink.markerId);
+        markersPointList.removeWhere((element) => element.markerId == blink.markerId,);
+        // for (Marker m in blinkMarkerList) {
+        //   controller.hideMarkerInfoWindow(m.markerId);
+        //   markersPointList.removeWhere(
+        //     (element) => element.markerId == m.markerId,
+        //   );
+        // }
       }
       isBlinkMarker = !isBlinkMarker;
       emit(IncidentReportPageLoadState());

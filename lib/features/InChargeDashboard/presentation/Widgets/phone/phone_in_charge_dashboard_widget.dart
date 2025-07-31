@@ -84,31 +84,31 @@ class _PhoneInChargeDashboardWidgetState
             itemCount: 4,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: columns,
-              crossAxisSpacing: 6,
-              mainAxisSpacing: 4,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
               childAspectRatio: aspectRatio,
             ),
             itemBuilder: (context, index) {
               final items = [
-                SummeryCard(
+                ResponsiveCard(
                   title: "MDPE",
                   value: "${dataState.dashboard.mdpeLength} km",
                   icon: Icons.straighten,
                   color: Colors.blue.shade100,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "Steel",
                   value: "${dataState.dashboard.steelLength} km",
                   icon: Icons.construction,
                   color: Colors.grey.shade300,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "DPNG",
                   value: "${dataState.dashboard.domesticCount}",
                   icon: Icons.home,
                   color: Colors.green.shade100,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "I & C",
                   value: "${dataState.dashboard.industrialCommercialCount}",
                   icon: Icons.factory,
@@ -133,19 +133,19 @@ class _PhoneInChargeDashboardWidgetState
             ),
             itemBuilder: (context, index) {
               final items = [
-                IncidentCard(
+                ResponsiveCard(
                   title: "Incident New",
                   value: "${dataState.dashboard.totalPendingIncident}",
                   icon: Icons.warning,
                   color: Colors.red.shade100,
                 ),
-                IncidentCard(
+                ResponsiveCard(
                   title: "Incident In Progress",
                   value: "${dataState.dashboard.totalInprogressIncident}",
                   icon: Icons.sync,
                   color: Colors.yellow.shade100,
                 ),
-                IncidentCard(
+                ResponsiveCard(
                   title: "Incident Completed",
                   value: "${dataState.dashboard.totalCompletedIncident}",
                   icon: Icons.check_circle,

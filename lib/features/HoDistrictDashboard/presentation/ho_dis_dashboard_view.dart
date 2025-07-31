@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
+import 'package:outage_app/Utils/common_widgets/app_update_message_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
@@ -10,6 +15,7 @@ import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashb
 import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashboard_state.dart';
 import 'package:outage_app/features/HoGridDashboard/presentation/ho_grid_dashboard_view.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'widget/summery_card.dart';
 
@@ -21,14 +27,49 @@ class HoDisDashboardView extends StatefulWidget {
 }
 
 class _HoDisDashboardViewState extends State<HoDisDashboardView> {
+
+  static const MethodChannel platform = MethodChannel('agcl/outage');
+
   @override
   void initState() {
-    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      callMethodeChannel();
+    });
     BlocProvider.of<HoDistrictDashboardBloc>(
       context,
     ).add(HoDistrictDashboardPageLoadEvent(context: context));
+    super.initState();
   }
-
+  callMethodeChannel() async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String applicationId = packageInfo.packageName;
+      String androidPlayStoreUrl =
+          "https://play.google.com/store/apps/details?id=$applicationId&hl=en&gl=US";
+      final dynamic result = await platform.invokeMethod('getAppUpdate');
+      if (Platform.isAndroid) {
+        if (kDebugMode) {
+          print("Upgrade Message ============== $result");
+        }
+        if (result.toString() == "success") {
+          try {
+            AppUpdateMessage.showAlertDialog(
+              context: context,
+              url: androidPlayStoreUrl,
+              isLater: false,
+            );
+          } catch (e) {
+            AppUpdateMessage.showAlertDialog(
+              context: context,
+              url: androidPlayStoreUrl,
+            );
+          }
+        }
+      }
+    } on PlatformException catch (e) {
+      return false;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,25 +143,25 @@ class _HoDisDashboardViewState extends State<HoDisDashboardView> {
             ),
             itemBuilder: (context, index) {
               final items = [
-                SummeryCard(
+                ResponsiveCard(
                   title: "MDPE",
                   value: "${dataState.dashboard.mdpeLength} km",
                   icon: Icons.straighten,
                   color: Colors.blue.shade100,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "Steel",
                   value: "${dataState.dashboard.steelLength} km",
                   icon: Icons.construction,
                   color: Colors.grey.shade300,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "DPNG",
                   value: "${dataState.dashboard.domesticCount}",
                   icon: Icons.home,
                   color: Colors.green.shade100,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "I & C",
                   value: "${dataState.dashboard.industrialCommercialCount}",
                   icon: Icons.factory,

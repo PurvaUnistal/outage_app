@@ -8,6 +8,9 @@ import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/enums.dart';
+import 'package:outage_app/features/HoDistrictDashboard/domain/model/DistrictDataModel.dart';
+import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.dart';
+import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
 import 'package:outage_app/testing.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -90,6 +93,11 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
         }
       } else {
         await SharedPref.clearAll();
+        await LogoutWidget.clearAndClosePipelineBox();
+        await SharedPref.clearAll();
+        await  AppConfig.instanceInit()!.setLoginData(newLoginData: LoginModel());
+        await  AppConfig.instanceInit()!.setDistrictData(districtData: DistrictData());
+        await  AppConfig.instanceInit()!.setGridData(gridData: GridData());
         Navigator.pushReplacementNamed(
           context,
           RoutesName.login,

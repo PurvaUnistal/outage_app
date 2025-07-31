@@ -261,7 +261,6 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
             polylines: dataState.polylinePointList,
             initialCameraPosition: CameraPosition(
               target: dataState.incidentLocation,
-              zoom: AppString.zoom,
             ),
             minMaxZoomPreference: _getZoomPreference(dataState),
             onCameraIdle: () {
@@ -282,13 +281,19 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
               backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
               child: IconButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => FullGoogleMapWidget(),
-                    ),
-                  );
+                  final state = BlocProvider.of<IncidentDetailBloc>(context).state;
+                  if (state is FetchIncidentDetailDataState) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FullGoogleMapWidget(
+                          polylineList: state.polylinePointList.toSet(),
+                          markerList: state.markersPointList.toSet(),
+                          cameraLatLng: state.incidentLocation,
+                        ),
+                      ),
+                    );
+                  }
                 },
                 icon: Icon(Icons.fullscreen_rounded, color: AppColor.white),
               ),

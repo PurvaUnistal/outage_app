@@ -76,49 +76,50 @@ class _HoGridDashboardViewState extends State<HoGridDashboardView> {
 
   Widget _tabWidget({required FetchHoGridDashboardDataState dataState}) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisSpacing = 8 * 1;
+    final crossAxisSpacing = 8;
     final padding = 12;
     final columns = 2;
     final itemWidth = (screenWidth - crossAxisSpacing - padding) / columns;
-    final itemHeight = MediaQuery.of(context).size.height * 0.09;
-
+    final itemHeight = MediaQuery.of(context).size.height * 0.10;
     final aspectRatio = itemWidth / itemHeight;
-    return Padding(
+
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// ---- Responsive Grid Cards ----
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 4,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: columns,
-              crossAxisSpacing: 6,
-              mainAxisSpacing: 4,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
               childAspectRatio: aspectRatio,
             ),
             itemBuilder: (context, index) {
               final items = [
-                SummeryCard(
+                ResponsiveCard(
                   title: "MDPE",
                   value: "${dataState.dashboard.mdpeLength} km",
                   icon: Icons.straighten,
                   color: Colors.blue.shade100,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "Steel",
                   value: "${dataState.dashboard.steelLength} km",
                   icon: Icons.construction,
                   color: Colors.grey.shade300,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "DPNG",
                   value: "${dataState.dashboard.domesticCount}",
                   icon: Icons.home,
                   color: Colors.green.shade100,
                 ),
-                SummeryCard(
+                ResponsiveCard(
                   title: "I & C",
                   value: "${dataState.dashboard.industrialCommercialCount}",
                   icon: Icons.factory,
@@ -128,91 +129,91 @@ class _HoGridDashboardViewState extends State<HoGridDashboardView> {
               return items[index];
             },
           ),
+
           const SizedBox(height: 20),
 
+          /// ---- Grid List Heading ----
           Text(
             'Grids(${AppConfig.instanceInit()?.districtData.name})',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          dataState.listOfGridData.length == 0
-              ? Center(
-                child: const Text(
-                  'No Found Grids',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.red),
-                ),
-              )
-              :ListView.separated(
-            itemCount: dataState.listOfGridData.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final grid = dataState.listOfGridData[index];
 
-              final colors = [
-                Colors.blue.shade100,
-                Colors.green.shade100,
-                Colors.orange.shade100,
-                Colors.purple.shade100,
-                Colors.teal.shade100,
-              ];
-              final color = colors[index % colors.length];
+          /// ---- List of Grid Data ----
+          if (dataState.listOfGridData.isEmpty)
+            const Center(
+              child: Text(
+                'No Found Grids',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
+              ),
+            )
+          else
+            ListView.separated(
+              itemCount: dataState.listOfGridData.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final grid = dataState.listOfGridData[index];
+                final colors = [
+                  Colors.blue.shade100,
+                  Colors.green.shade100,
+                  Colors.orange.shade100,
+                  Colors.purple.shade100,
+                  Colors.teal.shade100,
+                ];
+                final color = colors[index % colors.length];
 
-              return Container(
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(2, 2),
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  shape: RoundedRectangleBorder(
+                return Container(
+                  decoration: BoxDecoration(
+                    color: color,
                     borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(2, 2),
+                      ),
+                    ],
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      grid.gridName?.substring(0, 1) ?? '',
+                  child: ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        grid.gridName?.substring(0, 1) ?? '',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      grid.gridName ?? '',
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
                       ),
                     ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () async {
+                      await AppConfig.instanceInit()?.setGridData(gridData: grid);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => InChargeDashboardView()),
+                      );
+                    },
                   ),
-                  title: Text(
-                    grid.gridName ?? '',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () async {
-                    await AppConfig.instanceInit()?.setGridData(
-                      gridData: grid,
-                    );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => InChargeDashboardView(),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-
+                );
+              },
+            ),
         ],
       ),
     );
   }
+
 
 }

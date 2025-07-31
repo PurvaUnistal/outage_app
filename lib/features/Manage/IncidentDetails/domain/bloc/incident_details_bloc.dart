@@ -121,7 +121,6 @@ class IncidentDetailBloc
     isLoader = false;
     isBtnLoader = false;
     isBlinkMarker = isBlinkMarker;
-    incidentLocation = LatLng(0, 0);
     timer = Timer(Duration.zero, () {});
     googleMapController = Completer();
     listOfConsumerPoint = [];
@@ -144,8 +143,7 @@ class IncidentDetailBloc
     polylinePointList = {};
     listOfDiaColor = [];
 
-    incidentTypeId =
-        await AppConfig.instanceInit()?.viewIncidentData.incidentTypeId ?? "";
+    incidentTypeId = await AppConfig.instanceInit()?.viewIncidentData.incidentTypeId ?? "";
     incidentId = await AppConfig.instanceInit()?.viewIncidentData.incid ?? "";
     print("incidentTypeId-->${incidentTypeId}");
     role = await AppConfig.instanceInit()?.loginData.user?.role ?? "";
@@ -168,7 +166,7 @@ class IncidentDetailBloc
     GoogleMapController controller = await googleMapController.future;
     controller.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(target: incidentLocation, zoom: 18),
+        CameraPosition(target: incidentLocation, zoom: 20),
       ),
     );
 
@@ -281,7 +279,7 @@ class IncidentDetailBloc
     required BuildContext context,
     required String incidentId,
   }) async {
-  //   try {
+     try {
     var res = await IncidentDetailHelper.getValveConsumerAffectApi(
       context: context,
       incidentId: incidentId,
@@ -291,11 +289,7 @@ class IncidentDetailBloc
       final incidentData = AppConfig.instanceInit()?.viewIncidentData;
       if (consumerAffectModel.data != null) {
         consumerData = consumerAffectModel.data!;
-        incidentLocation =
-            IncidentDetailHelper.parseLatLng(
-              consumerData.latitude,
-              consumerData.longitude,
-            )!;
+        incidentLocation = IncidentDetailHelper.parseLatLng(consumerData.latitude, consumerData.longitude,)!;
         Set<Marker> tempMarker = {};
         var incidentMarker = await NavigateAlertHelper.markerIncident(
           position: [incidentLocation],
@@ -306,7 +300,6 @@ class IncidentDetailBloc
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,9 +355,9 @@ class IncidentDetailBloc
       }
       return res;
     }
-    // } catch (e) {
-    //   print("Error in _fetchValveConsumerAffectApi: $e");
-    // }
+    } catch (e) {
+      print("Error in _fetchValveConsumerAffectApi: $e");
+    }
   }
 
   Future<void> _handleConsumerMarkers({
