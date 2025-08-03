@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-abstract class IncidentReportEvent extends Equatable{}
+abstract class IncidentReportEvent extends Equatable {}
 
 class IncidentReportLoadEvent extends IncidentReportEvent {
   final BuildContext context;
@@ -12,23 +12,24 @@ class IncidentReportLoadEvent extends IncidentReportEvent {
   List<Object> get props => [context];
 }
 
-
-
 class SelectMapTypeButtonEvent extends IncidentReportEvent {
   @override
   // TODO: implement props
   List<Object> get props => [];
 }
 
-
 class SelectGoogleMapButtonEvent extends IncidentReportEvent {
   final LatLng latLngOnTap;
   final BuildContext context;
-  SelectGoogleMapButtonEvent({required this.latLngOnTap, required this.context});
+  SelectGoogleMapButtonEvent({
+    required this.latLngOnTap,
+    required this.context,
+  });
   @override
   // TODO: implement props
-  List<Object> get props => [latLngOnTap,context];
+  List<Object> get props => [latLngOnTap, context];
 }
+
 class SelectFilterButtonEvent extends IncidentReportEvent {
   final BuildContext context;
   SelectFilterButtonEvent({required this.context});
@@ -36,7 +37,6 @@ class SelectFilterButtonEvent extends IncidentReportEvent {
   // TODO: implement props
   List<Object> get props => [context];
 }
-
 
 class SelectCheckBoxTFGisEvent extends IncidentReportEvent {
   final BuildContext context;
@@ -59,7 +59,10 @@ class SelectTFGisEvent extends IncidentReportEvent {
 class SelectValveGISValueEvent extends IncidentReportEvent {
   final BuildContext context;
   final String gasValveGISId;
-  SelectValveGISValueEvent({required this.context, required this.gasValveGISId});
+  SelectValveGISValueEvent({
+    required this.context,
+    required this.gasValveGISId,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, gasValveGISId];
@@ -68,7 +71,10 @@ class SelectValveGISValueEvent extends IncidentReportEvent {
 class SelectCheckBoxValveGisEvent extends IncidentReportEvent {
   final BuildContext context;
   final bool checkBoxValve;
-  SelectCheckBoxValveGisEvent({required this.context, required this.checkBoxValve});
+  SelectCheckBoxValveGisEvent({
+    required this.context,
+    required this.checkBoxValve,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, checkBoxValve];
@@ -77,7 +83,10 @@ class SelectCheckBoxValveGisEvent extends IncidentReportEvent {
 class SelectRegulatorGISValueEvent extends IncidentReportEvent {
   final BuildContext context;
   final String gasRegulatorGISId;
-  SelectRegulatorGISValueEvent({required this.context, required this.gasRegulatorGISId});
+  SelectRegulatorGISValueEvent({
+    required this.context,
+    required this.gasRegulatorGISId,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, gasRegulatorGISId];
@@ -86,17 +95,22 @@ class SelectRegulatorGISValueEvent extends IncidentReportEvent {
 class SelectCheckBoxRegulatorGisEvent extends IncidentReportEvent {
   final BuildContext context;
   final bool checkBoxRegulator;
-  SelectCheckBoxRegulatorGisEvent({required this.context, required this.checkBoxRegulator});
+  SelectCheckBoxRegulatorGisEvent({
+    required this.context,
+    required this.checkBoxRegulator,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, checkBoxRegulator];
 }
 
-
 class SelectCommercialValueEvent extends IncidentReportEvent {
   final BuildContext context;
   final String commercialId;
-  SelectCommercialValueEvent({required this.context, required this.commercialId});
+  SelectCommercialValueEvent({
+    required this.context,
+    required this.commercialId,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, commercialId];
@@ -105,7 +119,10 @@ class SelectCommercialValueEvent extends IncidentReportEvent {
 class SelectCheckCommercialEvent extends IncidentReportEvent {
   final BuildContext context;
   final bool checkCommercial;
-  SelectCheckCommercialEvent({required this.context, required this.checkCommercial});
+  SelectCheckCommercialEvent({
+    required this.context,
+    required this.checkCommercial,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, checkCommercial];
@@ -123,7 +140,10 @@ class SelectDomesticValueEvent extends IncidentReportEvent {
 class SelectCheckDomesticEvent extends IncidentReportEvent {
   final BuildContext context;
   final bool checkDomestic;
-  SelectCheckDomesticEvent({required this.context, required this.checkDomestic});
+  SelectCheckDomesticEvent({
+    required this.context,
+    required this.checkDomestic,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, checkDomestic];
@@ -132,7 +152,10 @@ class SelectCheckDomesticEvent extends IncidentReportEvent {
 class SelectIndustrialValueEvent extends IncidentReportEvent {
   final BuildContext context;
   final String industrialId;
-  SelectIndustrialValueEvent({required this.context, required this.industrialId});
+  SelectIndustrialValueEvent({
+    required this.context,
+    required this.industrialId,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, industrialId];
@@ -141,7 +164,10 @@ class SelectIndustrialValueEvent extends IncidentReportEvent {
 class SelectCheckIndustrialEvent extends IncidentReportEvent {
   final BuildContext context;
   final bool checkIndustrial;
-  SelectCheckIndustrialEvent({required this.context, required this.checkIndustrial});
+  SelectCheckIndustrialEvent({
+    required this.context,
+    required this.checkIndustrial,
+  });
   @override
   // TODO: implement props
   List<Object> get props => [context, checkIndustrial];
@@ -150,7 +176,7 @@ class SelectCheckIndustrialEvent extends IncidentReportEvent {
 class SelectGoogleRouteDirEvent extends IncidentReportEvent {
   final BuildContext context;
   final LatLng toLatLng;
-  SelectGoogleRouteDirEvent({ required this.context,required this.toLatLng});
+  SelectGoogleRouteDirEvent({required this.context, required this.toLatLng});
   @override
   // TODO: implement props
   List<Object> get props => [context, toLatLng];
@@ -158,10 +184,10 @@ class SelectGoogleRouteDirEvent extends IncidentReportEvent {
 
 class OnCameraIdleEvent extends IncidentReportEvent {
   final BuildContext context;
-  OnCameraIdleEvent({required this.context,});
+  OnCameraIdleEvent({required this.context});
   @override
   // TODO: implement props
-  List<Object> get props => [context,];
+  List<Object> get props => [context];
 }
 
 class ResetFilterEvent extends IncidentReportEvent {
@@ -177,7 +203,7 @@ class CurrentLocationEvent extends IncidentReportEvent {
   CurrentLocationEvent({required this.context});
   @override
   // TODO: implement props
-  List<Object?> get props =>[context];
+  List<Object?> get props => [context];
 }
 
 class UpdateStartAddressEvent extends IncidentReportEvent {
@@ -186,7 +212,7 @@ class UpdateStartAddressEvent extends IncidentReportEvent {
 
   @override
   // TODO: implement props
-  List<Object?> get props =>[startAddress];
+  List<Object?> get props => [startAddress];
 }
 
 class UpdateDestinationAddressEvent extends IncidentReportEvent {
@@ -206,6 +232,7 @@ class SelectCurrentSuggestionEvent extends IncidentReportEvent {
   // TODO: implement props
   List<Object?> get props => [selectedCurrent];
 }
+
 class SelectDestinationSuggestionEvent extends IncidentReportEvent {
   final String selectedDescription;
   SelectDestinationSuggestionEvent(this.selectedDescription);
@@ -215,7 +242,7 @@ class SelectDestinationSuggestionEvent extends IncidentReportEvent {
   List<Object?> get props => [selectedDescription];
 }
 
-class ShowRouteButtonEvent extends IncidentReportEvent{
+class ShowRouteButtonEvent extends IncidentReportEvent {
   final BuildContext context;
   ShowRouteButtonEvent({required this.context});
 
@@ -224,7 +251,7 @@ class ShowRouteButtonEvent extends IncidentReportEvent{
   List<Object?> get props => [context];
 }
 
-class SearchHideShowEvent extends IncidentReportEvent{
+class SearchHideShowEvent extends IncidentReportEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [];
@@ -244,4 +271,9 @@ class SelectSearchEmergencyEvent extends IncidentReportEvent {
   @override
   // TODO: implement props
   List<Object> get props => [searchEmergency];
+}
+
+class StopTimerEvent extends IncidentReportEvent {
+  @override
+  List<Object> get props => [];
 }

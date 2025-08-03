@@ -26,8 +26,6 @@ class IncidentReportView extends StatefulWidget {
 }
 
 class _IncidentReportViewState extends State<IncidentReportView> {
-
-
   @override
   void initState() {
     super.initState();
@@ -39,23 +37,29 @@ class _IncidentReportViewState extends State<IncidentReportView> {
     ).add(OnCameraIdleEvent(context: context));
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(title: AppString.incidentReport, boolLeading: true),
-      body: SafeArea(
-        child: BackgroundInfoWidget(
-          child: BlocBuilder<IncidentReportBloc, IncidentReportState>(
-            builder: (context, state) {
-              if (state is FetchIncidentReportDataState) {
-                return _itemBuilder(dataState: state);
-              } else {
-                return const Center(child: SpinLoader());
-              }
-            },
+    return WillPopScope(
+      onWillPop: () async {
+        BlocProvider.of<IncidentReportBloc>(context).add(StopTimerEvent());
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBarWidget(
+          title: AppString.incidentReport,
+          boolLeading: true,
+        ),
+        body: SafeArea(
+          child: BackgroundInfoWidget(
+            child: BlocBuilder<IncidentReportBloc, IncidentReportState>(
+              builder: (context, state) {
+                if (state is FetchIncidentReportDataState) {
+                  return _itemBuilder(dataState: state);
+                } else {
+                  return const Center(child: SpinLoader());
+                }
+              },
+            ),
           ),
         ),
       ),
@@ -108,9 +112,9 @@ class _IncidentReportViewState extends State<IncidentReportView> {
                     _filterButtonWidget(dataState: dataState),
                     SizedBox(height: 16.0),
                     _emergencyButtonWidget(dataState: dataState),
+
                     // SizedBox(height: 16.0),
                     // _searchButtonWidget(dataState: dataState),
-
                     Spacer(),
                   ],
                 ),
@@ -218,7 +222,8 @@ class _IncidentReportViewState extends State<IncidentReportView> {
   _emergencyButtonWidget({required FetchIncidentReportDataState dataState}) {
     return CircleButton(
       iconData: Icons.emergency_outlined,
-      onTap: () => BlocProvider.of<IncidentReportBloc>(
+      onTap:
+          () => BlocProvider.of<IncidentReportBloc>(
             context,
           ).add(SelectEmergencyEvent(context: context)),
     );
@@ -233,6 +238,4 @@ class _IncidentReportViewState extends State<IncidentReportView> {
           ).add(SearchHideShowEvent()),
     );
   }
-
-
 }

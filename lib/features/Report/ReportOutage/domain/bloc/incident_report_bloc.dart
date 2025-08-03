@@ -3,7 +3,6 @@ import 'dart:core';
 import 'dart:developer';
 import 'dart:math' show cos, sqrt, asin;
 
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -73,6 +72,7 @@ class IncidentReportBloc
     on<SearchHideShowEvent>(_searchHideShowEvent);
     on<SelectEmergencyEvent>(_selectEmergency);
     on<SelectSearchEmergencyEvent>(_searchEmergencyHospital);
+    on<StopTimerEvent>(_stopTimer);
   }
 
   bool isLoader = false;
@@ -1190,7 +1190,6 @@ class IncidentReportBloc
     markersPointList = {...markersPointList};
   }
 
-
   @override
   Future<void> close() {
     blinkTimer.cancel();
@@ -1205,24 +1204,34 @@ class IncidentReportBloc
     _startBlinking();
   }
 
+  FutureOr<void> _stopTimer(
+    StopTimerEvent event,
+    Emitter<IncidentReportState> emit,
+  ) {
+    if (blinkTimer.isActive) {
+      blinkTimer.cancel();
+    }
+  }
+
   _startBlinking() async {
     final controller = await googleMapController.future;
     blinkTimer.cancel();
     blinkTimer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
       if (isBlinkMarker) {
         markersPointList.addAll(blinkMarkerList);
-          Future.delayed(Duration(milliseconds: 200), () {
-            final blink = blinkMarkerList.first;
-            controller.showMarkerInfoWindow(blink.markerId);
-            // for (var m in blinkMarkerList) {
-            //   controller.showMarkerInfoWindow(m.markerId);
-            // }
-          });
-
+        Future.delayed(Duration(milliseconds: 200), () {
+          final blink = blinkMarkerList.first;
+          controller.showMarkerInfoWindow(blink.markerId);
+          // for (var m in blinkMarkerList) {
+          //   controller.showMarkerInfoWindow(m.markerId);
+          // }
+        });
       } else {
         final blink = blinkMarkerList.first;
         controller.hideMarkerInfoWindow(blink.markerId);
-        markersPointList.removeWhere((element) => element.markerId == blink.markerId,);
+        markersPointList.removeWhere(
+          (element) => element.markerId == blink.markerId,
+        );
         // for (Marker m in blinkMarkerList) {
         //   controller.hideMarkerInfoWindow(m.markerId);
         //   markersPointList.removeWhere(
@@ -1284,8 +1293,6 @@ class IncidentReportBloc
       );
     });
   }
-
-
 
   _eventCompleted(Emitter<IncidentReportState> emit) {
     emit(
