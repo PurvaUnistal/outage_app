@@ -458,7 +458,6 @@ class IncidentReportHelper {
 
   static Future<List<String>?> getDiaColorApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
-
     String query = Uri(queryParameters: {"schema": ctx.schema}).query;
     var res = await ApiHelper.getData(urlEndPoint: Apis.diaColor + query,context: context);
     if (res != null && res["data"] != null) {

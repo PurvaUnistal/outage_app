@@ -60,6 +60,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     on<SearchDesEvent>(_searchDesEvent);
     on<SelectEmergencyEvent>(_selectEmergency);
      on<SelectSearchEmergencyEvent>(_searchEmergencyHospital);
+    on<StopTimerEvent>(_stopTimer);
   }
   bool isLoader = false;
   bool isMapDir = false;
@@ -1065,6 +1066,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     blinkTimer.cancel();
     return super.close();
   }
+
   void _restartBlinking() {
     if (blinkTimer.isActive == true) {
       blinkTimer.cancel();
@@ -1073,6 +1075,15 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _startBlinking();
   }
 
+  FutureOr<void> _stopTimer(
+      StopTimerEvent event, emit,
+      ) {
+    if (blinkTimer.isActive) {
+      blinkTimer.cancel();
+    }
+  }
+
+
 
   _startBlinking() async {
     final controller = await googleMapController.future;
@@ -1080,18 +1091,16 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     blinkTimer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
       if (isBlinkMarker) {
         markersPointList.addAll(blinkMarkerList);
-        for (var m in blinkMarkerList) {
-          Future.delayed(Duration(milliseconds: 300), () {
-            controller.showMarkerInfoWindow(m.markerId);
-          });
-        }
+        Future.delayed(Duration(milliseconds: 200), () {
+          final blink = blinkMarkerList.first;
+          controller.showMarkerInfoWindow(blink.markerId);
+        });
       } else {
-        for (Marker m in blinkMarkerList) {
-          controller.hideMarkerInfoWindow(m.markerId);
-          markersPointList.removeWhere(
-                (element) => element.markerId == m.markerId,
-          );
-        }
+        final blink = blinkMarkerList.first;
+        controller.hideMarkerInfoWindow(blink.markerId);
+        markersPointList.removeWhere(
+              (element) => element.markerId == blink.markerId,
+        );
       }
       isBlinkMarker = !isBlinkMarker;
       emit(NavigateAlertPageLoadState());

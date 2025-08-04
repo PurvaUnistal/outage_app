@@ -28,16 +28,34 @@ class IncidentDetailBloc
     on<IncidentDetailBlinkConsumerMarker>(_blinkConsumerMarker);
     on<IncidentDetailOnCameraIdleEvent>(_onCameraIdleEvent);
     on<SubmitBtnEvent>(_submitBtnEvent);
+    on<StopTimerEvent>(_stopTimer);
   }
 
   @override
   Future<void> close() {
-    timer.cancel();
+    blinkTimer.cancel();
     return super.close();
   }
 
+  void _restartBlinking() {
+    if (blinkTimer.isActive == true) {
+      blinkTimer.cancel();
+    }
+    isBlinkMarker = true;
+    _startBlinking();
+  }
+
+  FutureOr<void> _stopTimer(
+      StopTimerEvent event, emit,
+      ) {
+    if (blinkTimer.isActive) {
+      blinkTimer.cancel();
+    }
+  }
+
+
   _startBlinking() {
-    timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+    blinkTimer = Timer.periodic(Duration(milliseconds: 1000), (timer) async {
       if (isBlinkMarker) {
         markersPointList.addAll(consumerMarkers);
         markersPointList.addAll(valveMarkers);
@@ -113,7 +131,7 @@ class IncidentDetailBloc
 
 
   bool isBlinkMarker = true;
-  Timer timer = Timer(Duration.zero, () {});
+  Timer blinkTimer = Timer(Duration.zero, () {});
   Completer<GoogleMapController> googleMapController = Completer();
 
   _pageLoad(IncidentDetailLoadEvent event, emit) async {
@@ -121,7 +139,7 @@ class IncidentDetailBloc
     isLoader = false;
     isBtnLoader = false;
     isBlinkMarker = isBlinkMarker;
-    timer = Timer(Duration.zero, () {});
+    blinkTimer = Timer(Duration.zero, () {});
     googleMapController = Completer();
     listOfConsumerPoint = [];
     listOfValvePoint = [];
@@ -243,7 +261,10 @@ class IncidentDetailBloc
   }
 
   _updateMarkerPolyline() {
-    polylinePointList = {...pipePolylinePointList, ...filterPolyline};
+    polylinePointList = {
+      ...pipePolylinePointList,
+      ...filterPolyline,
+    };
     print("pipePolylinePointList-->${pipePolylinePointList.length}");
     print("filterPolyline-->${filterPolyline.length}");
   }
@@ -295,8 +316,7 @@ class IncidentDetailBloc
           position: [incidentLocation],
           context: context,
           icon: BitmapDescriptor.defaultMarker,
-          onTap:
-              () => showDialog(
+          onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
@@ -315,7 +335,7 @@ class IncidentDetailBloc
                         ),
                         IncidentDetailHelper.row(
                             title: "Incident Status",
-                            subtitle: incidentData?.actionStatus!.name ?? 'N/A'
+                            subtitle: incidentData?.actionStatus!.name.toUpperCase() ?? 'N/A'
                         ),
                       ],
                     ),
@@ -345,7 +365,7 @@ class IncidentDetailBloc
         }
         if (consumerData.valve != null && consumerData.valve!.isNotEmpty) {
           listOfValve = consumerData.valve!;
-          listOfValvePoint = _getLatLngList(listOfValve);
+          listOfValvePoint = _getValveLatLngList(listOfValve);
           await _handleValveMarkers(
             context: context,
             listOfValve: listOfValvePoint,
@@ -382,6 +402,7 @@ class IncidentDetailBloc
     final BitmapDescriptor iconBytes = await ReportMarkerPolyline.markerAsset(
       path:AssetPath.valveBlink,
     );
+
     valveMarkers = await NavigateAlertHelper.markerIncident(
       position: listOfValve,
       context: context,
@@ -390,12 +411,6 @@ class IncidentDetailBloc
     markersPointList.addAll(valveMarkers);
   }
 
-  void _restartBlinking() {
-    if (timer.isActive == true) {
-      timer.cancel();
-    }
-    _startBlinking();
-  }
 
   List<LatLng> _getConLatLngList(List<ConsumerBPList> dataList) {
     return dataList
@@ -409,7 +424,7 @@ class IncidentDetailBloc
         .toList();
   }
 
-  List<LatLng> _getLatLngList(List<ValveData> dataList) {
+  List<LatLng> _getValveLatLngList(List<ValveData> dataList) {
     return dataList
         .where((data) => data.latitude != null && data.longitude != null)
         .map(
@@ -422,29 +437,41 @@ class IncidentDetailBloc
   }
 
   _blinkValveMarker(IncidentDetailBlinkValveMarker event, emit) async {
+    try {
+    final controller = await googleMapController.future;
     LatLng latLng = LatLng(
       double.parse(event.valveData.longitude!),
       double.parse(event.valveData.latitude!),
     );
-    GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
+    print("_blinkValveMarker------------------->${latLng}");
+
+      await controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
+    } catch (e) {
+      debugPrint("Camera animation failed: $e");
+    }
 
     _eventCompleted(emit);
   }
 
   _blinkConsumerMarker(IncidentDetailBlinkConsumerMarker event, emit) async {
+    try {
+    final controller = await googleMapController.future;
     LatLng latLng = LatLng(
       double.parse(event.consumerBPList.latitude!),
       double.parse(event.consumerBPList.longitude!),
     );
-    GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
+    print("_blinkConsumerMarker------------------->${latLng}");
+
+      await controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
+    } catch (e) {
+      debugPrint("Camera animation failed: $e");
+    }
     _eventCompleted(emit);
   }
 
   _onCameraIdleEvent(IncidentDetailOnCameraIdleEvent event, emit) async {
     await IncidentReportHelper.clearCache();
-    _filterVisiblePolyline();
+    await _filterVisiblePolyline();
     _eventCompleted(emit);
   }
 

@@ -15,6 +15,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:outage_app/features/Manage/IncidentManage/presentation/widget/button_border_widget.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/bloc/incident_report_bloc.dart';
 import 'widget/GoogleMapWidget.dart';
 
 class IncidentDetailView extends StatefulWidget {
@@ -31,8 +32,7 @@ class IncidentDetailView extends StatefulWidget {
   State<IncidentDetailView> createState() => _IncidentDetailViewState();
 }
 
-class _IncidentDetailViewState extends State<IncidentDetailView>
-    with SingleTickerProviderStateMixin {
+class _IncidentDetailViewState extends State<IncidentDetailView> {
   @override
   void initState() {
     BlocProvider.of<IncidentDetailBloc>(
@@ -44,18 +44,24 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(title: "Report", boolLeading: true),
-      body: SafeArea(
-        child: BackgroundInfoWidget(
-          child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
-            builder: (context, state) {
-              if (state is FetchIncidentDetailDataState) {
-                return _itemBuilder(dataState: state);
-              } else {
-                return const Center(child: SpinLoader());
-              }
-            },
+    return WillPopScope(
+      onWillPop: () async {
+        BlocProvider.of<IncidentDetailBloc>(context).add(StopTimerEvent());
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBarWidget(title: "Report", boolLeading: true),
+        body: SafeArea(
+          child: BackgroundInfoWidget(
+            child: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
+              builder: (context, state) {
+                if (state is FetchIncidentDetailDataState) {
+                  return _itemBuilder(dataState: state);
+                } else {
+                  return const Center(child: SpinLoader());
+                }
+              },
+            ),
           ),
         ),
       ),
@@ -144,9 +150,9 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
                                   EnvironmentConfig.of(context)?.primaryTheme,
                             ),
                             onPressed: () {
-                              BlocProvider.of<IncidentDetailBloc>(
-                                context,
-                              ).add(IncidentDetailBlinkValveMarker(valveData: e));
+                              BlocProvider.of<IncidentDetailBloc>(context).add(
+                                IncidentDetailBlinkValveMarker(valveData: e),
+                              );
                             },
                           ),
                         ],
@@ -261,15 +267,18 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
             polylines: dataState.polylinePointList,
             initialCameraPosition: CameraPosition(
               target: dataState.incidentLocation,
+              zoom: 17,
             ),
             minMaxZoomPreference: _getZoomPreference(dataState),
             onCameraIdle: () {
-              BlocProvider.of<IncidentDetailBloc>(context).add(IncidentDetailOnCameraIdleEvent(
-                context: context,
-              ));
+              BlocProvider.of<IncidentDetailBloc>(context).add(
+                IncidentDetailOnCameraIdleEvent(
+                  latLng: dataState.incidentLocation,
+                ),
+              );
             },
             onMapCreated: (GoogleMapController controller) {
-              if (! dataState.googleMapController.isCompleted) {
+              if (!dataState.googleMapController.isCompleted) {
                 dataState.googleMapController.complete(controller);
               }
             },
@@ -281,20 +290,18 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
               backgroundColor: EnvironmentConfig.of(context)!.primaryTheme,
               child: IconButton(
                 onPressed: () {
-                  final state = BlocProvider.of<IncidentDetailBloc>(context).state;
-                  if (state is FetchIncidentDetailDataState) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FullGoogleMapWidget(
-                          polylineList: state.polylinePointList.toSet(),
-                          markerList: state.markersPointList.toSet(),
-                          cameraLatLng: state.incidentLocation,
-                        ),
-                      ),
-                    );
-                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => BlocProvider.value(
+                            value: BlocProvider.of<IncidentDetailBloc>(context),
+                            child: const FullGoogleMapWidget(),
+                          ),
+                    ),
+                  );
                 },
+
                 icon: Icon(Icons.fullscreen_rounded, color: AppColor.white),
               ),
             ),
@@ -303,11 +310,13 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
       ),
     );
   }
+
   MinMaxZoomPreference _getZoomPreference(FetchIncidentDetailDataState state) {
     return state.polylinePointList.length >= 2000
         ? const MinMaxZoomPreference(15, null)
         : const MinMaxZoomPreference(17, null);
   }
+
   Widget _nameWidget({
     required FetchIncidentDetailDataState dataState,
     required int i,
@@ -509,7 +518,7 @@ class _IncidentDetailViewState extends State<IncidentDetailView>
     required List<Widget> children,
   }) {
     return Flexible(
-     flex: 1,
+      flex: 1,
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.2,
         child: ListView(

@@ -37,18 +37,24 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(title: AppString.navigateAlert, boolLeading: true),
-      body: SafeArea(
-        child: BackgroundInfoWidget(
-          child: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
-            builder: (context, state) {
-              if (state is FetchNavigateAlertDataState) {
-                return _itemBuilder(dataState: state);
-              } else {
-                return const Center(child: SpinLoader());
-              }
-            },
+    return WillPopScope(
+      onWillPop: () async {
+        BlocProvider.of<NavigateAlertBloc>(context).add(StopTimerEvent());
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBarWidget(title: AppString.navigateAlert, boolLeading: true),
+        body: SafeArea(
+          child: BackgroundInfoWidget(
+            child: BlocBuilder<NavigateAlertBloc, NavigateAlertState>(
+              builder: (context, state) {
+                if (state is FetchNavigateAlertDataState) {
+                  return _itemBuilder(dataState: state);
+                } else {
+                  return const Center(child: SpinLoader());
+                }
+              },
+            ),
           ),
         ),
       ),

@@ -216,3 +216,7 @@ class SelectSearchEmergencyEvent extends NavigateAlertEvent {
   // TODO: implement props
   List<Object> get props => [searchEmergency];
 }
+class StopTimerEvent extends NavigateAlertEvent {
+  @override
+  List<Object> get props => [];
+}

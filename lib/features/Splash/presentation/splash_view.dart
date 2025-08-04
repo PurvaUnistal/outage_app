@@ -94,7 +94,6 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       } else {
         await SharedPref.clearAll();
         await LogoutWidget.clearAndClosePipelineBox();
-        await SharedPref.clearAll();
         await  AppConfig.instanceInit()!.setLoginData(newLoginData: LoginModel());
         await  AppConfig.instanceInit()!.setDistrictData(districtData: DistrictData());
         await  AppConfig.instanceInit()!.setGridData(gridData: GridData());

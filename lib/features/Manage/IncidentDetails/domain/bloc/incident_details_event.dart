@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/model/consumer_affect_model.dart';
 
 abstract class IncidentDetailEvent extends Equatable{}
@@ -39,13 +40,17 @@ class IncidentDetailBlinkConsumerMarker extends IncidentDetailEvent {
 }
 
 class IncidentDetailOnCameraIdleEvent extends IncidentDetailEvent {
-  final BuildContext context;
-  IncidentDetailOnCameraIdleEvent({required this.context,});
+  final LatLng latLng;
+  IncidentDetailOnCameraIdleEvent({required this.latLng,});
   @override
   // TODO: implement props
-  List<Object> get props => [context,];
+  List<Object> get props => [latLng,];
 }
 
+class StopTimerEvent extends IncidentDetailEvent {
+  @override
+  List<Object> get props => [];
+}
 class SubmitBtnEvent extends IncidentDetailEvent {
   final String actionStatus;
   final String incidentActionId;

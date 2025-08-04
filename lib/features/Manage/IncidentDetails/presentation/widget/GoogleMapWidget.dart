@@ -2,71 +2,81 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
-import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_bloc.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_event.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/bloc/incident_details_state.dart';
+class FullGoogleMapWidget extends StatefulWidget {
+  const FullGoogleMapWidget({super.key});
 
-class FullGoogleMapWidget extends StatelessWidget {
-  final Set<Polyline> polylineList;
-  final Set<Marker> markerList;
-  final LatLng cameraLatLng;
+  @override
+  State<FullGoogleMapWidget> createState() => _FullGoogleMapWidgetState();
+}
 
-  const FullGoogleMapWidget({
-    super.key,
-    required this.polylineList,
-    required this.markerList,
-    required this.cameraLatLng,
-  });
+class _FullGoogleMapWidgetState extends State<FullGoogleMapWidget> {
+  @override
+  void initState() {
+    BlocProvider.of<IncidentDetailBloc>(
+      context,
+    ).add(IncidentDetailLoadEvent(context: context));
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(title: "Report", boolLeading: true),
-      body: SafeArea(
-        child: BackgroundInfoWidget(
-          child: Stack(
-            children: [
-              GoogleMap(
-                polylines: polylineList,
-                markers: markerList,
-                initialCameraPosition: CameraPosition(
-                  target: cameraLatLng,
-                  zoom: 16,
+      body: BlocBuilder<IncidentDetailBloc, IncidentDetailState>(
+        builder: (context, state) {
+          if (state is FetchIncidentDetailDataState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                GoogleMap(
+                  buildingsEnabled: false,
+                  zoomControlsEnabled: false,
+                  // rotateGesturesEnabled: true,
+                  markers: state.markersPointList,
+                  polylines: state.polylinePointList,
+                  initialCameraPosition: CameraPosition(
+                    target: state.incidentLocation,
+                  ),
+                  minMaxZoomPreference: _getZoomPreference(state.markersPointList.length),
+                  onCameraIdle: () {
+                    BlocProvider.of<IncidentDetailBloc>(context).add(IncidentDetailOnCameraIdleEvent(
+                      latLng: state.incidentLocation,
+                    ));
+                  },
+                  onMapCreated: (GoogleMapController controller) {
+                    if (! state.googleMapController.isCompleted) {
+                      state.googleMapController.complete(controller);
+                    }
+                  },
                 ),
-                myLocationButtonEnabled: true,
-                rotateGesturesEnabled: true,
-                onMapCreated: (controller) {},
-                onCameraIdle: () {
-                  BlocProvider.of<IncidentDetailBloc>(context).add(IncidentDetailOnCameraIdleEvent(
-                    context: context,
-                  ));
-                },
-                minMaxZoomPreference: _getZoomPreference(polylineList.length),
-              ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: FloatingActionButton(
-                  heroTag: "exit_full_map",
-                  onPressed: () => Navigator.pop(context),
-                  backgroundColor: AppColor.white,
-                  child: Icon(
-                    Icons.fullscreen_exit_rounded,
-                    color: EnvironmentConfig.of(context)!.primaryTheme,
+                Positioned(
+                  bottom: 100,
+                  right: 10,
+                  child: FloatingActionButton(
+                    heroTag: "exit_full_map",
+                    onPressed: () => Navigator.pop(context),
+                    backgroundColor: AppColor.white,
+                    child: Icon(
+                      Icons.fullscreen_exit_rounded,
+                      color: EnvironmentConfig.of(context)!.primaryTheme,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            );
+          } else {
+            return const Center(child: SpinLoader());
+          }
+        },
       ),
     );
   }
+
   MinMaxZoomPreference _getZoomPreference(int count) {
     return count >= 2000
         ? const MinMaxZoomPreference(16, null)

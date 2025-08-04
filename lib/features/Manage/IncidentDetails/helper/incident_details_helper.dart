@@ -93,6 +93,35 @@ class IncidentDetailHelper{
     }
   }
 
+  Future<void> _processMarkersInBatches({
+    required List<LatLng> positions,
+    required BuildContext context,
+    required BitmapDescriptor icon,
+    required Function(Marker) onMarkerCreated,
+    Function()? onTap,
+    int batchSize = 50,
+  }) async {
+    for (int i = 0; i < positions.length; i += batchSize) {
+      final batch = positions.skip(i).take(batchSize);
+
+      final markers = await Future.wait(batch.map((pos) async {
+        return Marker(
+          markerId: MarkerId('${pos.latitude},${pos.longitude}'),
+          position: pos,
+          icon: icon,
+          onTap: onTap,
+        );
+      }));
+
+      for (final marker in markers) {
+        onMarkerCreated(marker);
+      }
+
+      // Optional pause to allow UI thread to breathe
+      await Future.delayed(Duration(milliseconds: 50));
+    }
+  }
+
 
   static Future<IncidentActionProgressModel?> incidentActionProgressApi({
     required BuildContext context,

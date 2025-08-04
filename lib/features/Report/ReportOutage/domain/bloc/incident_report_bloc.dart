@@ -1222,9 +1222,6 @@ class IncidentReportBloc
         Future.delayed(Duration(milliseconds: 200), () {
           final blink = blinkMarkerList.first;
           controller.showMarkerInfoWindow(blink.markerId);
-          // for (var m in blinkMarkerList) {
-          //   controller.showMarkerInfoWindow(m.markerId);
-          // }
         });
       } else {
         final blink = blinkMarkerList.first;
@@ -1232,12 +1229,6 @@ class IncidentReportBloc
         markersPointList.removeWhere(
           (element) => element.markerId == blink.markerId,
         );
-        // for (Marker m in blinkMarkerList) {
-        //   controller.hideMarkerInfoWindow(m.markerId);
-        //   markersPointList.removeWhere(
-        //     (element) => element.markerId == m.markerId,
-        //   );
-        // }
       }
       isBlinkMarker = !isBlinkMarker;
       emit(IncidentReportPageLoadState());
