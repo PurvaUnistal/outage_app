@@ -11,15 +11,15 @@ class HoDistrictDashboardHelper {
     String userId = await AppConfig.instanceInit()?.loginData.user!.id ?? "";
     Map<String, String> para = {"user_id": userId ?? ""};
     String json = Uri(queryParameters: para).query;
-    try {
+   // try {
       var res = await ApiHelper.getData(urlEndPoint: Apis.districtData + json,context: context);
       if (res != null) {
         DistrictDataModel response = DistrictDataModel.fromJson(res);
         return response;
       }
-    } catch (e) {
-      log("districtData-->${e.toString()}");
-    }
+    // } catch (e) {
+    //   log("districtData-->${e.toString()}");
+    // }
     return null;
   }
 }

@@ -10,11 +10,13 @@ import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert
 class AlertDialogDetailsWidgetWidget extends StatelessWidget {
   final dynamic pipelineData;
   final String? filterByKey;
+  final LatLng? currLatLng;
 
   const AlertDialogDetailsWidgetWidget({
     super.key,
     this.filterByKey,
     this.pipelineData,
+    this.currLatLng,
   });
 
   @override
@@ -104,13 +106,20 @@ class AlertDialogDetailsWidgetWidget extends StatelessWidget {
                   text: "Navigate",
                   icon: Icons.alt_route,
                   onPressed: () {
-                    double lat = double.parse(pipelineData.latitude);
-                    double lng = double.parse(pipelineData.longitude);
-                    LatLng toPoints = LatLng(lat, lng);
-                    BlocProvider.of<NavigateAlertBloc>(
-                      context,
-                    ).add(SelectGoogleRouteDirEvent(context: context,toLatLng: toPoints));
-                  },
+                    if(pipelineData.latitude == "" && pipelineData.longitude == ""){
+                      LatLng? toPoints = currLatLng;
+                      BlocProvider.of<NavigateAlertBloc>(context).add(
+                        SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints ?? LatLng(0,0)),
+                      );
+                    }else{
+                      double lat = double.parse(pipelineData.latitude);
+                      double lng = double.parse(pipelineData.longitude);
+                      LatLng toPoints = LatLng(lat, lng);
+                      BlocProvider.of<NavigateAlertBloc>(context).add(
+                        SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints),
+                      );
+                    }
+                    },
                 ),
               ),
             ],

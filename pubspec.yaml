@@ -75,10 +75,10 @@ dev_dependencies:
     sdk: flutter
 
 flutter_icons:
-  android: "agcl"
+  android: "pbg_logo"
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/icons/agcl_icon.png"
+  image_path: "assets/icons/pbg_logo.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -37,8 +37,8 @@ class DistrictDataModel {
 class Dashboard {
   String? mdpeLength;
   String? steelLength;
-  int? domesticCount;
-  int? industrialCommercialCount;
+  String? domesticCount;
+  String? industrialCommercialCount;
 
   Dashboard(
       {this.mdpeLength,
@@ -47,10 +47,10 @@ class Dashboard {
         this.industrialCommercialCount});
 
   Dashboard.fromJson(Map<String, dynamic> json) {
-    mdpeLength = json['mdpe_length'];
-    steelLength = json['steel_length'];
-    domesticCount = json['domestic_count'];
-    industrialCommercialCount = json['industrial_commercial_count'];
+    mdpeLength = json['mdpe_length'].toString();
+    steelLength = json['steel_length'].toString();
+    domesticCount = json['domestic_count'].toString();
+    industrialCommercialCount = json['industrial_commercial_count'].toString();
   }
 
   Map<String, dynamic> toJson() {

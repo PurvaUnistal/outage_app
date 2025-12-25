@@ -117,6 +117,8 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
               child: Image.asset(
                 AppConfig.instanceInit()!.client == Client.agcl
                     ? AssetPath.agclLogo
+                :AppConfig.instanceInit()!.client == Client.mahaNagar
+                    ? AssetPath.mglLogo
                     : AppConfig.instanceInit()!.client == Client.purvaBharti
                         ? AssetPath.pbgLogo
                         : AssetPath.iglLogo,

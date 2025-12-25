@@ -5,14 +5,9 @@ import 'package:outage_app/Utils/common_widgets/res/singleton.dart';
 class Apis {
 
 
-/*  // static String baseUrl = 'https://agcldemo.smartgasnet.com/api/';
-  // static String baseUrl = 'https://agcldemo.smartgasnet.com/api/';
-  // static String baseUrl = 'http://pbgpl.smartgasnet.com/api/';
-  static String basePath = 'http://agcl.smartgasnet.com/';*/
   static BuildContext? context = Singleton.instanceInit()?.context;
 
-  static final String baseUrl =
-      EnvironmentConfig.of(context!)!.generalUrlBaseFlavour;
+  static final String baseUrl = EnvironmentConfig.of(context!)!.generalUrlBaseFlavour;
 
 
   static get loginUrl  => "auth";

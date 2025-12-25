@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:core';
 import 'dart:developer';
 import 'dart:math' show cos, sqrt, asin;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -236,10 +235,7 @@ class IncidentReportBloc
     listOfPipeline = [];
     final ctx = await UserContext.getUserContext();
     log("HO User: ${ctx.isHo}");
-    currentPosition = LatLng(
-      double.parse(ctx.user.gaLatitude!),
-      double.parse(ctx.user.gaLongitude!),
-    );
+    currentPosition = LatLng(double.parse(ctx.user.gaLatitude ?? "0.0"), double.parse(ctx.user.gaLongitude ?? "0.0"),);
     latLngOnTap = LatLng(0, 0);
     points = [];
 
@@ -297,7 +293,8 @@ class IncidentReportBloc
   }
 
   _filerPipe({required BuildContext context, emit}) async {
-    if (await HiveDataBase.pipelineDataBox!.values.isEmpty) {
+    final pipelineBox = HiveDataBase.pipelineDataBox;
+    if (pipelineBox == null || pipelineBox.values.isEmpty) {
       var res = await IncidentReportHelper.getPipelineApi(
         context: context,
         latitude:
@@ -347,14 +344,16 @@ class IncidentReportBloc
   _fetchTFGisApi({required BuildContext context, emit}) async {
     if (checkTf == true) {
       try {
-        if (await HiveDataBase.tfGISBox!.isEmpty) {
+        final tfBox = HiveDataBase.tfGISBox;
+        if (tfBox == null || tfBox.values.isEmpty) {
           var res = await IncidentReportHelper.getTFGisApi(context: context);
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfTF = res.data!;
           }
         } else {
-          listOfTF = await HiveDataBase.tfGISBox!.values.toList();
+          listOfTF = tfBox.values.toList();
         }
+
         if (listOfTF.isNotEmpty) {
           listOfTFId = listOfTF.map((e) => e.tfNumber ?? "").toList();
           await ReportMarkerPolyline.processMarkersInBatches(
@@ -377,16 +376,16 @@ class IncidentReportBloc
   _fetchGasValueGisApi({required BuildContext context, emit}) async {
     if (checkValve == true) {
       try {
-        if (await HiveDataBase.valveGISBox!.isEmpty) {
-          var res = await IncidentReportHelper.getGasValueGisApi(
-            context: context,
-          );
+        final valveBox = HiveDataBase.valveGISBox;
+        if (valveBox == null || valveBox.values.isEmpty) {
+          var res = await IncidentReportHelper.getGasValueGisApi(context: context);
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfValue = res.data!;
           }
         } else {
-          listOfValue = await HiveDataBase.valveGISBox!.values.toList();
+          listOfValue = valveBox.values.toList();
         }
+
         if (listOfValue.isNotEmpty) {
           listOfValveId = listOfValue.map((e) => e.valveId ?? "").toList();
           await ReportMarkerPolyline.processMarkersInBatches(
@@ -409,16 +408,17 @@ class IncidentReportBloc
   _fetchGasRegulatorGisApi({required BuildContext context, emit}) async {
     if (checkRegulator == true) {
       try {
-        if (await HiveDataBase.regulatorGISBox!.isEmpty) {
-          var res = await IncidentReportHelper.getRegulatorGisApi(
-            context: context,
-          );
+        final regulatorBox = HiveDataBase.regulatorGISBox;
+
+        if (regulatorBox == null || regulatorBox.values.isEmpty) {
+          var res = await IncidentReportHelper.getRegulatorGisApi(context: context);
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfRegulator = res.data!;
           }
         } else {
-          listOfRegulator = await HiveDataBase.regulatorGISBox!.values.toList();
+          listOfRegulator = regulatorBox.values.toList();
         }
+
         if (listOfRegulator.isNotEmpty) {
           listOfRegulatorId =
               listOfRegulator.map((e) => e.regulatorid ?? "").toList();
@@ -442,17 +442,17 @@ class IncidentReportBloc
   _fetchCommercialApi({required BuildContext context, emit}) async {
     if (checkCommercial == true) {
       try {
-        if (await HiveDataBase.commercialDataBox!.isEmpty) {
-          var res = await IncidentReportHelper.getCommercialApi(
-            context: context,
-          );
+        final commercialBox = HiveDataBase.commercialDataBox;
+
+        if (commercialBox == null || commercialBox.values.isEmpty) {
+          var res = await IncidentReportHelper.getCommercialApi(context: context);
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfCommercial = res.data!;
           }
         } else {
-          listOfCommercial =
-              await HiveDataBase.commercialDataBox!.values.toList();
+          listOfCommercial = commercialBox.values.toList();
         }
+
         if (listOfCommercial.isNotEmpty) {
           listOfCommercialId =
               listOfCommercial.map((e) => e.bpNumber ?? "").toList();
@@ -475,13 +475,15 @@ class IncidentReportBloc
 
   _fetchDomesticApi({required BuildContext context, emit}) async {
     if (checkDomestic == true) {
-      if (await HiveDataBase.domesticDataBox!.isEmpty) {
+      final domesticBox = HiveDataBase.domesticDataBox;
+
+      if (domesticBox == null || domesticBox.values.isEmpty) {
         var res = await IncidentReportHelper.getDomesticApi(context: context);
         if (res != null && res.data != null && res.data!.isNotEmpty) {
           listOfDomestic = res.data!;
         }
       } else {
-        listOfDomestic = await HiveDataBase.domesticDataBox!.values.toList();
+        listOfDomestic = domesticBox.values.toList();
       }
       if (listOfDomestic.isNotEmpty) {
         listOfDomesticId = listOfDomestic.map((e) => e.bpNumber ?? "").toList();
@@ -502,17 +504,17 @@ class IncidentReportBloc
   _fetchIndustrialApi({required BuildContext context, emit}) async {
     if (checkIndustrial == true) {
       try {
-        if (await HiveDataBase.industrialDataBox!.isEmpty) {
-          var res = await IncidentReportHelper.getIndustrialApi(
-            context: context,
-          );
+        final industrialBox = HiveDataBase.industrialDataBox;
+
+        if (industrialBox == null || industrialBox.values.isEmpty) {
+          var res = await IncidentReportHelper.getIndustrialApi(context: context);
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfIndustrial = res.data!;
           }
         } else {
-          listOfIndustrial =
-              await HiveDataBase.industrialDataBox!.values.toList();
+          listOfIndustrial = industrialBox.values.toList();
         }
+
         if (listOfIndustrial.isNotEmpty) {
           listOfIndustrialId =
               listOfIndustrial.map((e) => e.bpNumber ?? "").toList();
@@ -823,10 +825,7 @@ class IncidentReportBloc
           (await MapService.getAddress(latLng: event.latLngOnTap))!;
       print("nameofLocation --> $nameofLocation");
       Set<Marker> tempMarker = Set.from(markersPointList);
-      if (mapService.isPointNearAnyPolyline(
-        event.latLngOnTap,
-        polylinePointList,
-      )) {
+      if (mapService.isPointNearAnyPolyline(event.latLngOnTap, polylinePointList)) {
         tempMarker.add(
           Marker(
             markerId: MarkerId('Pipeline'),
@@ -858,6 +857,7 @@ class IncidentReportBloc
                       ),
                       content: AlertDialogTwoBtnWidget(
                         pipelineData: pipelineData,
+                        currLatLng: event.latLngOnTap,
                       ),
                     ),
               );

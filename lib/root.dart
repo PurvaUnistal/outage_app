@@ -47,7 +47,7 @@ class _RootAppState extends State<RootApp> {
             seedColor: EnvironmentConfig.of(context)!.primaryTheme,
           ),
         ),
-        // home: GoogleMapSearchPlacesApi(),
+       //  home: PollScreen(),
         initialRoute: RoutesName.splash,
         onGenerateRoute: Routes.generateRoute,
       ),
@@ -55,105 +55,112 @@ class _RootAppState extends State<RootApp> {
   }
 }
 
-class GoogleMapSearchPlacesApi extends StatefulWidget {
-  const GoogleMapSearchPlacesApi({Key? key}) : super(key: key);
 
-  @override
-  _GoogleMapSearchPlacesApiState createState() =>
-      _GoogleMapSearchPlacesApiState();
+
+class PollAnswersModel {
+  dynamic id;
+  dynamic answer;
+  dynamic percentage;
+  dynamic myAnswer;
+  dynamic remaining;
+  bool isSelected;
+  bool isLoader;
+
+  PollAnswersModel({
+    this.id,
+    this.answer,
+    this.myAnswer,
+    this.percentage,
+    this.remaining,
+    this.isSelected = false,
+    this.isLoader = false
+  });
+
+  factory PollAnswersModel.fromJson(Map<String, dynamic> json) {
+    return PollAnswersModel(
+      id: json['answer_id']?.toString() ?? "",
+      answer: json['answer'] ?? "",
+      percentage: int.tryParse(json['percent']?.toString() ?? "0") ?? 0,
+      myAnswer: int.tryParse(json['my_answer']?.toString() ?? "0") ?? 0,
+      remaining: json['remaining'] ?? "",
+      isSelected: json['my_answer'] != null
+          ? json['my_answer'].toString() == "1"
+          ? true
+          : false
+          : false,
+      isLoader: false,
+    );
+  }
 }
 
-class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
-  final _controller = TextEditingController();
-  var uuid = const Uuid();
-  String _sessionToken = '1234567890';
-  List<dynamic> _placeList = [];
+List<PollAnswersModel> pollAnswerListResponse(Map<String, dynamic> json) {
+  final response = json['response'];
+  String remaining =  response['remaining'] != null ? response['remaining'].toString() : "0";
+  return List<PollAnswersModel>.from(response['poll'].map((x) {
+     x['percent'] =  24;
+     return PollAnswersModel.fromJson(x);
+  }));
 
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(() {
-      _onChanged();
-    });
-  }
+}
 
-  _onChanged() {
-    if (_sessionToken == null) {
-      setState(() {
-        _sessionToken = uuid.v4();
-      });
+class PollScreen extends StatelessWidget {
+  PollScreen({super.key});
+  final Map<String, dynamic> jsonData = {
+    "status": 200,
+    "response": {
+      "message": "Answer submitted successfully.",
+      "poll": [
+        {
+          "answer_id": "44",
+          "answer": "Real-Time Threat Detection",
+          "percent": 29,
+          "total_votes": 15,
+          "my_answer": 0
+        },
+        {
+          "answer_id": "45",
+          "answer": "AI-powered EDR",
+          "percent": 33,
+          "total_votes": 17,
+          "my_answer": 0
+        },
+        {
+          "answer_id": "46",
+          "answer": "Auto-Respond to Threats",
+          "percent": 27,
+          "total_votes": 14,
+          "my_answer": 0
+        },
+        {
+          "answer_id": "47",
+          "answer": "Integrate & Scale Easily",
+          "percent": 12,
+          "total_votes": 6,
+          "my_answer": 1
+        }
+      ],
+      "remaining": 2
     }
-    getSuggestion(_controller.text);
-  }
-
-  void getSuggestion(String input) async {
-    const String PLACES_API_KEY = Secrets.API_KEY;
-
-    try {
-      String baseURL =
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-      String request =
-          '$baseURL?input=$input&key=$PLACES_API_KEY&sessiontoken=$_sessionToken';
-      var response = await http.get(Uri.parse(request));
-      var data = json.decode(response.body);
-      if (kDebugMode) {
-        print('mydata');
-        print(data);
-      }
-      if (response.statusCode == 200) {
-        setState(() {
-          _placeList = json.decode(response.body)['predictions'];
-        });
-      } else {
-        throw Exception('Failed to load predictions');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  };
 
   @override
   Widget build(BuildContext context) {
+    final pollList = pollAnswerListResponse(jsonData);
+
     return Scaffold(
-      appBar: AppBar(elevation: 0, title: const Text('Search places Api')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Align(
-            alignment: Alignment.topCenter,
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: "Search your location here",
-                focusColor: Colors.white,
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                prefixIcon: const Icon(Icons.map),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.cancel),
-                  onPressed: () {
-                    _controller.clear();
-                  },
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: _placeList.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () async {},
-                  child: ListTile(
-                    title: Text(_placeList[index]["description"]),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+      body: ListView.builder(
+        itemCount: pollList.length,
+        itemBuilder: (context, index) {
+          final poll = pollList[index];
+          return ListTile(
+            title: Text(poll.answer),
+            subtitle: Text("Remaining: ${poll.percentage}"),
+          );
+        },
       ),
     );
   }
 }
+
+
+

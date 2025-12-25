@@ -192,20 +192,21 @@ class IncidentDetailBloc
     _eventCompleted(emit);
   }
   _filerPipe({required BuildContext context, emit}) async {
-    if (await HiveDataBase.pipelineDataBox!.values.isEmpty) {
+    final pipelineBox = HiveDataBase.pipelineDataBox;
+
+    if (pipelineBox == null || pipelineBox.values.isEmpty) {
       var res = await IncidentReportHelper.getPipelineApi(
         context: context,
-        latitude:
-        AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
-        longitude:
-        AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+        latitude: AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+        longitude: AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
       );
       if (res != null && res.data != null && res.data!.isNotEmpty) {
         listOfPipeline = res.data!;
       }
     } else {
-      listOfPipeline = await HiveDataBase.pipelineDataBox!.values.toList();
+      listOfPipeline = pipelineBox.values.toList();
     }
+
     if (listOfPipeline.isNotEmpty) {
       finalPolyline.clear();
       _eventCompleted(emit);

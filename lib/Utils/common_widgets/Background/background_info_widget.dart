@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import '../res/app_string.dart';
 import '../res/app_styles.dart';
@@ -14,15 +15,11 @@ class BackgroundInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final ctx = UserContext.getUserContext();
 
-    final themeColor =
-        EnvironmentConfig.of(context)?.primaryTheme ??
-        Theme.of(context).primaryColor;
-
     return Column(
       children: [
         Container(
           width: double.infinity,
-          color: themeColor,
+          decoration: BoxDecoration( gradient: CommonStyle.gradients,),
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child:
               ctx.user.name?.isNotEmpty == true
@@ -47,7 +44,7 @@ class BackgroundInfoWidget extends StatelessWidget {
         Expanded(child: child),
         Container(
           width: double.infinity,
-          color: themeColor,
+          decoration: BoxDecoration( gradient: CommonStyle.gradients,),
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

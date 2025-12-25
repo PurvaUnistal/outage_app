@@ -98,8 +98,8 @@ class User {
     userStatus = json['user_status'] ?? "";
     pwdChanged = json['pwd_changed'] ?? "";
     gaId = json['ga_id'] ?? "";
-    gaLatitude = json['ga_latitude'] ?? "";
-    gaLongitude = json['ga_longitude'] ?? "";
+    gaLatitude = json['ga_latitude'] ?? "0.0";
+    gaLongitude = json['ga_longitude'] ?? "0.0";
     modules = json['modules'] ?? "";
     areas = json['areas'] ?? "";
     chargeareas = json['chargeareas'] ?? "";

@@ -128,6 +128,8 @@ class _LoginViewState extends State<PhoneLoginView> {
           child: Image.asset(
             AppConfig.instanceInit()!.client == Client.agcl
                 ? AssetPath.agclIcon
+                :AppConfig.instanceInit()!.client == Client.mahaNagar
+                ? AssetPath.mglLogo
                 : AppConfig.instanceInit()!.client == Client.purvaBharti
                     ? AssetPath.pbgLogo
                     : AssetPath.iglLogo,

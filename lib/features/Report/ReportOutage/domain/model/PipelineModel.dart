@@ -58,6 +58,10 @@ class PipelineData {
   String? attachFile;
   @HiveField(11)
   String? bpName;
+  @HiveField(12)
+  String? latitude;
+  @HiveField(13)
+  String? longitude;
 
   PipelineData({
     this.geomencode,
@@ -72,6 +76,8 @@ class PipelineData {
     this.housePhoto,
     this.attachFile,
     this.bpName,
+    this.latitude,
+    this.longitude,
   });
 
   PipelineData.fromJson(Map<String, dynamic> json) {
@@ -87,6 +93,8 @@ class PipelineData {
     housePhoto = json['house_photo'] ?? "";
     attachFile = json['attach_file'] ?? "";
     bpName = json['bp_name'] ?? "";
+    latitude = json['latitude'] ?? "";
+    longitude = json['longitude'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -103,6 +111,8 @@ class PipelineData {
     data['house_photo'] = this.housePhoto;
     data['attach_file'] = this.attachFile;
     data['bp_name'] = this.bpName;
+    data['latitude'] = this.latitude;
+    data['longitude'] = this.longitude;
     return data;
   }
 }

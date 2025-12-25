@@ -110,18 +110,22 @@ class IncidentReportHelper {
       print("--------------->${ Apis.getTFGis + query}");
       if(res != null && res["data"] != null &&  res["data"] is List){
         print("ctx.isHo--->${ctx.isHo}");
-        final response = TFGISModel.fromJson(res);
+        TFGISModel? response = TFGISModel.fromJson(res);
         if (ctx.isHo) {
+          if (HiveDataBase.tfGISBox != null) {
+            await HiveDataBase.tfGISBox!.clear();
+          }
           return response;
         } else {
-          final box = HiveDataBase.tfGISBox;
-          if (box?.isOpen ?? false) {
-            await box!.clear();
-            await box.addAll(response.data);
+          if (HiveDataBase.tfGISBox != null && await HiveDataBase.tfGISBox!.isOpen) {
+            await HiveDataBase.tfGISBox!.clear();
+            if (response.data != null) {
+              await HiveDataBase.tfGISBox!.addAll(response.data!);
+            }
           }
           return response;
         }
-     } else if(res != null && res["data"] != null &&  res["data"] is String){
+      } else if(res != null && res["data"] != null &&  res["data"] is String){
         await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
       }
@@ -139,22 +143,27 @@ class IncidentReportHelper {
       var res = await ApiHelper.getData(
         urlEndPoint: Apis.getGasValueGis + json,context: context
       );
-      if (res != null && res["data"] != null &&  res["data"] is List) {
-        ValveGISModel response = ValveGISModel.fromJson(res);
-        if (ctx.isHo) {
+    if (res != null && res["data"] != null && res["data"] is List) {
+      ValveGISModel? response = ValveGISModel.fromJson(res);
+
+      if (ctx.isHo) {
+        if (HiveDataBase.valveGISBox != null) {
           await HiveDataBase.valveGISBox!.clear();
-          return response;
-        } else {
-          if (await HiveDataBase.valveGISBox!.isOpen) {
-            await HiveDataBase.valveGISBox!.clear();
-            await HiveDataBase.valveGISBox!.addAll(response.data);
-          }
-          return response;
         }
-      }else if(res != null && res["data"] != null &&  res["data"] is String){
-        await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
-        return null;
+        return response;
+      } else {
+        if (HiveDataBase.valveGISBox != null && await HiveDataBase.valveGISBox!.isOpen) {
+          await HiveDataBase.valveGISBox!.clear();
+          if (response.data != null) {
+            await HiveDataBase.valveGISBox!.addAll(response.data!);
+          }
+        }
+        return response;
       }
+    } else if (res != null && res["data"] != null && res["data"] is String) {
+      await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
+      return null;
+    }
     } catch (e) {
       log("getGasValueGis-->${e.toString()}");
     }
@@ -169,12 +178,16 @@ class IncidentReportHelper {
       if (res != null && res["data"] != null &&  res["data"] is List) {
         RegulatorGISModel response = RegulatorGISModel.fromJson(res);
         if (ctx.isHo) {
-          await HiveDataBase.regulatorGISBox!.clear();
+          if (HiveDataBase.regulatorGISBox != null) {
+            await HiveDataBase.regulatorGISBox!.clear();
+          }
           return response;
         } else {
-          if (await HiveDataBase.regulatorGISBox!.isOpen) {
+          if (HiveDataBase.regulatorGISBox != null && await HiveDataBase.regulatorGISBox!.isOpen) {
             await HiveDataBase.regulatorGISBox!.clear();
-            await HiveDataBase.regulatorGISBox!.addAll(response.data);
+            if (response.data != null) {
+              await HiveDataBase.regulatorGISBox!.addAll(response.data!);
+            }
           }
           return response;
         }
@@ -183,7 +196,7 @@ class IncidentReportHelper {
         return null;
       }
     } catch (e) {
-      log("getGasValueGis-->${e.toString()}");
+      log("getRegulatorGis-->${e.toString()}");
     }
     return null;
   }
@@ -201,14 +214,17 @@ class IncidentReportHelper {
       var res = await ApiHelper.getData(urlEndPoint: Apis.getConsumerGis + json,context: context);
       if (res != null && res["data"] != null &&  res["data"] is List) {
         CommercialModel response = CommercialModel.fromJson(res);
-
         if (ctx.isHo) {
+          if (HiveDataBase.commercialDataBox != null) {
+            await HiveDataBase.commercialDataBox!.clear();
+          }
           return response;
         } else {
-          final box = HiveDataBase.commercialDataBox;
-          if (box?.isOpen ?? false) {
-            await box!.clear();
-            await box.addAll(response.data);
+          if (HiveDataBase.commercialDataBox != null && await HiveDataBase.commercialDataBox!.isOpen) {
+            await HiveDataBase.commercialDataBox!.clear();
+            if (response.data != null) {
+              await HiveDataBase.commercialDataBox!.addAll(response.data!);
+            }
           }
           return response;
         }
@@ -217,7 +233,7 @@ class IncidentReportHelper {
         return null;
       }
     } catch (e) {
-      log("CommercialModel-->${e.toString()}");
+      log("getConsumerGis-->${e.toString()}");
     }
     return null;
   }
@@ -237,20 +253,20 @@ class IncidentReportHelper {
       );
       if (res != null && res["data"] != null &&  res["data"] is List) {
         DomesticModel response = DomesticModel.fromJson(res);
-        final box = HiveDataBase.domesticDataBox;
-
         if (ctx.isHo) {
-          await box!.clear();
+          if (HiveDataBase.domesticDataBox != null) {
+            await HiveDataBase.domesticDataBox!.clear();
+          }
           return response;
         } else {
-          if (box?.isOpen ?? false) {
-            await box!.clear();
-            await box.addAll(response.data);
+          if (HiveDataBase.domesticDataBox != null && await HiveDataBase.domesticDataBox!.isOpen) {
+            await HiveDataBase.domesticDataBox!.clear();
+            if (response.data != null) {
+              await HiveDataBase.domesticDataBox!.addAll(response.data!);
+            }
           }
           return response;
         }
-
-
       }else if(res != null && res["data"] != null &&  res["data"] is String){
         await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
@@ -276,18 +292,21 @@ class IncidentReportHelper {
       );
       if (res != null && res["data"] != null &&  res["data"] is List) {
         IndustrialModel response = IndustrialModel.fromJson(res);
-        final box = HiveDataBase.industrialDataBox;
+
         if (ctx.isHo) {
-          await box!.clear();
+          if (HiveDataBase.industrialDataBox != null) {
+            await HiveDataBase.industrialDataBox!.clear();
+          }
           return response;
         } else {
-          if (box?.isOpen ?? false) {
-            await box!.clear();
-            await box.addAll(response.data);
+          if (HiveDataBase.industrialDataBox != null && await HiveDataBase.industrialDataBox!.isOpen) {
+            await HiveDataBase.industrialDataBox!.clear();
+            if (response.data != null) {
+              await HiveDataBase.industrialDataBox!.addAll(response.data!);
+            }
           }
           return response;
         }
-
       } else if(res != null && res["data"] != null &&  res["data"] is String){
         await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
         return null;
@@ -328,7 +347,7 @@ class IncidentReportHelper {
         return response;
       }
     } catch (e) {
-      log("getGasValueGis-->${e.toString()}");
+      log("getNonControllableFittingGis-->${e.toString()}");
     }
     return null;
   }
@@ -350,7 +369,7 @@ class IncidentReportHelper {
         return response;
       }
     } catch (e) {
-      log("getGasValueGis-->${e.toString()}");
+      log("getNonControllableFittingGis-->${e.toString()}");
     }
     return null;
   }
@@ -373,7 +392,7 @@ class IncidentReportHelper {
         return response;
       }
     } catch (e) {
-      log("getGasValueGis-->${e.toString()}");
+      log("getNonControllableFittingGis-->${e.toString()}");
     }
     return null;
   }

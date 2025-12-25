@@ -29,6 +29,8 @@ class PipelineDataAdapter extends TypeAdapter<PipelineData> {
       housePhoto: fields[9] as String?,
       attachFile: fields[10] as String?,
       bpName: fields[11] as String?,
+      latitude: fields[12] as String?,
+      longitude: fields[13] as String?,
     );
   }
 
@@ -59,7 +61,11 @@ class PipelineDataAdapter extends TypeAdapter<PipelineData> {
       ..writeByte(10)
       ..write(obj.attachFile)
       ..writeByte(11)
-      ..write(obj.bpName);
+      ..write(obj.bpName)
+      ..writeByte(12)
+      ..write(obj.latitude)
+      ..writeByte(13)
+      ..write(obj.longitude);
   }
 
   @override

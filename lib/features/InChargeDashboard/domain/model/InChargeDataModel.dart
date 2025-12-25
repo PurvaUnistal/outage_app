@@ -30,11 +30,11 @@ class InChargeDataModel {
 class Dashboard {
   final String? mdpeLength;
   final String? steelLength;
-  final int? domesticCount;
-  final int? industrialCommercialCount;
-  final int? totalPendingIncident;
-  final int? totalInprogressIncident;
-  final int? totalCompletedIncident;
+  final String? domesticCount;
+  final String? industrialCommercialCount;
+  final String? totalPendingIncident;
+  final String? totalInprogressIncident;
+  final String? totalCompletedIncident;
 
   Dashboard({
     this.mdpeLength,
@@ -48,13 +48,13 @@ class Dashboard {
 
   factory Dashboard.fromJson(Map<String, dynamic> json) {
     return Dashboard(
-      mdpeLength: json['mdpe_length'],
-      steelLength: json['steel_length'],
-      domesticCount: json['domestic_count'],
-      industrialCommercialCount: json['industrial_commercial_count'],
-      totalPendingIncident: json['total_pending_incident'],
-      totalInprogressIncident: json['total_inprogress_incident'],
-      totalCompletedIncident: json['total_completed_incident'],
+      mdpeLength: json['mdpe_length'].toString(),
+      steelLength: json['steel_length'].toString(),
+      domesticCount: json['domestic_count'].toString(),
+      industrialCommercialCount: json['industrial_commercial_count'].toString(),
+      totalPendingIncident: json['total_pending_incident'].toString(),
+      totalInprogressIncident: json['total_inprogress_incident'].toString(),
+      totalCompletedIncident: json['total_completed_incident'].toString(),
     );
   }
 }

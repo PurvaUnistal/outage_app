@@ -10,6 +10,7 @@ import 'package:outage_app/Utils/common_widgets/app_update_message_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashboard_bloc.dart';
 import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashboard_event.dart';
 import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashboard_state.dart';
@@ -92,7 +93,7 @@ class _HoDisDashboardViewState extends State<HoDisDashboardView> {
 
   _appBarWidget() {
     return AppBarWidget(
-      title: "AGCL HO",
+      title: AppConfig.instanceInit()!.client == Client.agcl ? "AGCL HO" : "MGL HO",
       boolLeading: true,
       actions: [
         IconButton(

@@ -13,11 +13,13 @@ import '../../domain/bloc/incident_report_event.dart';
 class AlertDialogTwoBtnWidget extends StatelessWidget {
   final dynamic pipelineData;
   final String? filterByKey;
+  final LatLng? currLatLng;
 
   const AlertDialogTwoBtnWidget({
     super.key,
     this.filterByKey,
     this.pipelineData,
+    this.currLatLng,
   });
 
   @override
@@ -136,12 +138,20 @@ class AlertDialogTwoBtnWidget extends StatelessWidget {
                   text: "Navigate",
                   icon: Icons.alt_route,
                   onPressed: () {
-                    double lat = double.parse(pipelineData.latitude);
-                    double lng = double.parse(pipelineData.longitude);
-                    LatLng toPoints = LatLng(lat, lng);
-                    BlocProvider.of<IncidentReportBloc>(context).add(
-                      SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints),
-                    );
+                    if(pipelineData.latitude == "" && pipelineData.longitude == ""){
+                      LatLng? toPoints = currLatLng;
+                      BlocProvider.of<IncidentReportBloc>(context).add(
+                        SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints ?? LatLng(0,0)),
+                      );
+                    }else{
+                      double lat = double.parse(pipelineData.latitude);
+                      double lng = double.parse(pipelineData.longitude);
+                      LatLng toPoints = LatLng(lat, lng);
+                      BlocProvider.of<IncidentReportBloc>(context).add(
+                        SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints),
+                      );
+                    }
+
                   },
                 ),
               ),

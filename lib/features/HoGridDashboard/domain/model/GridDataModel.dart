@@ -1,3 +1,4 @@
+
 class GridDataModel {
   int? success;
   bool? error;
@@ -37,8 +38,8 @@ class GridDataModel {
 class GDashboard {
   String? mdpeLength;
   String? steelLength;
-  int? domesticCount;
-  int? industrialCommercialCount;
+  String? domesticCount;
+  String? industrialCommercialCount;
 
   GDashboard(
       {this.mdpeLength,
@@ -47,10 +48,10 @@ class GDashboard {
         this.industrialCommercialCount});
 
   GDashboard.fromJson(Map<String, dynamic> json) {
-    mdpeLength = json['mdpe_length'];
-    steelLength = json['steel_length'];
-    domesticCount = json['domestic_count'];
-    industrialCommercialCount = json['industrial_commercial_count'];
+    mdpeLength = json['mdpe_length'].toString();
+    steelLength = json['steel_length'].toString();
+    domesticCount = json['domestic_count'].toString();
+    industrialCommercialCount = json['industrial_commercial_count'].toString();
   }
 
   Map<String, dynamic> toJson() {

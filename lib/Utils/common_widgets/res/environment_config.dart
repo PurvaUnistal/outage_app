@@ -22,6 +22,8 @@ class EnvironmentConfig extends InheritedWidget {
     switch (flavor) {
       case EnvironmentFlavor.prodAGCL:
         return "http://agcl.smartgasnet.com/api/";
+      case EnvironmentFlavor.prodMGL:
+        return "https://mgl.smartgasnet.com/api/";
       case EnvironmentFlavor.prodPBGPL:
         return "http://pbgpl.smartgasnet.com/api/";
       case EnvironmentFlavor.prodIGL:
@@ -33,6 +35,8 @@ class EnvironmentConfig extends InheritedWidget {
     switch (flavor) {
       case EnvironmentFlavor.prodAGCL:
         return Colors.blue.shade800;
+      case EnvironmentFlavor.prodMGL:
+        return Colors.green.shade800;
       case EnvironmentFlavor.prodPBGPL:
         return Colors.green.shade800;
       case EnvironmentFlavor.prodIGL:
@@ -44,6 +48,8 @@ class EnvironmentConfig extends InheritedWidget {
     switch (flavor) {
       case EnvironmentFlavor.prodAGCL:
         return Colors.blue.shade800;
+      case EnvironmentFlavor.prodMGL:
+        return Colors.yellow.shade800;
       case EnvironmentFlavor.prodPBGPL:
         return Colors.yellow.shade800;
       case EnvironmentFlavor.prodIGL:

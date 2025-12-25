@@ -6,8 +6,7 @@ import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.d
 import 'ho_dis_dashboard_event.dart';
 import 'ho_dis_dashboard_state.dart';
 
-class HoDistrictDashboardBloc
-    extends Bloc<HoDistrictDashboardEvent, HoDistrictDashboardState> {
+class HoDistrictDashboardBloc extends Bloc<HoDistrictDashboardEvent, HoDistrictDashboardState> {
   HoDistrictDashboardBloc() : super(HoDistrictDashboardInitialState()) {
     on<HoDistrictDashboardPageLoadEvent>(_pageLoad);
   }

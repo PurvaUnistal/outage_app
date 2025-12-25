@@ -47,7 +47,6 @@ class IncidentDetailHelper{
       };
 
       String json = Uri(queryParameters: para).query;
-      print("Apis.getIncidentTypeAction + json-->${Apis.getIncidentTypeAction + json}");
       var res = await ApiHelper.getData(urlEndPoint: Apis.getIncidentTypeAction + json, context: context);
       if(res != null){
         IncidentTypeActionModel response = IncidentTypeActionModel.fromJson(res);
@@ -146,7 +145,6 @@ class IncidentDetailHelper{
 
       };
       log("jsonBody-->${body}");
-      log("Apis.incidentActionProgress-->${Apis.incidentActionProgress}");
       var res = await ApiHelper.postData(urlEndPoint: "${Apis.incidentActionProgress}", formData: body, context: context);
       if(res != null){
         return IncidentActionProgressModel.fromJson(res);

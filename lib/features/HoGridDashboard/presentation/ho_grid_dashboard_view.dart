@@ -8,6 +8,7 @@ import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/features/HoDistrictDashboard/presentation/widget/summery_card.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_bloc.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_event.dart';
@@ -59,7 +60,7 @@ class _HoGridDashboardViewState extends State<HoGridDashboardView> {
 
   _appBarWidget() {
     return AppBarWidget(
-      title: "AGCL HO",
+      title: AppConfig.instanceInit()!.client == Client.agcl ? "AGCL HO" : "MGL HO",
       boolLeading: true,
       actions: [
         IconButton(

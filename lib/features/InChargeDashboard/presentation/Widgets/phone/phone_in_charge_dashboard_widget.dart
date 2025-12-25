@@ -24,8 +24,7 @@ class PhoneInChargeDashboardWidget extends StatefulWidget {
       _PhoneInChargeDashboardWidgetState();
 }
 
-class _PhoneInChargeDashboardWidgetState
-    extends State<PhoneInChargeDashboardWidget> {
+class _PhoneInChargeDashboardWidgetState extends State<PhoneInChargeDashboardWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

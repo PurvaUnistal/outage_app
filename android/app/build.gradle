@@ -2,49 +2,36 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id 'com.google.gms.google-services'
+    id "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+    localPropertiesFile.withReader('UTF-8') { reader -> localProperties.load(reader) }
 }
 
 def keystoreProperties = new Properties()
-
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     namespace "unistal"
-        compileSdk 35
-        ndkVersion flutter.ndkVersion
+    compileSdk 36
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
+    kotlinOptions { jvmTarget = '17' }
+    sourceSets { main.java.srcDirs += 'src/main/kotlin' }
 
     flavorDimensions "app"
+
     productFlavors {
         prodAGCL {
             dimension "app"
@@ -54,10 +41,19 @@ android {
                     appIcon: "@mipmap/agcl",
                     appIconRound: "@mipmap/agcl"
             ]
-            def keystorePropertiesFile = rootProject.file('key.properties')
-            if (keystorePropertiesFile.exists()) {
-                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-            }
+            versionCode 23
+            versionName "1.0.2-agcl"
+        }
+        prodMGL {
+            dimension "app"
+            applicationIdSuffix ".mgloutage.app"
+            resValue "string", "app_name", "MGL Outage"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/mgl",
+                    appIconRound: "@mipmap/mgl"
+            ]
+            versionCode 01
+            versionName "1.1.0-mgl"
         }
         prodPBGPL {
             dimension "app"
@@ -67,6 +63,8 @@ android {
                     appIcon: "@mipmap/unistal_logo",
                     appIconRound: "@mipmap/unistal_logo"
             ]
+            versionCode 01
+            versionName "1.2.0-pbgpl"
         }
         prodIGL {
             dimension "app"
@@ -76,19 +74,15 @@ android {
                     appIcon: "@mipmap/unistal_logo",
                     appIconRound: "@mipmap/unistal_logo"
             ]
+            versionCode 01
+            versionName "2.0.0-igl"
         }
     }
 
-
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "unistal"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 24
-        targetSdkVersion 35
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        targetSdkVersion 36
     }
 
     signingConfigs {
@@ -102,15 +96,13 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
         }
     }
+
     packagingOptions {
         exclude 'META-INF/proguard/androidx-annotations.pro'
         exclude 'META-INF/proguard/coroutines.pro'
@@ -120,8 +112,6 @@ android {
 flutter {
     source = "../.."
 }
-
-
 
 dependencies {
     implementation platform("com.google.firebase:firebase-bom:33.12.0")
