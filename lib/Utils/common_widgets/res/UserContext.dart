@@ -18,6 +18,8 @@ class UserContext {
     final gridData = appConfig?.gridData;
     final districtData = appConfig?.districtData;
 
+
+
     final isHo = user?.isHo == "1";
 
     return UserContext(
@@ -25,8 +27,10 @@ class UserContext {
       user: user!,
       gridData: gridData!,
       schema: isHo ? (districtData?.schema ?? "") : (user.schema ?? ""),
-      areas: isHo ? (gridData.id ?? "") : (user.areas ?? ""),
-      gaId: isHo ? (districtData?.id ?? "") : (user.gaId ?? ""),
+      // areas: isHo ? (gridData.id ?? "") : (user.areas ?? ""),
+      // gaId: isHo ? (districtData?.id ?? "") : (user.gaId ?? ""),
+      areas: isHo ? (gridData.id ?? "") : (user.gaId ?? ""),
+      gaId: isHo ? (districtData?.id ?? "") : (user.areas ?? ""),
     );
   }
 

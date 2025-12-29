@@ -11,15 +11,12 @@ class HoGridDashboardHelper{
 
   static Future<GridDataModel?> getGridDataApi({required BuildContext context}) async {
     String userId =  await AppConfig.instanceInit()?.loginData.user!.id ?? "";
-    String gridId =  await AppConfig.instanceInit()?.loginData.user!.gaId ?? "";
     String schema =  await AppConfig.instanceInit()?.districtData.schema ?? "";
     String districtId =  await AppConfig.instanceInit()?.districtData.id ?? "";
     Map<String, String> para = {
       "schema": schema ?? "",
       "user_id": userId ?? "",
-      // "grid_id": gridId ?? "",
       "district_id": districtId ?? "",
-
     };
     String json = Uri(queryParameters: para).query;
     try {
