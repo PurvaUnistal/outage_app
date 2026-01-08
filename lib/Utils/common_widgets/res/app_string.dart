@@ -5,7 +5,11 @@ import 'enums.dart';
 class AppString {
   static double zoom = 15;
   static String version =
-      "Version : Outage-${AppConfig.instanceInit()?.appVersion}- ${AppConfig.instanceInit()!.client == Client.agcl ? "1/08/2025" : "13/08/2025"} ";
+      "Version : Outage-${AppConfig.instanceInit()?.appVersion}- ${AppConfig.instanceInit()!.client == Client.agcl
+          ? "1/08/2025"
+          : AppConfig.instanceInit()!.client == Client.purvaBharti
+          ? "8/01/2026"
+          : "13/08/2025"} ";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";

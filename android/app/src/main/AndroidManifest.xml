@@ -20,7 +20,7 @@
     <application
         android:name="${applicationName}"
         android:label="@string/app_name"
-        android:icon="@mipmap/unistal_logo"
+        android:icon="@mipmap/pbg_logo"
         android:roundIcon="${appIconRound}"
         android:allowBackup="true"
         android:hardwareAccelerated="false"

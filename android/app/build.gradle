@@ -20,7 +20,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "unistal"
     compileSdk 36
-    ndkVersion flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -60,10 +60,10 @@ android {
             applicationIdSuffix ".pbgploutage.app"
             resValue "string", "app_name", "PBGPL Outage"
             manifestPlaceholders = [
-                    appIcon: "@mipmap/unistal_logo",
-                    appIconRound: "@mipmap/unistal_logo"
+                    appIcon: "@mipmap/pbg_logo",
+                    appIconRound: "@mipmap/pbg_logo"
             ]
-            versionCode 01
+            versionCode 03
             versionName "1.2.0-pbgpl"
         }
         prodIGL {

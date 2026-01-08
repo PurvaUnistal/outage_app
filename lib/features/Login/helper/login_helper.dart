@@ -68,6 +68,8 @@ class LoginHelper {
       if (res != null && res["error"] == false) {
         if (res["user"]["role"] == "outage management" ||
             res["user"]["role"] == "incident" ||
+            res["user"]["role"] == "technician" ||
+            res["user"]["role"] == "onmengineer" ||
             res["user"]["role"] == "Manager") {
           await Utils.successSnackBar(msg: res["messages"],context: context);
           String baseUrl = Apis.loginUrl.replaceAll("api/auth", "");
