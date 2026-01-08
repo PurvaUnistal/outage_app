@@ -1,0 +1,2 @@
+E:/All Update Office Project/PurvaBharti Project/Outage/android/app/.cxx/RelWithDebInfo/2s6s5n1y/x86/CMakeFiles/edit_cache.dir
+E:/All Update Office Project/PurvaBharti Project/Outage/android/app/.cxx/RelWithDebInfo/2s6s5n1y/x86/CMakeFiles/rebuild_cache.dir
