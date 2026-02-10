@@ -33,6 +33,8 @@ class NavigateAlertHelper {
                         ? 'Valve : ${data.valveId}'
                         : filterByKey == FilterKey.RegulatorId
                         ? 'Regulator : ${data.regulatorid}'
+                        : filterByKey == FilterKey.SERVICE_ID
+                        ? "Service ID : ${data.servicePointId}"
                         : 'ID: ${data.id}',
                   ),
                 )
@@ -47,6 +49,8 @@ class NavigateAlertHelper {
             ? "Valve: ${data.valveId}"
             : filterByKey == FilterKey.RegulatorId
             ? "RegulatorId: ${data.regulatorId}"
+            : filterByKey == FilterKey.SERVICE_ID
+            ? "Service ID : ${data.servicePointId}"
             : "ID: ${data.id}"),
         icon: icon,
       ),

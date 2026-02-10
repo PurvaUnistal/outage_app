@@ -36,6 +36,7 @@ class NavigatePopWidget extends StatelessWidget {
                   CommonStyle.vertical(context: context),
                   _tfWidget(dataState: state),
                   _valveWidget(dataState: state),
+                  _servicePointWidget(dataState: state),
                   _regulatorWidget(dataState: state),
                   _commercialWidget(dataState: state),
                   _domesticWidget(dataState: state),
@@ -146,6 +147,42 @@ class NavigatePopWidget extends StatelessWidget {
     );
   }
 
+  Widget _servicePointWidget({required FetchNavigateAlertDataState dataState}) {
+    return ListTile(
+      leading: Checkbox(
+        value: dataState.checkService,
+        activeColor: Colors.deepOrange,
+        onChanged: (bool? val) {
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
+            SelectCheckBoxServiceGisEvent(checkBoxService: val!, context: mContext),
+          );
+        },
+      ),
+      title:
+      dataState.isServiceLoader == false
+          ? AutoCompleteTextFieldWidget(
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3.0),
+          child: Image.asset(AssetPath.service, width: 20, height: 20),
+        ),
+        label: AppString.gasServiceGIS,
+        hintText: AppString.gasServiceGIS,
+        enabled: dataState.checkService == true ? true : false,
+        controller: dataState.serviceController,
+        suggestions: dataState.listOfServiceId,
+        onSelected: (val) {
+          BlocProvider.of<NavigateAlertBloc>(mContext).add(
+            SelectServiceGISServiceEvent(
+              gasServiceGISId: val,
+              context: mContext,
+            ),
+          );
+          Navigator.pop(mContext);
+        },
+      )
+          : DottedLoaderWidget(),
+    );
+  }
   Widget _regulatorWidget({required FetchNavigateAlertDataState dataState}) {
     return ListTile(
       leading: Checkbox(

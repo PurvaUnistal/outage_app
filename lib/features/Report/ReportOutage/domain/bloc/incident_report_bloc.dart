@@ -17,6 +17,7 @@ import 'package:outage_app/features/Report/ReportOutage/domain/model/EmergencyMo
 import 'package:outage_app/features/Report/ReportOutage/domain/model/IndustrialModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/RegulatorGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/ServiceModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/TFGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/ValveGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/helper/decodePolyline.dart';
@@ -46,6 +47,9 @@ class IncidentReportBloc
 
     on<SelectCheckBoxValveGisEvent>(_selectCheckBoxValveGis);
     on<SelectValveGISValueEvent>(_selectValveGISValue);
+
+    on<SelectCheckBoxServiceGisEvent>(_selectCheckBoxServiceGis);
+    on<SelectServiceGISServiceEvent>(_selectServiceGISService);
 
     on<SelectCheckBoxRegulatorGisEvent>(_selectCheckBoxRegulatorGis);
     on<SelectRegulatorGISValueEvent>(_selectRegulatorGISValue);
@@ -81,7 +85,10 @@ class IncidentReportBloc
   bool checkTf = false;
   bool isTFLoader = false;
   bool checkValve = false;
+  bool checkService = false;
   bool isValveLoader = false;
+
+  bool isServiceLoader = false;
   bool checkRegulator = false;
   bool isRegulatorLoader = false;
   bool checkCommercial = false;
@@ -101,6 +108,7 @@ class IncidentReportBloc
   Set<Marker> blinkMarkerList = {};
   final TextEditingController tfGisController = TextEditingController();
   final TextEditingController valveController = TextEditingController();
+  final TextEditingController serviceController = TextEditingController();
   final TextEditingController regulatorController = TextEditingController();
   final TextEditingController commercialController = TextEditingController();
   final TextEditingController domesticController = TextEditingController();
@@ -115,6 +123,9 @@ class IncidentReportBloc
 
   List<ValveGISData> listOfValue = [];
   List<String> listOfValveId = [];
+
+  List<ServiceData> listOfService = [];
+  List<String> listOfServiceId = [];
 
   List<RegulatorGISData> listOfRegulator = [];
   List<String> listOfRegulatorId = [];
@@ -131,7 +142,7 @@ class IncidentReportBloc
   List<EmergencyData> listOfEmergencyData = [];
   List<String> listOfEmergencyId = [];
 
-  List<String> listOfDiaColor = [];
+  Map<String, String> diaColors = {};
   List<dynamic> curPlaceList = [];
   List<dynamic> desPlaceList = [];
 
@@ -147,6 +158,7 @@ class IncidentReportBloc
   Set<Marker> finalMarker = {};
   Set<Marker> tfMarker = {};
   Set<Marker> valveMarker = {};
+  Set<Marker> serviceMarker = {};
   Set<Marker> regularMarker = {};
   Set<Marker> commercialMarker = {};
   Set<Marker> domesticMarker = {};
@@ -179,6 +191,8 @@ class IncidentReportBloc
     isTFLoader = false;
     checkValve = false;
     isValveLoader = false;
+    checkService = false;
+    isServiceLoader = false;
     checkRegulator = false;
     isRegulatorLoader = false;
     checkCommercial = false;
@@ -198,6 +212,7 @@ class IncidentReportBloc
     blinkMarkerList = {};
     tfGisController.text = "";
     valveController.text = "";
+    serviceController.text = "";
     regulatorController.text = "";
     commercialController.text = "";
     domesticController.text = "";
@@ -211,6 +226,9 @@ class IncidentReportBloc
 
     listOfValue = [];
     listOfValveId = [];
+
+    listOfService = [];
+    listOfServiceId = [];
 
     listOfRegulator = [];
     listOfRegulatorId = [];
@@ -227,7 +245,7 @@ class IncidentReportBloc
     listOfEmergencyData = [];
     listOfEmergencyId = [];
 
-    listOfDiaColor = [];
+    diaColors = {};
     curPlaceList = [];
     desPlaceList = [];
 
@@ -244,6 +262,7 @@ class IncidentReportBloc
     finalMarker = {};
     tfMarker = {};
     valveMarker = {};
+    serviceMarker = {};
     regularMarker = {};
     commercialMarker = {};
     domesticMarker = {};
@@ -273,7 +292,8 @@ class IncidentReportBloc
     );
     var res = await IncidentReportHelper.getDiaColorApi(context: event.context);
     if (res != null) {
-      listOfDiaColor = res;
+      diaColors = res;
+     await AppConfig.instanceInit()?.setDiaColor(newDiaColors: diaColors);
     }
 
     await _fetchEmergency(context: event.context);
@@ -322,7 +342,7 @@ class IncidentReportBloc
             );
             final color = ReportMarkerPolyline.getPolylineColor(
               value: int.tryParse(pipelineData.nominaldia ?? '0') ?? 0,
-              color: listOfDiaColor,
+              colorMap: diaColors,
             );
             Set<Polyline> polyline = ReportMarkerPolyline.polylinePoint(
               i: i,
@@ -399,6 +419,38 @@ class IncidentReportBloc
         }
       } catch (e) {
         print("Error during Gas Valve GIS API fetching: $e");
+      }
+    }
+    _filterVisiblePolyline();
+    _eventCompleted(emit);
+  }
+
+  _fetchGasServiceGisApi({required BuildContext context, emit}) async {
+    if (checkService == true) {
+      try {
+        final serviceBox = HiveDataBase.serviceGISBox;
+        if (serviceBox == null || serviceBox.values.isEmpty) {
+          var res = await IncidentReportHelper.getGasServiceGisApi(context: context);
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
+            listOfService = res.data!;
+          }
+        } else {
+          listOfService = serviceBox.values.toList();
+        }
+
+        if (listOfService.isNotEmpty) {
+          listOfServiceId = listOfService.map((e) => e.servicePointId ?? "").toList();
+          await ReportMarkerPolyline.processMarkersInBatches(
+            context: context,
+            dataList: listOfService,
+            assetPath: AssetPath.service,
+            targetMarkerSet: serviceMarker,
+            finalMarker: finalMarker,
+            filterByKey: FilterKey.SERVICE_ID,
+          );
+        }
+      } catch (e) {
+        print("Error during Gas SERVICE GIS API fetching: $e");
       }
     }
     _filterVisiblePolyline();
@@ -566,6 +618,22 @@ class IncidentReportBloc
     _eventCompleted(emit);
   }
 
+  _selectServiceGISService(SelectServiceGISServiceEvent event, emit) async {
+    isPipelineLoader = true;
+    _eventCompleted(emit);
+    await _searchFilter(
+      searchText: event.gasServiceGISId,
+      dataList: listOfService,
+      context: event.context,
+      iconBytes: await ReportMarkerPolyline.markerAsset(path: AssetPath.service),
+      filterByKey: FilterKey.SERVICE_ID,
+      emit: emit,
+    );
+    isPipelineLoader = false;
+    _eventCompleted(emit);
+  }
+
+
   _selectRegulatorGISValue(SelectRegulatorGISValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
@@ -664,6 +732,21 @@ class IncidentReportBloc
     } else {
       finalMarker.removeWhere((marker) => valveMarker.contains(marker));
       valveMarker.clear();
+    }
+    _eventCompleted(emit);
+  }
+
+  _selectCheckBoxServiceGis(SelectCheckBoxServiceGisEvent event, emit) async {
+    checkService = event.checkBoxService;
+    if (checkService == true) {
+      isServiceLoader = true;
+      _eventCompleted(emit);
+      await _fetchGasServiceGisApi(context: event.context, emit: emit);
+      isServiceLoader = false;
+      _eventCompleted(emit);
+    } else {
+      finalMarker.removeWhere((marker) => serviceMarker.contains(marker));
+      serviceMarker.clear();
     }
     _eventCompleted(emit);
   }
@@ -771,6 +854,8 @@ class IncidentReportBloc
             switch (filterByKey) {
               case FilterKey.VALUE_ID:
                 return data.valveId.toString() == searchText;
+              case FilterKey.SERVICE_ID:
+                return data.servicePointId.toString() == searchText;
               case FilterKey.BP_NUMBER:
                 return data.bpNumber.toString() == searchText;
               case FilterKey.ID:
@@ -1143,6 +1228,8 @@ class IncidentReportBloc
     isTFLoader = false;
     checkValve = false;
     isValveLoader = false;
+    isServiceLoader = false;
+    checkService = false;
     checkRegulator = false;
     isRegulatorLoader = false;
     checkCommercial = false;
@@ -1154,6 +1241,7 @@ class IncidentReportBloc
 
     tfGisController.text = "";
     valveController.text = "";
+    serviceController.text = "";
     regulatorController.text = "";
     commercialController.text = "";
     domesticController.text = "";
@@ -1166,12 +1254,14 @@ class IncidentReportBloc
   _clearPopTextField() {
     isTFLoader = false;
     isValveLoader = false;
+    isServiceLoader = false;
     isRegulatorLoader = false;
     isCommercialLoader = false;
     isDomesticLoader = false;
     isIndustrialLoader = false;
     tfGisController.text = "";
     valveController.text = "";
+    serviceController.text = "";
     regulatorController.text = "";
     commercialController.text = "";
     domesticController.text = "";
@@ -1241,7 +1331,9 @@ class IncidentReportBloc
           checkTf: checkTf,
           isTfLoader: isTFLoader,
           checkValve: checkValve,
+          checkService: checkService,
           isValveLoader: isValveLoader,
+          isServiceLoader: isServiceLoader,
           checkRegulator: checkRegulator,
           isRegulatorLoader: isRegulatorLoader,
 
@@ -1264,6 +1356,7 @@ class IncidentReportBloc
           polylinePointList: Set.of(polylinePointList),
           tfController: tfGisController,
           valveController: valveController,
+          serviceController: serviceController,
           regulatorController: regulatorController,
           commercialController: commercialController,
           domesticController: domesticController,
@@ -1273,6 +1366,7 @@ class IncidentReportBloc
           emergencyController: emergencyController,
           listOfTfId: listOfTFId,
           listOfValveId: listOfValveId,
+          listOfServiceId: listOfServiceId,
           listOfRegulatorId: listOfRegulatorId,
           listOfCommercialId: listOfCommercialId,
           listOfDomesticId: listOfDomesticId,
@@ -1295,7 +1389,9 @@ class IncidentReportBloc
         checkTf: checkTf,
         isTfLoader: isTFLoader,
         checkValve: checkValve,
+        checkService: checkService,
         isValveLoader: isValveLoader,
+        isServiceLoader: isServiceLoader,
         checkRegulator: checkRegulator,
         isRegulatorLoader: isRegulatorLoader,
 
@@ -1319,6 +1415,7 @@ class IncidentReportBloc
         polylinePointList: Set.of(polylinePointList),
         tfController: tfGisController,
         valveController: valveController,
+        serviceController: serviceController,
         regulatorController: regulatorController,
         commercialController: commercialController,
         domesticController: domesticController,
@@ -1328,6 +1425,7 @@ class IncidentReportBloc
         emergencyController: emergencyController,
         listOfTfId: listOfTFId,
         listOfValveId: listOfValveId,
+        listOfServiceId: listOfServiceId,
         listOfRegulatorId: listOfRegulatorId,
         listOfCommercialId: listOfCommercialId,
         listOfDomesticId: listOfDomesticId,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/ServiceModel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -166,6 +167,43 @@ class IncidentReportHelper {
     }
     } catch (e) {
       log("getGasValueGis-->${e.toString()}");
+    }
+    return null;
+  }
+
+  static Future<ServiceModel?> getGasServiceGisApi({ required BuildContext context,}) async {
+    final ctx = UserContext.getUserContext();
+    try {
+      String json = Uri(queryParameters: {
+        "ga_id": ctx.gaId,
+       "areas": ctx.areas
+      }).query;
+      var res = await ApiHelper.getData(
+        urlEndPoint: Apis.getGasServiceGis + json,context: context
+      );
+    if (res != null && res["data"] != null && res["data"] is List) {
+      ServiceModel? response = ServiceModel.fromJson(res);
+
+      if (ctx.isHo) {
+        if (HiveDataBase.serviceGISBox != null) {
+          await HiveDataBase.serviceGISBox!.clear();
+        }
+        return response;
+      } else {
+        if (HiveDataBase.serviceGISBox != null && await HiveDataBase.serviceGISBox!.isOpen) {
+          await HiveDataBase.serviceGISBox!.clear();
+          if (response.data != null) {
+            await HiveDataBase.serviceGISBox!.addAll(response.data!);
+          }
+        }
+        return response;
+      }
+    } else if (res != null && res["data"] != null && res["data"] is String) {
+      await Utils.errorSnackBar(msg: res["data"].toString(), context: context);
+      return null;
+    }
+    } catch (e) {
+      log("getGasServiceGisApi-->${e.toString()}");
     }
     return null;
   }
@@ -475,18 +513,41 @@ class IncidentReportHelper {
   }
 
 
-  static Future<List<String>?> getDiaColorApi({required BuildContext context}) async {
+  // static Future<List<String>?> getDiaColorApi({required BuildContext context}) async {
+  //   final ctx = UserContext.getUserContext();
+  //   String query = Uri(queryParameters: {"schema": ctx.schema}).query;
+  //   var res = await ApiHelper.getData(urlEndPoint: Apis.diaColor + query,context: context);
+  //   if (res != null && res["data"] != null) {
+  //     final data = res["data"];
+  //     if (data is Map<String, dynamic>) {
+  //       return data.values.map((e) => e.toString()).toList();
+  //     }
+  //   }
+  //   return null;
+  // }
+  static Future<Map<String, String>?> getDiaColorApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();
     String query = Uri(queryParameters: {"schema": ctx.schema}).query;
-    var res = await ApiHelper.getData(urlEndPoint: Apis.diaColor + query,context: context);
-    if (res != null && res["data"] != null) {
-      final data = res["data"];
-      if (data is Map<String, dynamic>) {
-        return data.values.map((e) => e.toString()).toList();
+
+    try {
+      var res = await ApiHelper.getData(
+        urlEndPoint: Apis.diaColor + query,
+        context: context,
+      );
+
+      if (res != null && res["data"] != null) {
+        final data = res["data"];
+        if (data is Map<String, dynamic>) {
+          return data.map((key, value) => MapEntry(key, value.toString()));
+        }
       }
+    } catch (e) {
+      debugPrint("Error fetching DIA colors: $e");
     }
+
     return null;
   }
+
 
   static Future<EmergencyModel?> getEmergencySearchApi({required BuildContext context}) async {
     final ctx = UserContext.getUserContext();

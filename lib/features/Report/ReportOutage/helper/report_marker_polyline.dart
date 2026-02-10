@@ -67,6 +67,8 @@ class ReportMarkerPolyline {
                             ? 'Valve : ${data.valveId}'
                             : filterByKey == FilterKey.RegulatorId
                             ? 'Regulator : ${data.regulatorid}'
+                            : filterByKey == FilterKey.SERVICE_ID
+                            ? "Service ID : ${data.servicePointId}"
                             : 'ID: ${data.id}',
                   ),
                 ),
@@ -77,12 +79,13 @@ class ReportMarkerPolyline {
         infoWindow: InfoWindow(
           title:
               filterByKey == FilterKey.BP_NUMBER
-                  ? "BP"
-                      ": ${data.bpNumber}"
+                  ? "BP"": ${data.bpNumber}"
                   : filterByKey == FilterKey.VALUE_ID
                   ? 'Valve : ${data.valveId}'
                   : filterByKey == FilterKey.RegulatorId
                   ? 'Regulator : ${data.regulatorid}'
+                  : filterByKey == FilterKey.SERVICE_ID
+                  ? "Service ID : ${data.servicePointId}"
                   : 'ID: ${data.id}',
         ),
         icon: icon,
@@ -116,27 +119,48 @@ class ReportMarkerPolyline {
     );
     return polylineList;
   }
-
   static Color getPolylineColor({
     required int value,
-    required List<String> color,
+    required Map<String, String> colorMap,
   }) {
-    if (color.length < 4) {
-      throw ArgumentError('color list must have at least 4 values');
+    for (var entry in colorMap.entries) {
+      // Split the key range, e.g. "0-20"
+      final parts = entry.key.split('-');
+      if (parts.length == 2) {
+        final start = int.tryParse(parts[0]) ?? 0;
+        final end = int.tryParse(parts[1]) ?? 0;
+
+        if (value >= start && value <= end) {
+          return Color(int.parse(entry.value));
+        }
+      }
     }
 
-    if (value >= 0 && value <= 50) {
-      return Color(int.parse(color[0]));
-    } else if (value >= 63 && value <= 90) {
-      return Color(int.parse(color[1]));
-    } else if (value >= 100 && value <= 140) {
-      return Color(int.parse(color[2]));
-    } else if (value >= 150 && value <= 200) {
-      return Color(int.parse(color[3]));
-    } else {
-      return Colors.blue.shade800; // default color
-    }
+    // Default color if no range matches
+    return Colors.blue.shade800;
   }
+
+
+  // static Color getPolylineColor({
+  //   required int value,
+  //   required List<String> color,
+  // }) {
+  //   if (color.length < 4) {
+  //     throw ArgumentError('color list must have at least 4 values');
+  //   }
+  //
+  //   if (value >= 0 && value <= 50) {
+  //     return Color(int.parse(color[0]));
+  //   } else if (value >= 63 && value <= 90) {
+  //     return Color(int.parse(color[1]));
+  //   } else if (value >= 100 && value <= 140) {
+  //     return Color(int.parse(color[2]));
+  //   } else if (value >= 150 && value <= 200) {
+  //     return Color(int.parse(color[3]));
+  //   } else {
+  //     return Colors.blue.shade800; // default color
+  //   }
+  // }
 
   static showMyCupertinoDialog(BuildContext context) {
     showCupertinoDialog(

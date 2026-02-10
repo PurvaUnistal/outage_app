@@ -5,11 +5,13 @@ import 'enums.dart';
 class AppString {
   static double zoom = 15;
   static String version =
-      "Version : Outage-${AppConfig.instanceInit()?.appVersion}- ${AppConfig.instanceInit()!.client == Client.agcl
+      "Version : Outage-${AppConfig.instanceInit()?.appVersion}-${AppConfig.instanceInit()!.client == Client.agcl
           ? "1/08/2025"
           : AppConfig.instanceInit()!.client == Client.purvaBharti
           ? "8/01/2026"
-          : "13/08/2025"} ";
+          : AppConfig.instanceInit()!.client == Client.mahaNagar
+          ? "10/02/2026"
+          : ""} ";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";
@@ -56,6 +58,7 @@ class AppString {
   static const String emergency = 'Emergency';
   static const String gasTfGis = 'TF';
   static const String gasValveGIS = 'Valve';
+  static const String gasServiceGIS = 'Service';
   static const String gasRegulatorGIS = 'Regulator';
   static const String domestic = 'Domestic';
   static const String industrial = 'Industrial';

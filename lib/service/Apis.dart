@@ -29,6 +29,7 @@ class Apis {
   static get getPipelineGis => "get-pipeline-gis";
   static get getTFGis => "get-tf-gis?";
   static get getGasValueGis => "get-gasvalve-gis?";
+  static get getGasServiceGis => "get-servicepoint-gis?";
   static get getRegulatorGis => "get-regulator-gis?";
   static get getConsumerGis => "get-consumer-gis?";
   static get getNonControllableFittingGis =>"get-noncontrolable-fitting-gis?";

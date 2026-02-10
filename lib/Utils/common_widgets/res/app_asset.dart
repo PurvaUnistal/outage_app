@@ -17,6 +17,7 @@ class AssetPath {
   static String reportOutage = 'assets/images/reportOutage.png';
   static String tf = 'assets/gis/TF.png';
   static String valve = 'assets/gis/valve.png';
+  static String service = 'assets/gis/valve.png';
   static String station = 'assets/gis/cng-station.png';
   //static String coupler = 'assets/gis/coupler.png';
   static String elbow = 'assets/gis/elbow.png';

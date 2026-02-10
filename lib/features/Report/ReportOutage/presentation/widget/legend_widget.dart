@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:outage_app/Utils/common_widgets/button_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
@@ -13,6 +14,17 @@ class LegendPopWidget extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
+    final diaColors = AppConfig.instanceInit()?.diaColors;
+    // Generate dynamic legend lines based on diaColors
+    final diaLegendLines = diaColors?.entries.map((entry) {
+      final parts = entry.key.split('-');
+      return _line(
+        color: Color(int.parse(entry.value)),
+        label: (parts.length == 2)
+            ? "${parts[0]} To ${parts[1]} (Dia)"
+            : entry.key,
+      );
+    }).toList() ?? [];
     return SingleChildScrollView(
             child: Dialog(
               backgroundColor:Colors.white70,
@@ -49,15 +61,19 @@ class LegendPopWidget extends StatelessWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 12),
                         ),
                         Expanded(
+                          // child: Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Center(child: Text("Pipeline")),
+                          //     _line(color: Color(0xFFFF0000), label: "0 To 50 (Dia)"),
+                          //     _line(color: Color(0xFFFFC0CB), label: "63 To 90 (Dia)"),
+                          //     _line(color: Color(0xFF00FFFF), label: "100 To 140 (Dia)"),
+                          //     _line(color: Color(0xFF90EE90), label: "150 To 200 (Dia)"),
+                          //   ],
+                          // ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(child: Text("Pipeline")),
-                              _line(color: Color(0xFFFF0000), label: "0 To 50 (Dia)"),
-                              _line(color: Color(0xFFFFC0CB), label: "63 To 90 (Dia)"),
-                              _line(color: Color(0xFF00FFFF), label: "100 To 140 (Dia)"),
-                              _line(color: Color(0xFF90EE90), label: "150 To 200 (Dia)"),
-                            ],
+                            children: diaLegendLines,
                           ),
                         ),
                       ],
@@ -71,6 +87,8 @@ class LegendPopWidget extends StatelessWidget {
             ),
           );
   }
+
+
   Widget _row({required String path, required String name}){
     return Column(
       children: [

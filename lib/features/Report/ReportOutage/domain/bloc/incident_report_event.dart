@@ -80,6 +80,29 @@ class SelectCheckBoxValveGisEvent extends IncidentReportEvent {
   List<Object> get props => [context, checkBoxValve];
 }
 
+class SelectServiceGISServiceEvent extends IncidentReportEvent {
+  final BuildContext context;
+  final String gasServiceGISId;
+  SelectServiceGISServiceEvent({
+    required this.context,
+    required this.gasServiceGISId,
+  });
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, gasServiceGISId];
+}
+
+class SelectCheckBoxServiceGisEvent extends IncidentReportEvent {
+  final BuildContext context;
+  final bool checkBoxService;
+  SelectCheckBoxServiceGisEvent({
+    required this.context,
+    required this.checkBoxService,
+  });
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, checkBoxService];
+}
 class SelectRegulatorGISValueEvent extends IncidentReportEvent {
   final BuildContext context;
   final String gasRegulatorGISId;

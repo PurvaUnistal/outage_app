@@ -5,6 +5,7 @@ import 'package:outage_app/features/Report/ReportOutage/domain/model/DomesticMod
 import 'package:outage_app/features/Report/ReportOutage/domain/model/IndustrialModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/RegulatorGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/ServiceModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/TFGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/ValveGISModel.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,6 +15,7 @@ class HiveDataBase {
   static Box<PipelineData>? pipelineDataBox;
   static Box<TFGISData>? tfGISBox;
   static Box<ValveGISData>? valveGISBox;
+  static Box<ServiceData>? serviceGISBox;
   static Box<RegulatorGISData>? regulatorGISBox;
   static Box<CommercialData>? commercialDataBox;
   static Box<DomesticData>? domesticDataBox;
@@ -27,6 +29,7 @@ Future<void> init() async {
   Hive.registerAdapter(PipelineDataAdapter());
   Hive.registerAdapter(TFGISDataAdapter());
   Hive.registerAdapter(ValveGISDataAdapter());
+  Hive.registerAdapter(ServiceDataAdapter());
   Hive.registerAdapter(RegulatorGISDataAdapter());
   Hive.registerAdapter(CommercialDataAdapter());
   Hive.registerAdapter(DomesticDataAdapter());
@@ -35,6 +38,7 @@ Future<void> init() async {
    pipelineDataBox = await Hive.openBox<PipelineData>(HiveBoxName.pipelineDataBox);
   tfGISBox = await Hive.openBox<TFGISData>(HiveBoxName.tfGISBox);
   valveGISBox = await Hive.openBox<ValveGISData>(HiveBoxName.valveGISBox);
+  serviceGISBox = await Hive.openBox<ServiceData>(HiveBoxName.serviceGISBox);
   regulatorGISBox = await Hive.openBox<RegulatorGISData>(HiveBoxName.regulatorGISBox);
   commercialDataBox = await Hive.openBox<CommercialData>(HiveBoxName.commercialDataBox);
   domesticDataBox = await Hive.openBox<DomesticData>(HiveBoxName.domesticDataBox);

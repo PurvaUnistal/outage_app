@@ -42,18 +42,18 @@ android {
                     appIconRound: "@mipmap/agcl"
             ]
             versionCode 23
-            versionName "1.0.2-agcl"
+            versionName "1.0.2-AGCL"
         }
         prodMGL {
             dimension "app"
             applicationIdSuffix ".mgloutage.app"
             resValue "string", "app_name", "MGL Outage"
             manifestPlaceholders = [
-                    appIcon: "@mipmap/mgl",
-                    appIconRound: "@mipmap/mgl"
+                    appIcon: "@mipmap/mgl_logo",
+                    appIconRound: "@mipmap/mgl_logo"
             ]
             versionCode 01
-            versionName "1.1.0-mgl"
+            versionName "1.0.0-MGL"
         }
         prodPBGPL {
             dimension "app"
@@ -63,8 +63,8 @@ android {
                     appIcon: "@mipmap/pbg_logo",
                     appIconRound: "@mipmap/pbg_logo"
             ]
-            versionCode 03
-            versionName "1.2.0-pbgpl"
+            versionCode 05
+            versionName "1.2.0-PBGPL"
         }
         prodIGL {
             dimension "app"
@@ -75,7 +75,7 @@ android {
                     appIconRound: "@mipmap/unistal_logo"
             ]
             versionCode 01
-            versionName "2.0.0-igl"
+            versionName "1.0.0-IGL"
         }
     }
 

@@ -127,7 +127,9 @@ class IncidentDetailBloc
   Set<Polyline> filterPolyline = {};
   Set<Polyline> finalPolyline = {};
   List<LatLng> points = [];
-  List<String> listOfDiaColor = [];
+
+
+  Map<String, String> diaColors = {};
 
 
   bool isBlinkMarker = true;
@@ -159,7 +161,8 @@ class IncidentDetailBloc
     conMarkerPointList = {};
     valveMarkerPointList = {};
     polylinePointList = {};
-    listOfDiaColor = [];
+
+    diaColors = {};
 
     incidentTypeId = await AppConfig.instanceInit()?.viewIncidentData.incidentTypeId ?? "";
     incidentId = await AppConfig.instanceInit()?.viewIncidentData.incid ?? "";
@@ -168,7 +171,8 @@ class IncidentDetailBloc
     baseUrl = await SharedPref.getString(key: PrefsValue.baseUrl);
     var res = await IncidentReportHelper.getDiaColorApi(context: event.context);
     if (res != null) {
-      listOfDiaColor = res;
+      diaColors = res;
+      await AppConfig.instanceInit()?.setDiaColor(newDiaColors: diaColors);
     }
 
 
@@ -220,7 +224,7 @@ class IncidentDetailBloc
             );
             final color = ReportMarkerPolyline.getPolylineColor(
               value: int.tryParse(pipelineData.nominaldia ?? '0') ?? 0,
-              color: listOfDiaColor,
+              colorMap: diaColors,
             );
             Set<Polyline> polyline = ReportMarkerPolyline.polylinePoint(
               i: i,

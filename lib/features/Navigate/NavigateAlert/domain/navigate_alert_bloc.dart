@@ -20,13 +20,13 @@ import 'package:outage_app/features/Report/ReportOutage/domain/model/EmergencyMo
 import 'package:outage_app/features/Report/ReportOutage/domain/model/IndustrialModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/PipelineModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/RegulatorGISModel.dart';
+import 'package:outage_app/features/Report/ReportOutage/domain/model/ServiceModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/TFGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/ValveGISModel.dart';
 import 'package:outage_app/features/Report/ReportOutage/helper/decodePolyline.dart';
 import 'package:outage_app/features/Report/ReportOutage/helper/incident_report_helper.dart';
 import 'package:outage_app/features/Report/ReportOutage/helper/report_marker_polyline.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/MapService.dart';
-import 'package:outage_app/features/Report/ReportOutage/presentation/widget/emergency_widget_report.dart';
 
 class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   NavigateAlertBloc() : super(NavigateAlertInitialState()) {
@@ -39,6 +39,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     on<SelectTFGisEvent>(_selectTFGisValue);
     on<SelectCheckBoxValveGisEvent>(_selectCheckBoxValveGis);
     on<SelectValveGISValueEvent>(_selectValveGISValue);
+
+    on<SelectCheckBoxServiceGisEvent>(_selectCheckBoxServiceGis);
+    on<SelectServiceGISServiceEvent>(_selectServiceGISService);
 
     on<SelectCheckBoxRegulatorGisEvent>(_selectCheckBoxRegulatorGis);
     on<SelectRegulatorGISValueEvent>(_selectRegulatorGISValue);
@@ -69,7 +72,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   bool checkTf = false;
   bool isTFLoader = false;
   bool checkValve = false;
+  bool checkService = false;
   bool isValveLoader = false;
+  bool isServiceLoader = false;
   bool checkRegulator = false;
   bool isRegulatorLoader = false;
   bool checkCommercial = false;
@@ -89,6 +94,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   Set<Marker> blinkMarkerList = {};
   final TextEditingController tfGisController = TextEditingController();
   final TextEditingController valveController = TextEditingController();
+  final TextEditingController serviceController = TextEditingController();
   final TextEditingController regulatorController = TextEditingController();
   final TextEditingController commercialController = TextEditingController();
   final TextEditingController domesticController = TextEditingController();
@@ -103,6 +109,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   List<ValveGISData> listOfValue = [];
   List<String> listOfValveId = [];
+
+  List<ServiceData> listOfService = [];
+  List<String> listOfServiceId = [];
 
   List<RegulatorGISData> listOfRegulator = [];
   List<String> listOfRegulatorId = [];
@@ -119,7 +128,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   List<EmergencyData> listOfEmergencyData = [];
   List<String> listOfEmergencyId = [];
 
-  List<String> listOfDiaColor = [];
+  Map<String, String> diaColors = {};
 
   PipelineData pipelineData = PipelineData();
   List<PipelineData> listOfPipeline = [];
@@ -133,6 +142,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   Set<Marker> finalMarker = {};
   Set<Marker> tfMarker = {};
   Set<Marker> valveMarker = {};
+  Set<Marker> serviceMarker = {};
   Set<Marker> regularMarker = {};
   Set<Marker> commercialMarker = {};
   Set<Marker> domesticMarker = {};
@@ -165,7 +175,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     checkTf = false;
     isTFLoader = false;
     checkValve = false;
+    checkService = false;
     isValveLoader = false;
+    isServiceLoader = false;
     checkRegulator = false;
     isRegulatorLoader = false;
     checkCommercial = false;
@@ -185,6 +197,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     blinkMarkerList = {};
     tfGisController.text = "";
     valveController.text = "";
+    serviceController.text = "";
     regulatorController.text = "";
     commercialController.text = "";
     domesticController.text = "";
@@ -198,6 +211,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
     listOfValue = [];
     listOfValveId = [];
+
+    listOfService = [];
+    listOfServiceId = [];
 
     listOfRegulator = [];
     listOfRegulatorId = [];
@@ -214,7 +230,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     listOfEmergencyData = [];
     listOfEmergencyId = [];
 
-    listOfDiaColor = [];
+    diaColors = {};
 
     pipelineData = PipelineData();
     listOfPipeline = [];
@@ -228,6 +244,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     finalMarker = {};
     tfMarker = {};
     valveMarker = {};
+    serviceMarker = {};
     regularMarker = {};
     commercialMarker = {};
     domesticMarker = {};
@@ -257,7 +274,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     );
     var res = await IncidentReportHelper.getDiaColorApi(context: event.context);
     if (res != null) {
-      listOfDiaColor = res;
+      diaColors = res;
+      await AppConfig.instanceInit()?.setDiaColor(newDiaColors: diaColors);
     }
 
     await _fetchEmergency(context: event.context);
@@ -307,7 +325,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             );
             final color = ReportMarkerPolyline.getPolylineColor(
               value: int.tryParse(pipelineData.nominaldia ?? '0') ?? 0,
-              color: listOfDiaColor,
+              colorMap: diaColors,
             );
             Set<Polyline> polyline = ReportMarkerPolyline.polylinePoint(
               i: i,
@@ -383,6 +401,38 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         }
       } catch (e) {
         print("Error during Gas Valve GIS API fetching: $e");
+      }
+    }
+    _filterVisiblePolyline();
+    _eventCompleted(emit);
+  }
+
+  _fetchGasServiceGisApi({required BuildContext context, emit}) async {
+    if (checkService == true) {
+      try {
+        final serviceBox = HiveDataBase.serviceGISBox;
+        if (serviceBox == null || serviceBox.values.isEmpty) {
+          var res = await IncidentReportHelper.getGasServiceGisApi(context: context);
+          if (res != null && res.data != null && res.data!.isNotEmpty) {
+            listOfService = res.data!;
+          }
+        } else {
+          listOfService = serviceBox.values.toList();
+        }
+
+        if (listOfService.isNotEmpty) {
+          listOfServiceId = listOfService.map((e) => e.servicePointId ?? "").toList();
+          await ReportMarkerPolyline.processMarkersInBatches(
+            context: context,
+            dataList: listOfService,
+            assetPath: AssetPath.service,
+            targetMarkerSet: serviceMarker,
+            finalMarker: finalMarker,
+            filterByKey: FilterKey.SERVICE_ID,
+          );
+        }
+      } catch (e) {
+        print("Error during Gas SERVICE GIS API fetching: $e");
       }
     }
     _filterVisiblePolyline();
@@ -551,6 +601,22 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _eventCompleted(emit);
   }
 
+  _selectServiceGISService(SelectServiceGISServiceEvent event, emit) async {
+    isPipelineLoader = true;
+    _eventCompleted(emit);
+    await _searchFilter(
+      searchText: event.gasServiceGISId,
+      dataList: listOfService,
+      context: event.context,
+      iconBytes: await ReportMarkerPolyline.markerAsset(path: AssetPath.service),
+      filterByKey: FilterKey.SERVICE_ID,
+      emit: emit,
+    );
+    isPipelineLoader = false;
+    _eventCompleted(emit);
+  }
+
+
   _selectRegulatorGISValue(SelectRegulatorGISValueEvent event, emit) async {
     isPipelineLoader = true;
     _eventCompleted(emit);
@@ -649,6 +715,21 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     } else {
       finalMarker.removeWhere((marker) => valveMarker.contains(marker));
       valveMarker.clear();
+    }
+    _eventCompleted(emit);
+  }
+
+  _selectCheckBoxServiceGis(SelectCheckBoxServiceGisEvent event, emit) async {
+    checkService = event.checkBoxService;
+    if (checkService == true) {
+      isServiceLoader = true;
+      _eventCompleted(emit);
+      await _fetchGasServiceGisApi(context: event.context, emit: emit);
+      isServiceLoader = false;
+      _eventCompleted(emit);
+    } else {
+      finalMarker.removeWhere((marker) => serviceMarker.contains(marker));
+      serviceMarker.clear();
     }
     _eventCompleted(emit);
   }
@@ -800,6 +881,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
             switch (filterByKey) {
               case FilterKey.VALUE_ID:
                 return data.valveId.toString() == searchText;
+              case FilterKey.SERVICE_ID:
+                return data.servicePointId.toString() == searchText;
               case FilterKey.BP_NUMBER:
                 return data.bpNumber.toString() == searchText;
               case FilterKey.ID:
@@ -984,7 +1067,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     checkTf = false;
     isTFLoader = false;
     checkValve = false;
+    checkService = false;
     isValveLoader = false;
+    isServiceLoader = false;
     checkRegulator = false;
     isRegulatorLoader = false;
     checkCommercial = false;
@@ -996,6 +1081,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
     tfGisController.text = "";
     valveController.text = "";
+    serviceController.text = "";
     regulatorController.text = "";
     commercialController.text = "";
     domesticController.text = "";
@@ -1005,12 +1091,14 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   _clearPopTextField() {
     isTFLoader = false;
     isValveLoader = false;
+    isServiceLoader = false;
     isRegulatorLoader = false;
     isCommercialLoader = false;
     isDomesticLoader = false;
     isIndustrialLoader = false;
     tfGisController.text = "";
     valveController.text = "";
+    serviceController.text = "";
     regulatorController.text = "";
     commercialController.text = "";
     domesticController.text = "";
@@ -1114,7 +1202,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           checkTf: checkTf,
           isTfLoader: isTFLoader,
           checkValve: checkValve,
+          checkService: checkService,
           isValveLoader: isValveLoader,
+          isServiceLoader: isServiceLoader,
           checkRegulator: checkRegulator,
           isRegulatorLoader: isRegulatorLoader,
 
@@ -1134,6 +1224,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           polylinePointList: Set.of(polylinePointList),
           tfController: tfGisController,
           valveController: valveController,
+          serviceController: serviceController,
           regulatorController: regulatorController,
           commercialController: commercialController,
           domesticController: domesticController,
@@ -1141,6 +1232,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           emergencyController: emergencyController,
           listOfTfId: listOfTFId,
           listOfValveId: listOfValveId,
+          listOfServiceId: listOfServiceId,
           listOfRegulatorId: listOfRegulatorId,
           listOfCommercialId: listOfCommercialId,
           listOfDomesticId: listOfDomesticId,
@@ -1170,9 +1262,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         isIndustrialLoader: isIndustrialLoader,
         isTfLoader: isTFLoader,
         isValveLoader: isValveLoader,
+        isServiceLoader: isServiceLoader,
         isRegulatorLoader: isRegulatorLoader,
         checkTf: checkTf,
         checkValve: checkValve,
+        checkService: checkService,
         checkRegulator: checkRegulator,
         checkCommercial: checkCommercial,
         checkDomestic: checkDomestic,
@@ -1180,6 +1274,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
         tfController: tfGisController,
         valveController: valveController,
+        serviceController: serviceController,
         regulatorController: regulatorController,
         commercialController: commercialController,
         domesticController: domesticController,
@@ -1188,6 +1283,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
         listOfTfId: listOfTFId,
         listOfValveId: listOfValveId,
+        listOfServiceId: listOfServiceId,
         listOfRegulatorId: listOfRegulatorId,
         listOfCommercialId: listOfCommercialId,
         listOfDomesticId: listOfDomesticId,

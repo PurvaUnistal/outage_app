@@ -77,6 +77,31 @@ class SelectCheckBoxValveGisEvent extends NavigateAlertEvent {
   List<Object> get props => [context, checkBoxValve];
 }
 
+
+class SelectServiceGISServiceEvent extends NavigateAlertEvent {
+  final BuildContext context;
+  final String gasServiceGISId;
+  SelectServiceGISServiceEvent({
+    required this.context,
+    required this.gasServiceGISId,
+  });
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, gasServiceGISId];
+}
+
+class SelectCheckBoxServiceGisEvent extends NavigateAlertEvent {
+  final BuildContext context;
+  final bool checkBoxService;
+  SelectCheckBoxServiceGisEvent({
+    required this.context,
+    required this.checkBoxService,
+  });
+  @override
+  // TODO: implement props
+  List<Object> get props => [context, checkBoxService];
+}
+
 class SelectRegulatorGISValueEvent extends NavigateAlertEvent {
   final BuildContext context;
   final String gasRegulatorGISId;

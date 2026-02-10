@@ -14,14 +14,13 @@ class AppConfig {
   DistrictData districtData = DistrictData();
   GridData gridData = GridData();
 
+  Map<String, String> diaColors = {};
+
   String _baseURL = "";
   String get baseURL => _baseURL;
 
   String _gaId = "";
   String get gaId => _gaId;
-
-
-
 
   String _emailId = "";
   String get emailId => _emailId;
@@ -56,6 +55,10 @@ class AppConfig {
   setClient({required Client client}) {
     this.client = client;
   }
+  setDiaColor({required Map<String, String> newDiaColors}) {
+    this.diaColors = newDiaColors;
+  }
+
 
   setDistrictData({required DistrictData districtData}) {
     this.districtData = districtData;

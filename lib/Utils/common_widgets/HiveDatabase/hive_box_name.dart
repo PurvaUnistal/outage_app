@@ -2,6 +2,7 @@ class HiveBoxName {
   static get pipelineDataBox => "pipelineDataBox";
   static get tfGISBox => "tfGISBox";
   static get valveGISBox => "valveGISBox";
+  static get serviceGISBox => "serviceGISBox";
   static get regulatorGISBox => "regulatorGISBox";
   static get commercialDataBox => "commercialDataBox";
   static get domesticDataBox => "domesticDataBox";
@@ -16,4 +17,5 @@ class HiveTypeId {
   static const commercial = 4;
   static const domestic = 5;
   static const industrial = 6;
+  static const serviceGIS = 7;
 }

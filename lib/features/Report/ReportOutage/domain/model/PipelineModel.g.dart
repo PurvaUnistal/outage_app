@@ -37,7 +37,7 @@ class PipelineDataAdapter extends TypeAdapter<PipelineData> {
   @override
   void write(BinaryWriter writer, PipelineData obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.geomencode)
       ..writeByte(1)
