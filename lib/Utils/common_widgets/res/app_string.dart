@@ -4,14 +4,17 @@ import 'enums.dart';
 
 class AppString {
   static double zoom = 15;
-  static String version =
-      "Version : Outage-${AppConfig.instanceInit()?.appVersion}-${AppConfig.instanceInit()!.client == Client.agcl
-          ? "1/08/2025"
-          : AppConfig.instanceInit()!.client == Client.purvaBharti
-          ? "8/01/2026"
-          : AppConfig.instanceInit()!.client == Client.mahaNagar
-          ? "10/02/2026"
-          : ""} ";
+
+  static const Map<Client, String> _releaseDates = {
+    Client.mahaNagar: "10/02/2026",
+    Client.purvaBharti: "8/01/2026",
+    Client.igl: "11-06-2025",
+    Client.agcl: "1/08/2025",
+    Client.hpoil: "6-03-2026",
+  };
+
+  static String get version => "Version : Outage-${AppConfig.instanceInit()?.appVersion}-${_releaseDates[AppConfig.instanceInit()!.client] ?? ""}";
+
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";

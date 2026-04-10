@@ -1,11 +1,32 @@
+import 'app_config.dart';
+import 'enums.dart';
+
 class AssetPath {
+
+  static appLogo(){
+    return AppConfig.instanceInit()!.client == Client.agcl
+        ? AssetPath.agclLogo
+        :AppConfig.instanceInit()!.client == Client.mahaNagar
+        ? AssetPath.mglLogo
+        : AppConfig.instanceInit()!.client == Client.purvaBharti
+        ? AssetPath.pbgLogo
+        : AppConfig.instanceInit()!.client == Client.hpoil
+        ? AssetPath.hpOilLogo
+        : AssetPath.unistalLogo;
+  }
+
+
   static String pin_circle_red = 'assets/icons/pin_circle_red.png';
   static String smartgasnetLog = 'assets/icons/smartgasnet_log.png';
   static String agclLogo = 'assets/icons/agcl_logo.png';
   static String agclIcon = 'assets/icons/agcl_icon.png';
   static String pbgLogo = 'assets/icons/pbg_logo.png';
   static String mglLogo = 'assets/icons/mgl_logo.png';
+  static String hpOilLogo = 'assets/icons/hp_oil_logo.png';
+  static String unistalLogo = 'assets/icons/unistal_logo.png';
   static String iglLogo = 'assets/gis/igl_logo.png';
+
+
   static String meter = 'assets/icons/meter.jpg';
   static String tfIcon = 'assets/icons/tf_icon.png';
   static String household = 'assets/icons/household-bills.jpg';

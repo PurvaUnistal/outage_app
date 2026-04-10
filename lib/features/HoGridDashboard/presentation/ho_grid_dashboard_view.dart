@@ -60,8 +60,7 @@ class _HoGridDashboardViewState extends State<HoGridDashboardView> {
 
   _appBarWidget() {
     return AppBarWidget(
-    //  title: AppConfig.instanceInit()!.client == Client.agcl ? "AGCL HO" : "MGL HO",
-      boolLeading: true,
+    boolLeading: true,
       actions: [
         IconButton(
           onPressed:

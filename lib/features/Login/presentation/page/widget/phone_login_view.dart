@@ -126,13 +126,7 @@ class _LoginViewState extends State<PhoneLoginView> {
           backgroundColor: Colors.white,
           radius: logoRadius * 0.95,
           child: Image.asset(
-            AppConfig.instanceInit()!.client == Client.agcl
-                ? AssetPath.agclIcon
-                :AppConfig.instanceInit()!.client == Client.mahaNagar
-                ? AssetPath.mglLogo
-                : AppConfig.instanceInit()!.client == Client.purvaBharti
-                    ? AssetPath.pbgLogo
-                    : AssetPath.iglLogo,
+            AssetPath.appLogo(),
             width: imageSize,
             height: imageSize,
             fit: BoxFit.contain,

@@ -93,8 +93,7 @@ class _HoDisDashboardViewState extends State<HoDisDashboardView> {
 
   _appBarWidget() {
     return AppBarWidget(
-     // title: AppConfig.instanceInit()!.client == Client.agcl ? "AGCL HO" :  AppConfig.instanceInit()!.client == Client.purvaBharti ? "MGL HO":"MGL HO",
-      boolLeading: true,
+     boolLeading: true,
       actions: [
         IconButton(
           onPressed:
