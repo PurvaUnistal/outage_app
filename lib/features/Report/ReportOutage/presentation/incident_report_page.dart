@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
@@ -32,9 +33,6 @@ class _IncidentReportViewState extends State<IncidentReportView> {
     BlocProvider.of<IncidentReportBloc>(
       context,
     ).add(IncidentReportLoadEvent(context: context));
-    BlocProvider.of<IncidentReportBloc>(
-      context,
-    ).add(OnCameraIdleEvent(context: context));
   }
 
   @override
@@ -98,19 +96,25 @@ class _IncidentReportViewState extends State<IncidentReportView> {
             : Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                padding: const EdgeInsets.only(
+                  left: 10.0,
+                  right: 10.0,
+                  top: 10.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     CommonStyle.vertical(context: context),
+                    _refreshPipelineButtonWidget(dataState: dataState),
+                    _vertical(),
                     _currentLocationButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _legendButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _mapTypeButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _filterButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _emergencyButtonWidget(dataState: dataState),
 
                     // SizedBox(height: 16.0),
@@ -123,12 +127,16 @@ class _IncidentReportViewState extends State<IncidentReportView> {
       ],
     );
   }
+  _vertical(){
+    return  SizedBox(height: MediaQuery.of(context).size.height * 0.009);
+  }
 
   _googleMapWidget({required FetchIncidentReportDataState dataState}) {
     return GoogleMap(
       buildingsEnabled: false,
       mapType: dataState.currentMapType,
       myLocationEnabled: true,
+      myLocationButtonEnabled: false,
       rotateGesturesEnabled: true,
       zoomControlsEnabled: false,
       mapToolbarEnabled: true,
@@ -140,6 +148,8 @@ class _IncidentReportViewState extends State<IncidentReportView> {
         if (!dataState.googleMapController.isCompleted) {
           dataState.googleMapController.complete(controller);
         }
+        BlocProvider.of<IncidentReportBloc>(context)
+            .add(OnMapCreatedEvent(context: context));
       },
       minMaxZoomPreference: _getZoomPreference(dataState),
       // minMaxZoomPreference: MinMaxZoomPreference(15, null),
@@ -195,6 +205,18 @@ class _IncidentReportViewState extends State<IncidentReportView> {
         );
       },
     );
+  }
+
+  _refreshPipelineButtonWidget({required FetchIncidentReportDataState dataState,}) {
+    return dataState.isRefresh == false
+        ? CircleButton(
+          iconData: Icons.refresh_outlined,
+          onTap:
+              () => context.read<IncidentReportBloc>().add(
+                RefreshEvent(context: context),
+              ),
+        )
+        : DottedLoaderWidget();
   }
 
   _currentLocationButtonWidget({

@@ -19,6 +19,7 @@ class NavigateAlertPageLoadState extends NavigateAlertState {
 
 class FetchNavigateAlertDataState extends NavigateAlertState {
   final bool isLoader;
+  final bool isRefresh;
   final bool isMapDir;
   final String nameofLocation;
   final String role;
@@ -62,6 +63,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
 
   FetchNavigateAlertDataState({
     required this.isLoader,
+    required this.isRefresh,
     required this.isMapDir,
     required this.nameofLocation,
     required this.role,
@@ -107,6 +109,7 @@ class FetchNavigateAlertDataState extends NavigateAlertState {
   @override
   List<Object> get props => [
     isLoader,
+    isRefresh,
     isMapDir,
     nameofLocation,
     role,

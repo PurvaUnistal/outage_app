@@ -99,6 +99,25 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717074212478:android:df75f0802716bf7b479a2f",
+        "android_client_info": {
+          "package_name": "unistal.hpcloutage.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLJZQN4zWXza_ShJJUHSONR0wqGEQmHUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"

@@ -45,4 +45,5 @@ class Apis {
   static get gridData => "outage/get-grid-data?";
   static get inChargeData => "outage/get-grid-incharge-data?";
   static get emergencySearch => "outage/get-emergency-search?";
+  static get showPipelineData  => "showPipelinedata";
 }

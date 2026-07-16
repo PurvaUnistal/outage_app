@@ -213,6 +213,14 @@ class OnCameraIdleEvent extends IncidentReportEvent {
   List<Object> get props => [context];
 }
 
+class OnMapCreatedEvent extends IncidentReportEvent {
+  final BuildContext context;
+  OnMapCreatedEvent({required this.context});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [context];
+}
 class ResetFilterEvent extends IncidentReportEvent {
   final BuildContext context;
   ResetFilterEvent({required this.context});
@@ -299,4 +307,12 @@ class SelectSearchEmergencyEvent extends IncidentReportEvent {
 class StopTimerEvent extends IncidentReportEvent {
   @override
   List<Object> get props => [];
+}
+
+class RefreshEvent extends IncidentReportEvent {
+  final BuildContext context;
+  RefreshEvent({required this.context});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [context];
 }

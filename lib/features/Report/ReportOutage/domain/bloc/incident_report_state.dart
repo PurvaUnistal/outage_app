@@ -17,6 +17,7 @@ class IncidentReportPageLoadState extends IncidentReportState {
 
 class FetchIncidentReportDataState extends IncidentReportState {
   final bool isLoader;
+  final bool isRefresh;
   final bool isMapDir;
   final bool isVisible;
   final String nameofLocation;
@@ -68,6 +69,7 @@ class FetchIncidentReportDataState extends IncidentReportState {
 
   FetchIncidentReportDataState({
     required this.isLoader,
+    required this.isRefresh,
     required this.isMapDir,
     required this.isVisible,
     required this.nameofLocation,
@@ -121,6 +123,7 @@ class FetchIncidentReportDataState extends IncidentReportState {
   @override
   List<Object> get props => [
     isLoader,
+    isRefresh,
     isMapDir,
     isVisible,
     nameofLocation,

@@ -184,6 +184,15 @@ class NavigateAlertOnCameraIdleEvent extends NavigateAlertEvent {
   List<Object> get props => [context,];
 }
 
+class OnMapCreatedEvent extends NavigateAlertEvent {
+  final BuildContext context;
+  OnMapCreatedEvent({required this.context});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [context];
+}
+
 class ResetFilterEvent extends NavigateAlertEvent {
   final BuildContext context;
   ResetFilterEvent({required this.context});
@@ -244,4 +253,12 @@ class SelectSearchEmergencyEvent extends NavigateAlertEvent {
 class StopTimerEvent extends NavigateAlertEvent {
   @override
   List<Object> get props => [];
+}
+
+class RefreshEvent extends NavigateAlertEvent {
+  final BuildContext context;
+  RefreshEvent({required this.context});
+  @override
+  // TODO: implement props
+  List<Object?> get props => [context];
 }

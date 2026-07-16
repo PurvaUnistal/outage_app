@@ -70,7 +70,9 @@ class LoginHelper {
             res["user"]["role"] == "incident" ||
             res["user"]["role"] == "technician" ||
             res["user"]["role"] == "onmengineer" ||
-            res["user"]["role"] == "Manager") {
+            res["user"]["role"] == "Manager" ||
+            res["user"]["role"] == "mdpecontractors"
+        ) {
           await Utils.successSnackBar(msg: res["messages"],context: context);
           String baseUrl = Apis.loginUrl.replaceAll("api/auth", "");
           AppConfig.instanceInit()?.setBaseURL(baseURL: baseUrl);

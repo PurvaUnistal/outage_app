@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/WaveLoaderWidget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
@@ -78,24 +79,30 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
     return Stack(
       children: <Widget>[
         _googleMapWidget(dataState: dataState),
-        dataState.isPipelineLoader
+         dataState.isPipelineLoader
             ? WaveLoaderWidget()
             : Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                padding: const EdgeInsets.only(
+                  left: 10.0,
+                  right: 10.0,
+                  top: 10.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    _refreshPipelineButtonWidget(dataState: dataState),
+                    _vertical(),
                     CommonStyle.vertical(context: context),
                     _currentLocationButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _legendButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _mapTypeButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _filterButtonWidget(dataState: dataState),
-                    SizedBox(height: 16.0),
+                    _vertical(),
                     _emergencyButtonWidget(dataState: dataState),
                     Spacer(),
                   ],
@@ -104,6 +111,10 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
             ),
       ],
     );
+  }
+
+  _vertical(){
+    return  SizedBox(height: MediaQuery.of(context).size.height * 0.009);
   }
 
   Widget _googleMapWidget({required FetchNavigateAlertDataState dataState}) {
@@ -115,7 +126,7 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
       mapToolbarEnabled: true,
 
       myLocationEnabled: true,
-      myLocationButtonEnabled: true,
+      myLocationButtonEnabled: false,
       markers: dataState.markersPointList,
       polylines: dataState.polylinePointList,
       initialCameraPosition: CameraPosition(target: dataState.currentPosition),
@@ -192,6 +203,18 @@ class _NavigateAlertViewState extends State<NavigateAlertView> {
         );
       },
     );
+  }
+
+  _refreshPipelineButtonWidget({required FetchNavigateAlertDataState dataState,}) {
+    return dataState.isRefresh == false
+        ? CircleButton(
+      iconData: Icons.refresh_outlined,
+      onTap:
+          () => context.read<NavigateAlertBloc>().add(
+        RefreshEvent(context: context),
+      ),
+    )
+        : DottedLoaderWidget();
   }
 
   _currentLocationButtonWidget({

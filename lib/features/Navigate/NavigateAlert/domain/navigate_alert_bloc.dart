@@ -7,6 +7,9 @@ import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart'
 import 'package:outage_app/Utils/common_widgets/res/UserContext.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/Utils/common_widgets/res/enums.dart';
+import 'package:outage_app/features/InChargeDashboard/Helper/in_charge_dashboard_helper.dart';
+import 'package:outage_app/features/InChargeDashboard/domain/model/show_pipeline_model.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/model/filter_key_enum.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_event.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/domain/navigate_alert_state.dart';
@@ -55,6 +58,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     on<SelectCheckIndustrialEvent>(_selectCheckIndustrial);
     on<SelectIndustrialValueEvent>(_selectIndustrial);
     on<NavigateAlertOnCameraIdleEvent>(_onCameraIdleEvent);
+    on<OnMapCreatedEvent>(_onMapCreatedEvent);
     on<ResetFilterEvent>(_onResetFilterEvent);
 
     on<UpdateStartAddress>(_updateStartAddress);
@@ -62,10 +66,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     on<ShowRouteButtonEvent>(_showRouteButtonEvent);
     on<SearchDesEvent>(_searchDesEvent);
     on<SelectEmergencyEvent>(_selectEmergency);
-     on<SelectSearchEmergencyEvent>(_searchEmergencyHospital);
+    on<SelectSearchEmergencyEvent>(_searchEmergencyHospital);
     on<StopTimerEvent>(_stopTimer);
+    on<RefreshEvent>(_selectRefreshEvent);
   }
+
   bool isLoader = false;
+  bool isRefresh = false;
   bool isMapDir = false;
   bool isVisible = false;
   bool isPipelineLoader = false;
@@ -101,8 +108,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   final TextEditingController industrialController = TextEditingController();
   final TextEditingController startAddressController = TextEditingController();
   final TextEditingController destinationAddressController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController emergencyController = TextEditingController();
+
+  List<ShowPipelineModel> showPipelineModel = [];
 
   List<TFGISData> listOfTF = [];
   List<String> listOfTFId = [];
@@ -150,6 +159,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   Set<Marker> markersPointList = {};
   Set<Marker> routePointList = {};
 
+  Set<Marker> refreshMarkerList = {};
+  Set<Polyline> refreshPolylineList = {};
+
   Set<Polyline> polylinePointList = {};
   Set<Polyline> pipePolylinePointList = {};
   Set<Polyline> filterPolyline = {};
@@ -159,16 +171,15 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   Completer<GoogleMapController> googleMapController = Completer();
 
-
   bool isBlinkMarker = true;
   Timer blinkTimer = Timer(Duration.zero, () {});
 
   final mapService = MapService();
 
-
   _pageLoad(NavigateAlertLoadEvent event, emit) async {
     emit(NavigateAlertPageLoadState());
     isLoader = false;
+    isRefresh = false;
     isMapDir = false;
     isVisible = false;
     isPipelineLoader = false;
@@ -206,6 +217,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     destinationAddressController.text = "";
     emergencyController.text = "";
 
+    showPipelineModel = [];
+    refreshPolylineList = {};
+    refreshMarkerList = {};
+
     listOfTF = [];
     listOfTFId = [];
 
@@ -235,7 +250,10 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     pipelineData = PipelineData();
     listOfPipeline = [];
     final ctx = UserContext.getUserContext();
-    currentPosition = LatLng(double.parse(ctx.user.gaLatitude!), double.parse(ctx.user.gaLongitude!));
+    currentPosition = LatLng(
+      double.parse(ctx.user.gaLatitude!),
+      double.parse(ctx.user.gaLongitude!),
+    );
     latLngOnTap = LatLng(0, 0);
     points = [];
 
@@ -262,6 +280,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
     isBlinkMarker = true;
     blinkTimer = Timer(Duration.zero, () {});
+    final client = await  AppConfig.instanceInit()!.client;
+    final isMGL = client == Client.mahaNagar;
+    final isHPCL = client == Client.hpcl;
 
     var icons = await ReportMarkerPolyline.markerAsset(path: "");
     await _searchFilter(
@@ -280,9 +301,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
     await _fetchEmergency(context: event.context);
     await _filerPipe(context: event.context, emit: emit);
-    _eventCompleted(emit);
+    if (isMGL || isHPCL) {
+      await _fetchDrowPipeLine(context: event.context);
+      _eventCompleted(emit);
+    }
   }
-
 
   _fetchEmergency({required BuildContext context}) async {
     var res = await IncidentReportHelper.getEmergencySearchApi(
@@ -295,15 +318,25 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     }
   }
 
+  _fetchDrowPipeLine({required BuildContext context}) async {
+    final res = await InChargeDashboardHelper.fetchShowPipelineData(
+      context: context,
+    );
+    if (res != null) {
+      showPipelineModel = [res];
+      await _rebuildOverlays(context: context);
+    }
+  }
+
   _filerPipe({required BuildContext context, emit}) async {
     final pipelineBox = HiveDataBase.pipelineDataBox;
     if (pipelineBox == null || pipelineBox.values.isEmpty) {
       var res = await IncidentReportHelper.getPipelineApi(
         context: context,
         latitude:
-        AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
+            AppConfig.instanceInit()!.loginData.user!.gaLatitude.toString(),
         longitude:
-        AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
+            AppConfig.instanceInit()!.loginData.user!.gaLongitude.toString(),
       );
       if (res != null && res.data != null && res.data!.isNotEmpty) {
         listOfPipeline = res.data!;
@@ -344,6 +377,83 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     }
   }
 
+  Future<void> _selectRefreshEvent(RefreshEvent event, emit) async {
+    try {
+      isRefresh = true;
+      _eventCompleted(emit);
+      await _fetchDrowPipeLine(context: event.context);
+      isRefresh = false;
+      _eventCompleted(emit);
+    } catch (_) {
+      // TODO: surface error to UI via a dedicated error state
+    } finally {
+      isRefresh = false;
+      _eventCompleted(emit);
+    }
+  }
+
+  Future<void> _rebuildOverlays({required BuildContext context}) async {
+    refreshPolylineList.clear();
+    refreshMarkerList.clear();
+    for (final pipeline in showPipelineModel) {
+      // ✅ Polylines add karo
+      if (pipeline.polylines?.isNotEmpty ?? false) {
+        refreshPolylineList.addAll(
+          ReportMarkerPolyline.toPolylineSet(pipeline.polylines!),
+        );
+      }
+
+      // ✅ Markers with onTap add karo
+      if (pipeline.markers?.isNotEmpty ?? false) {
+        for (final m in pipeline.markers!) {
+          final lat = m.point?.lat?.toDouble();
+          final lng = m.point?.lng?.toDouble();
+          if (lat == null || lng == null) continue;
+
+          final markerLatLng = LatLng(lat, lng); // ✅ marker ki actual position
+
+          final markerWithTap = await ReportMarkerPolyline.createMarker(
+            marker: m,
+            onTap: () async {
+              final currentPoint = await mapService.getCurrentLocation(
+                context: context,
+              );
+              if (currentPoint == null) return;
+
+              // ✅ State update karo
+              latLngOnTap = markerLatLng;
+              isMapDir = true;
+              googleMapsUrl = mapService.buildGoogleMapsUrl(
+                currentPoint,
+                markerLatLng,
+              );
+              nameofLocation =
+                  (await MapService.getAddress(latLng: markerLatLng)) ?? '';
+
+              Set<Marker> tempMarker = Set.from(markersPointList);
+              showDialog(
+                context: context,
+                builder:
+                    (_) => AlertDialog(
+                      contentPadding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      content: AlertDialogDetailsWidgetWidget(
+                        pipelineData: pipelineData,
+                        currLatLng: markerLatLng,
+                      ),
+                    ),
+              );
+              markersPointList = tempMarker;
+            },
+          );
+          refreshMarkerList.add(markerWithTap);
+          markersPointList.add(markerWithTap);
+        }
+      }
+    }
+  }
 
   _fetchTFGisApi({required BuildContext context, emit}) async {
     if (checkTf == true) {
@@ -381,7 +491,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       try {
         final valveBox = HiveDataBase.valveGISBox;
         if (valveBox == null || valveBox.values.isEmpty) {
-          var res = await IncidentReportHelper.getGasValueGisApi(context: context);
+          var res = await IncidentReportHelper.getGasValueGisApi(
+            context: context,
+          );
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfValue = res.data!;
           }
@@ -412,7 +524,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       try {
         final serviceBox = HiveDataBase.serviceGISBox;
         if (serviceBox == null || serviceBox.values.isEmpty) {
-          var res = await IncidentReportHelper.getGasServiceGisApi(context: context);
+          var res = await IncidentReportHelper.getGasServiceGisApi(
+            context: context,
+          );
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfService = res.data!;
           }
@@ -421,7 +535,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         }
 
         if (listOfService.isNotEmpty) {
-          listOfServiceId = listOfService.map((e) => e.servicePointId ?? "").toList();
+          listOfServiceId =
+              listOfService.map((e) => e.servicePointId ?? "").toList();
           await ReportMarkerPolyline.processMarkersInBatches(
             context: context,
             dataList: listOfService,
@@ -445,7 +560,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         final regulatorBox = HiveDataBase.regulatorGISBox;
 
         if (regulatorBox == null || regulatorBox.values.isEmpty) {
-          var res = await IncidentReportHelper.getRegulatorGisApi(context: context);
+          var res = await IncidentReportHelper.getRegulatorGisApi(
+            context: context,
+          );
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfRegulator = res.data!;
           }
@@ -453,7 +570,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
           listOfRegulator = regulatorBox.values.toList();
         }
         if (listOfRegulator.isNotEmpty) {
-          listOfRegulatorId = listOfRegulator.map((e) => e.regulatorid ?? "").toList();
+          listOfRegulatorId =
+              listOfRegulator.map((e) => e.regulatorid ?? "").toList();
           await NavigateAlertHelper.processMarkersInBatches(
             context: context,
             dataList: listOfRegulator,
@@ -477,7 +595,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         final commercialBox = HiveDataBase.commercialDataBox;
 
         if (commercialBox == null || commercialBox.values.isEmpty) {
-          var res = await IncidentReportHelper.getCommercialApi(context: context);
+          var res = await IncidentReportHelper.getCommercialApi(
+            context: context,
+          );
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfCommercial = res.data!;
           }
@@ -543,7 +663,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         final industrialBox = HiveDataBase.industrialDataBox;
 
         if (industrialBox == null || industrialBox.values.isEmpty) {
-          var res = await IncidentReportHelper.getIndustrialApi(context: context);
+          var res = await IncidentReportHelper.getIndustrialApi(
+            context: context,
+          );
           if (res != null && res.data != null && res.data!.isNotEmpty) {
             listOfIndustrial = res.data!;
           }
@@ -608,14 +730,15 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       searchText: event.gasServiceGISId,
       dataList: listOfService,
       context: event.context,
-      iconBytes: await ReportMarkerPolyline.markerAsset(path: AssetPath.service),
+      iconBytes: await ReportMarkerPolyline.markerAsset(
+        path: AssetPath.service,
+      ),
       filterByKey: FilterKey.SERVICE_ID,
       emit: emit,
     );
     isPipelineLoader = false;
     _eventCompleted(emit);
   }
-
 
   _selectRegulatorGISValue(SelectRegulatorGISValueEvent event, emit) async {
     isPipelineLoader = true;
@@ -849,7 +972,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _currentPointMarker({required BuildContext context}) async {
-    LatLng? currentPoint = await mapService.getCurrentLocation(context: context);
+    LatLng? currentPoint = await mapService.getCurrentLocation(
+      context: context,
+    );
     if (currentPoint != null) {
       GoogleMapController controller = await googleMapController.future;
       controller.animateCamera(
@@ -929,7 +1054,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectGoogleMapButton(SelectGoogleMapButtonEvent event, emit) async {
-    final currentPoint = await mapService.getCurrentLocation(context: event.context);
+    final currentPoint = await mapService.getCurrentLocation(
+      context: event.context,
+    );
     if (currentPoint != null) {
       latLngOnTap = event.latLngOnTap;
       isMapDir = true;
@@ -988,7 +1115,9 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _selectGoogleRouteDirEvent(SelectGoogleRouteDirEvent event, emit) async {
-    final currentPoint = await mapService.getCurrentLocation(context: event.context);
+    final currentPoint = await mapService.getCurrentLocation(
+      context: event.context,
+    );
     if (currentPoint != null) {
       latLngOnTap = event.toLatLng;
       isMapDir = true;
@@ -1019,8 +1148,16 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _updateMarkerPolyline() {
-    polylinePointList = {...pipePolylinePointList, ...filterPolyline};
-    markersPointList = {...markersPointList, ...filterMarkerList};
+    polylinePointList = {
+      ...pipePolylinePointList,
+      ...filterPolyline,
+      ...refreshPolylineList, // ✅ always included on every update
+    };
+    markersPointList = {
+      ...markersPointList,
+      ...filterMarkerList,
+      ...refreshMarkerList, // ✅ always included on every update
+    };
     print("pipePolylinePointList-->${pipePolylinePointList.length}");
     print("filterPolyline-->${filterPolyline.length}");
     print("markersPointList-->${markersPointList.length}");
@@ -1028,17 +1165,26 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   }
 
   _onCameraIdleEvent(NavigateAlertOnCameraIdleEvent event, emit) async {
-    await IncidentReportHelper.clearCache();
-    _filterVisiblePolyline();
+    //  await IncidentReportHelper.clearCache();
+    await _filterVisiblePolyline();
+    _eventCompleted(emit);
+  }
+
+  // Handler - fires AFTER controller is ready
+  FutureOr<void> _onMapCreatedEvent(OnMapCreatedEvent event, emit) async {
+    // Wait a frame so getVisibleRegion() returns correct bounds
+    await Future.delayed(const Duration(milliseconds: 300));
+    await _filterVisiblePolyline();
     _eventCompleted(emit);
   }
 
   _gotoInitialPosition(LatLng location) async {
     CameraPosition cameraPosition = CameraPosition(target: location);
     final GoogleMapController controller = await googleMapController.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    await controller.animateCamera(
+      CameraUpdate.newCameraPosition(cameraPosition),
+    );
   }
-
 
   _onResetFilterEvent(ResetFilterEvent event, emit) async {
     tempMarker = {};
@@ -1108,6 +1254,8 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
   _clearMarkerPolyline() {
     filterPolyline = {};
     polylinePointList = {};
+    refreshPolylineList = {}; // ✅ clear refresh too
+    refreshMarkerList = {}; // ✅ clear refresh too
     polylinePointList = {...pipePolylinePointList};
   }
 
@@ -1126,7 +1274,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
 
   _searchEmergencyHospital(SelectSearchEmergencyEvent event, emit) async {
     final selected = listOfEmergencyData.firstWhere(
-          (e) => e.emergencyName == event.searchEmergency,
+      (e) => e.emergencyName == event.searchEmergency,
     );
 
     final lat = double.tryParse(selected.latitude);
@@ -1142,11 +1290,13 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       ),
     );
     Set<Marker> emergencyMarker = Set.from(markersPointList);
-    emergencyMarker.add(Marker(
-      markerId: MarkerId('selected_emergency'),
-      position: targetPosition,
-      infoWindow: InfoWindow(title: selected.emergencyName),
-    ));
+    emergencyMarker.add(
+      Marker(
+        markerId: MarkerId('selected_emergency'),
+        position: targetPosition,
+        infoWindow: InfoWindow(title: selected.emergencyName),
+      ),
+    );
     filterMarkerList = emergencyMarker;
     _eventCompleted(emit);
   }
@@ -1165,15 +1315,11 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     _startBlinking();
   }
 
-  FutureOr<void> _stopTimer(
-      StopTimerEvent event, emit,
-      ) {
+  FutureOr<void> _stopTimer(StopTimerEvent event, emit) {
     if (blinkTimer.isActive) {
       blinkTimer.cancel();
     }
   }
-
-
 
   _startBlinking() async {
     final controller = await googleMapController.future;
@@ -1189,7 +1335,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
         final blink = blinkMarkerList.first;
         controller.hideMarkerInfoWindow(blink.markerId);
         markersPointList.removeWhere(
-              (element) => element.markerId == blink.markerId,
+          (element) => element.markerId == blink.markerId,
         );
       }
       isBlinkMarker = !isBlinkMarker;
@@ -1197,6 +1343,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
       emit(
         FetchNavigateAlertDataState(
           isLoader: isLoader,
+          isRefresh: isRefresh,
           isMapDir: isMapDir,
           isPipelineLoader: isPipelineLoader,
           checkTf: checkTf,
@@ -1247,6 +1394,7 @@ class NavigateAlertBloc extends Bloc<NavigateAlertEvent, NavigateAlertState> {
     emit(
       FetchNavigateAlertDataState(
         isLoader: isLoader,
+        isRefresh: isRefresh,
         isMapDir: isMapDir,
         baseUrl: baseUrl,
         nameofLocation: nameofLocation,

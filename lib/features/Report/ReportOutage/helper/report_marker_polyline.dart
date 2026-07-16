@@ -1,19 +1,115 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
-
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
+import 'package:outage_app/features/InChargeDashboard/domain/model/show_pipeline_model.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/model/filter_key_enum.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/widget/alert_dialog_widget.dart';
 
 class ReportMarkerPolyline {
+
+
   static Future<BitmapDescriptor> markerAsset({required String path}) async {
     return await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(28, 28)),
       path,
     );
+  }
+
+
+  static final Map<String, BitmapDescriptor> _cache = {};
+
+  static Future<BitmapDescriptor> markerFromUrl({required String endPath, int width = 80,}) async {
+    if (endPath.trim().isEmpty) {
+      return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+    }
+
+    final path = endPath.trim();
+
+    // ---------- Detect source ----------
+    final bool isHttp = path.startsWith('http');
+    final bool isAsset = path.startsWith('assets/');
+
+    // ---------- Build full URL if needed ----------
+    String fullUrl = path;
+
+    if (!isHttp && !isAsset) {
+      final baseUrl =
+          AppConfig.instanceInit()!.loginData.user?.projectUrl?.trim() ?? "";
+
+      if (baseUrl.isNotEmpty) {
+        fullUrl = Uri.parse(baseUrl).resolve(path).toString();
+      }
+    }
+
+    final cacheKey = isAsset ? path : fullUrl;
+
+    // ---------- Cache ----------
+    if (_cache.containsKey(cacheKey)) {
+      return _cache[cacheKey]!;
+    }
+
+    Uint8List bytes;
+
+    try {
+      if (isAsset) {
+        final data = await rootBundle.load(path);
+        bytes = data.buffer.asUint8List();
+      } else {
+        final response = await http.get(Uri.parse(fullUrl));
+        if (response.statusCode != 200) {
+          throw Exception("Image load failed: $fullUrl");
+        }
+        bytes = response.bodyBytes;
+      }
+
+      // ---------- Resize ----------
+      final codec = await ui.instantiateImageCodec(bytes, targetWidth: width,);
+
+      final frame = await codec.getNextFrame();
+      final resized = await frame.image.toByteData(format: ui.ImageByteFormat.png,);
+
+      final descriptor = BitmapDescriptor.fromBytes(resized!.buffer.asUint8List());
+
+      _cache[cacheKey] = descriptor;
+      return descriptor;
+
+    } catch (e) {
+      print("Marker load error: $e");
+      return BitmapDescriptor.defaultMarker;
+    }
+  }
+
+  static Future<Marker> createMarker({dynamic marker, VoidCallback? onTap}) async {
+    final icon = await ReportMarkerPolyline.markerFromUrl(endPath: marker.imagePath?.toString() ?? "",);
+    return Marker(
+      markerId: MarkerId(marker.id ?? ''),
+      position: LatLng(
+        marker.point?.lat?.toDouble() ?? 0,
+        marker.point?.lng?.toDouble() ?? 0,
+      ),
+      icon: icon,
+      onTap: onTap,
+      anchor: const Offset(0.5, 0.5),
+    );
+  }
+
+  static Set<Polyline> toPolylineSet(List<ShowPolylines> list) {
+    return list.map((poly) {
+      return Polyline(
+        polylineId: PolylineId(poly.id.toString()),
+        points:
+        (poly.points ?? [])
+            .where((p) => p.lat != null && p.lng != null)
+            .map((p) => LatLng(p.lat!, p.lng!))
+            .toList(),
+        width: 4,
+        color: Color(poly.colorValue ?? 0xFF000000),
+      );
+    }).toSet();
   }
 
   static Future<Uint8List> generateDotImage({

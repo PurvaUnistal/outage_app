@@ -23,107 +23,130 @@ class AlertDialogDetailsWidgetWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textColor = EnvironmentConfig.of(context)?.primaryTheme;
 
-    return SizedBox(
+    return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height / 3.8,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (pipelineData != null) ...[
-                        if (pipelineData.bpName != null && pipelineData.bpName != "") ...[
-                          if (filterByKey != null && filterByKey!.isNotEmpty)
-                            Text(filterByKey ?? "NA"),
-                          buildInfoRow("Customer Name", pipelineData.bpName),
-                          if (pipelineData.imagePath != null &&
-                              pipelineData.imagePath.isNotEmpty &&
-                              pipelineData.housePhoto != null &&
-                              pipelineData.housePhoto.isNotEmpty)
-                            InkWell(
-                              onTap: () => showHouseImage(context, pipelineData.imagePath),
-                              child: Row(
-                                children: [
-                                  const Text("House Photo"),
-                                  const SizedBox(width: 8),
-                                  Flexible(
-                                    child: Image.network(
-                                      pipelineData.imagePath,width: 50,height: 50,
-                                      fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Center(
-                                        child: Icon(Icons.image, size: 24, color: textColor),
-                                      ),
+      padding: const EdgeInsets.all(8),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (pipelineData != null) ...[
+                      Builder(
+                        builder: (context) {
+                          // Check karo safely
+                          bool hasBpName = false;
+                          bool hasServicePointId = false;
+
+                          try { hasBpName = pipelineData.bpName != null && pipelineData.bpName != ""; } catch (_) {}
+                          try { hasServicePointId = pipelineData.servicePointId != null && pipelineData.servicePointId != ""; } catch (_) {}
+
+                          if (hasBpName) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (filterByKey != null && filterByKey!.isNotEmpty)
+                                  Text(filterByKey ?? "NA"),
+                                buildInfoRow("Customer Name", pipelineData.bpName),
+                                if (pipelineData.imagePath != null && pipelineData.imagePath.isNotEmpty
+                                    && pipelineData.housePhoto != null && pipelineData.housePhoto.isNotEmpty)
+                                  InkWell(
+                                    onTap: () => showHouseImage(context, pipelineData.imagePath),
+                                    child: Row(
+                                      children: [
+                                        const Text("House Photo"),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: Image.network(
+                                            pipelineData.imagePath,width: 50,height: 50,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => Center(
+                                              child: Icon(Icons.image, size: 24, color: textColor),
+                                            ),
+                                          ),
+                                        ),
+
+                                      ],
                                     ),
                                   ),
-
-                                ],
-                              ),
-                            ),
-                        ] else ...[
-                          if (filterByKey != null && filterByKey!.isNotEmpty)
-                            Text(filterByKey ?? "NA"),
-                          buildInfoRow("Grid", pipelineData.location),
-                          buildInfoRow("District", pipelineData.district),
-                          buildInfoRow("Nominal Dia", "${pipelineData.nominaldia}mm"),
-                        ],
-                        const SizedBox(height: 8),
-                        const Divider(),
-                      ],
+                              ],
+                            );
+                          } else if (hasServicePointId) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (filterByKey != null && filterByKey!.isNotEmpty)
+                                  Text(filterByKey ?? "NA"),
+                                buildInfoRow("Service Point ID", pipelineData.servicePointId),
+                                buildInfoRow("Grid", pipelineData.location),
+                                buildInfoRow("District", pipelineData.district),
+                              ],
+                            );
+                          } else {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (filterByKey != null && filterByKey!.isNotEmpty)
+                                  Text(filterByKey ?? "NA"),
+                                buildInfoRow("Grid", pipelineData.location),
+                                buildInfoRow("District", pipelineData.district),
+                              ],
+                            );
+                          }
+                        },
+                      ),
                     ],
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.cancel, color: Colors.red),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ],
-              ),
-              Center(
-                child: Text(
-                  "Map GPS navigation",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
+                  ],
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.cancel, color: Colors.red),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: ButtonWidget(
-                  text: "Navigate",
-                  icon: Icons.alt_route,
-                  onPressed: () {
-                    if(pipelineData.latitude == "" && pipelineData.longitude == ""){
-                      LatLng? toPoints = currLatLng;
-                      BlocProvider.of<NavigateAlertBloc>(context).add(
-                        SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints ?? LatLng(0,0)),
-                      );
-                    }else{
-                      double lat = double.parse(pipelineData.latitude);
-                      double lng = double.parse(pipelineData.longitude);
-                      LatLng toPoints = LatLng(lat, lng);
-                      BlocProvider.of<NavigateAlertBloc>(context).add(
-                        SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints),
-                      );
-                    }
-                    },
+              ],
+            ),
+            Center(
+              child: Text(
+                "Map GPS Navigation",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 12),
+            Center(
+              child: ButtonWidget(
+                text: "Navigate",
+                icon: Icons.alt_route,
+                onPressed: () {
+                  if(pipelineData.latitude == "" && pipelineData.longitude == ""){
+                    LatLng? toPoints = currLatLng;
+                    BlocProvider.of<NavigateAlertBloc>(context).add(
+                      SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints ?? LatLng(0,0)),
+                    );
+                  }else{
+                    double lat = double.parse(pipelineData.latitude);
+                    double lng = double.parse(pipelineData.longitude);
+                    LatLng toPoints = LatLng(lat, lng);
+                    BlocProvider.of<NavigateAlertBloc>(context).add(
+                      SelectGoogleRouteDirEvent(context: context, toLatLng: toPoints),
+                    );
+                  }
+                  },
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:outage_app/features/Report/ReportOutage/domain/model/ServiceModel.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:outage_app/Utils/Utils.dart';
 import 'package:outage_app/Utils/common_widgets/HiveDatabase/hive_database.dart';

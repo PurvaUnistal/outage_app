@@ -62,6 +62,7 @@ class User {
   String? isHo;
   String? smartLogo;
   String? projectLogo;
+  String? projectUrl;
   dynamic hoga;
 
   User({
@@ -86,6 +87,7 @@ class User {
     this.isHo,
     this.smartLogo,
     this.projectLogo,
+    this.projectUrl,
     this.hoga,
   });
 
@@ -113,6 +115,7 @@ class User {
     role = json['role'] ?? "";
     smartLogo = json['smartLogo'] ?? "";
     projectLogo = json['projectLogo'] ?? "";
+    projectUrl = json['projectUrl'] ?? "";
     spreadId = json['spread_id'] ?? "";
     sectionId = json['section_id'] ?? "";
     isHo = json['is_ho'];
@@ -128,6 +131,7 @@ class User {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['smartLogo'] = this.smartLogo;
     data['projectLogo'] = this.projectLogo;
+    data['projectUrl'] = this.projectUrl;
     data['id'] = this.id;
     data['email'] = this.email;
     data['password'] = this.password;

@@ -31,13 +31,14 @@ class PipelineDataAdapter extends TypeAdapter<PipelineData> {
       bpName: fields[11] as String?,
       latitude: fields[12] as String?,
       longitude: fields[13] as String?,
+      servicepointid: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PipelineData obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.geomencode)
       ..writeByte(1)
@@ -65,7 +66,9 @@ class PipelineDataAdapter extends TypeAdapter<PipelineData> {
       ..writeByte(12)
       ..write(obj.latitude)
       ..writeByte(13)
-      ..write(obj.longitude);
+      ..write(obj.longitude)
+      ..writeByte(14)
+      ..write(obj.servicepointid);
   }
 
   @override

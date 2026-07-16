@@ -62,6 +62,8 @@ class PipelineData {
   String? latitude;
   @HiveField(13)
   String? longitude;
+  @HiveField(14)
+  String? servicepointid;
 
   PipelineData({
     this.geomencode,
@@ -78,6 +80,7 @@ class PipelineData {
     this.bpName,
     this.latitude,
     this.longitude,
+    this.servicepointid,
   });
 
   PipelineData.fromJson(Map<String, dynamic> json) {
@@ -95,6 +98,7 @@ class PipelineData {
     bpName = json['bp_name'] ?? "";
     latitude = json['latitude'] ?? "";
     longitude = json['longitude'] ?? "";
+    servicepointid = json['servicepointid'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -113,6 +117,7 @@ class PipelineData {
     data['bp_name'] = this.bpName;
     data['latitude'] = this.latitude;
     data['longitude'] = this.longitude;
+    data['servicepointid'] = this.servicepointid;
     return data;
   }
 }
