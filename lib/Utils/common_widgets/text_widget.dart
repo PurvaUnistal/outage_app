@@ -1,23 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:outage_app/Utils/common_widgets/row_widget.dart';
-
-import 'res/app_styles.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 
 class TextWidget extends StatelessWidget {
-  final String title;
-  final String subTitle;
-  const TextWidget({super.key, required this.title, required this.subTitle});
+  final String text;
+  final TextAlign? textAlign;
+  final int? maxLines;
+  final TextOverflow? overflow;
+  final Color? color;
+  final FontWeight? fontWeight;
+  final double? fontSize;
+
+  const TextWidget(
+      this.text, {
+        super.key,
+        this.textAlign,
+        this.maxLines,
+        this.overflow,
+        this.color,
+        this.fontWeight,
+        this.fontSize,
+      });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        RowWidget(
-            widget1: Text(title, style: Styles.text),
-            widget2: Text(subTitle, style: Styles.texts,)
-        ),
-        Divider(),
-      ],
+    return Text(
+      text,
+      textAlign: textAlign ?? TextAlign.start,
+      maxLines: maxLines,
+      overflow: overflow ?? (maxLines != null ? TextOverflow.ellipsis : null),
+      style: Styles.bodySmall.copyWith(
+        color: color,
+        fontWeight: fontWeight,
+        fontSize: fontSize,
+      ),
     );
   }
 }

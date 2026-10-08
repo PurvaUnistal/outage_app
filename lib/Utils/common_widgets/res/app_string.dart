@@ -11,10 +11,11 @@ class AppString {
     Client.igl: "11-06-2025",
     Client.agcl: "1/08/2025",
     Client.hpoil: "6-03-2026",
+    Client.hpcl: "07-10-2026",
+    Client.hngpl: "07-10-2026",
   };
 
-  static String get version => "Version : Outage-${AppConfig.instanceInit()?.appVersion}-${_releaseDates[AppConfig.instanceInit()!.client] ?? ""}";
-
+  static String get date => "-${_releaseDates[AppConfig.instanceInit()!.client] ?? ""}";
   static String companyName = "© Unistal Systems Pvt. Ltd.";
   static String release = "Release Date";
   static String dateFormat = "dd-MM-yyyy";
@@ -26,9 +27,7 @@ class AppString {
   static String yes = "Yes";
   static String no = "No";
   static String login = "Login";
-  static String logout = "Logout";
-  static String logoutMsg =
-      "Are you sure you want to logout? Once you logout, you will be return to login screen";
+
   static String acceptedMsg = "Are you sure!";
   static String star = "* ";
 

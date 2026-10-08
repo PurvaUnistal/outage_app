@@ -7,12 +7,10 @@ import 'package:outage_app/Utils/common_widgets/SharedPerfs/preference_utils.dar
 import 'package:outage_app/Utils/common_widgets/res/app_asset.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
-import 'package:outage_app/Utils/common_widgets/res/enums.dart';
 import 'package:outage_app/features/HoDistrictDashboard/domain/model/DistrictDataModel.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.dart';
-import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
+import 'package:outage_app/Utils/common_widgets/logout_widget.dart';
 import 'package:outage_app/features/Login/domain/model/login_model.dart';
-import 'package:outage_app/testing.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashView extends StatefulWidget {
@@ -71,7 +69,10 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
     final password = await SharedPref.getString(key: PrefsValue.passwordVal);
    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
    final newVersion  = await packageInfo.buildNumber;
-   AppConfig.instanceInit()?.setAppVersion(appVersion: packageInfo.buildNumber);
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
+    AppConfig.instanceInit()?.setBuildNumber(value: "$buildNumber($version)");
+    AppConfig.instanceInit()?.setPackageName(value: packageInfo.packageName);
     final oldVersion = await SharedPref.getString(key: PrefsValue.buildNumber);
     Timer(
         const Duration(seconds: 3),
@@ -92,11 +93,8 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
 
         }
       } else {
-        await SharedPref.clearAll();
-        await LogoutWidget.clearAndClosePipelineBox();
-        await  AppConfig.instanceInit()!.setLoginData(newLoginData: LoginModel());
-        await  AppConfig.instanceInit()!.setDistrictData(districtData: DistrictData());
-        await  AppConfig.instanceInit()!.setGridData(gridData: GridData());
+        await LogoutWidget.deleteCacheDir();
+        await LogoutWidget.logout();
         Navigator.pushReplacementNamed(
           context,
           RoutesName.login,

@@ -6,13 +6,12 @@ import 'package:outage_app/Utils/common_widgets/Loader/DottedLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Loader/SpinLoader.dart';
 import 'package:outage_app/Utils/common_widgets/Background/background_info_widget.dart';
 import 'package:outage_app/Utils/common_widgets/dropdown_widget.dart';
-import 'package:outage_app/Utils/common_widgets/image_pop_widget.dart';
-import 'package:outage_app/Utils/common_widgets/image_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Image/image_pop_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Image/image_widget.dart';
 import 'package:outage_app/Utils/common_widgets/message_box_two_button_pop.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_bar_widget.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_string.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
 import 'package:outage_app/Utils/common_widgets/res/common_style.dart';
 import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
 import 'package:outage_app/Utils/common_widgets/row_widget.dart';
@@ -261,12 +260,12 @@ class _CreateAlertFormViewState extends State<CreateAlertFormView> {
                     onTapCamera: () async {
                       Navigator.of(context).pop();
                       BlocProvider.of<CreateAlertFormBloc>(context)
-                          .add(CaptureCameraPhotoEvent());
+                          .add(CaptureCameraPhotoEvent(context: context));
                     },
                     onTapGallery: () async {
                       Navigator.of(context).pop();
                       BlocProvider.of<CreateAlertFormBloc>(context)
-                          .add(CaptureGalleryPhotoEvent());
+                          .add(CaptureGalleryPhotoEvent(context: context));
                     },
                   );
                 });

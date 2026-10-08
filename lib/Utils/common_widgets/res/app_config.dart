@@ -9,6 +9,8 @@ class AppConfig {
   static AppConfig? instance;
 
   Client? client;
+
+  String buildNumber = "";
   LoginModel loginData = LoginModel();
   ViewIncidentData viewIncidentData = ViewIncidentData();
   DistrictData districtData = DistrictData();
@@ -31,11 +33,8 @@ class AppConfig {
   String _token = "";
   String get token => _token;
 
-  String _appVersion = "";
-  String get appVersion => _appVersion;
 
-  String _packageName = "";
-  String get packageName => _packageName;
+  String packageName = "";
 
   dynamic data = "";
   FilterKey? filterKey;
@@ -58,7 +57,9 @@ class AppConfig {
   setDiaColor({required Map<String, String> newDiaColors}) {
     this.diaColors = newDiaColors;
   }
-
+  setBuildNumber({required String value}) {
+    buildNumber = value;
+  }
 
   setDistrictData({required DistrictData districtData}) {
     this.districtData = districtData;
@@ -97,14 +98,10 @@ class AppConfig {
     print("password : $token");
   }
 
-  void setAppVersion({required String appVersion}) {
-    _appVersion = appVersion;
-    print("appVersion : $_appVersion");
-  }
 
-  void setPackageName({required String packageName}) {
-    _packageName = packageName;
-    print("packageName : $packageName");
+  void setPackageName({required String value}) {
+    packageName = value;
+    print("packageName : $value");
   }
 
   void setData({required dynamic newData}) {
@@ -127,5 +124,14 @@ class AppConfig {
    setViewIncidentData({required ViewIncidentData newViewIncidentData}) {
     viewIncidentData = newViewIncidentData;
     print("newViewIncidentData : ${newViewIncidentData}");
+  }
+
+  static void reset() {
+    final old = instance;
+    instance = AppConfig()
+      ..client = old?.client
+      ..buildNumber = old?.buildNumber ?? ""
+      ..packageName = old?.packageName ?? ""
+    .._baseURL = old?._baseURL ?? "";
   }
 }

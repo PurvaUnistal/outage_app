@@ -68,7 +68,7 @@ class ApiHelper {
       }
     } catch (e) {
       print("catch--->" + e.toString());
-      Utils.errorSnackBar(msg: e.toString(), context: context!);
+      Utils.errorSnackBar(msg: e.toString(), context: context);
       return null;
     }
   }

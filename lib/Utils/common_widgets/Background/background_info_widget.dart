@@ -21,23 +21,31 @@ class BackgroundInfoWidget extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration( gradient: CommonStyle.gradients,),
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-          child:
-              ctx.user.name?.isNotEmpty == true
-                  ? Text(
-                "${ctx.user.name?.toUpperCase() ?? ""} "
-                    "${ctx.schema.isEmpty ? "" :
-                "(${ctx.schema.toUpperCase()}${ctx.gaId.isEmpty
-                    ? ""
-                    : (ctx.gridData.gridName != null && ctx.gridData.gridName!.isNotEmpty
-                    ? " (${ctx.gridData.gridName!.toUpperCase()})"
-                    : "")})"}",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 12,
-                    decoration: TextDecoration.none),
-                overflow: TextOverflow.ellipsis,
-              )
+          child: ctx.user.name?.isNotEmpty == true
+                  ? Row(
+                    children: [
+                      Icon(Icons.person_rounded,
+                          size: 13, color: Colors.white.withOpacity(0.85)),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                                        "${ctx.user.name?.toUpperCase() ?? ""} "
+                          "${ctx.schema.isEmpty ? "" :
+                                        "(${ctx.schema.toUpperCase()}${ctx.gaId.isEmpty
+                          ? ""
+                          : (ctx.gridData.gridName != null && ctx.gridData.gridName!.isNotEmpty
+                          ? " (${ctx.gridData.gridName!.toUpperCase()})"
+                          : "")})"}",
+                                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                          decoration: TextDecoration.none),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                      ),
+                    ],
+                  )
 
                   : Container(),
         ),
@@ -50,7 +58,7 @@ class BackgroundInfoWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(AppString.companyName, style: Styles.rel),
-              Text(AppString.version, style: Styles.rel),
+              Text( "Version-${AppConfig.instanceInit()!.buildNumber}${AppString.date}", style: Styles.rel),
             ],
           ),
         ),

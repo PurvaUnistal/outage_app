@@ -67,4 +67,11 @@ class Styles {
       color: color,
     );
   }
+
+  static final TextStyle bodySmall = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: Color(0xFF212121),
+  );
+
 }

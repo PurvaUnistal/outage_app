@@ -14,6 +14,8 @@ class AssetPath {
         ? AssetPath.hpOilLogo
         : AppConfig.instanceInit()!.client == Client.hpcl
         ? AssetPath.hpclLogo
+        : AppConfig.instanceInit()!.client == Client.hngpl
+        ? AssetPath.hngplLogo
         : AssetPath.unistalLogo;
   }
 
@@ -26,6 +28,7 @@ class AssetPath {
   static String pbgLogo = 'assets/icons/pbg_logo.png';
   static String mglLogo = 'assets/icons/mgl_logo.png';
   static String hpOilLogo = 'assets/icons/hp_oil_logo.png';
+  static String hngplLogo = 'assets/icons/hngpl_logo.png';
   static String unistalLogo = 'assets/icons/unistal_logo.png';
   static String iglLogo = 'assets/gis/igl_logo.png';
 

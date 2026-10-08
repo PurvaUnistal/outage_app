@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:outage_app/Utils/Utils.dart';
 import 'package:outage_app/Utils/common_widgets/CurrentPosition/current_position.dart';
 import 'package:outage_app/Utils/common_widgets/GetImage/get_image_widget.dart';
+import 'package:outage_app/Utils/common_widgets/Image/media_picker_helper.dart';
 import 'package:outage_app/Utils/common_widgets/Routes/routes_name.dart';
 import 'package:outage_app/Utils/common_widgets/res/app_config.dart';
 import 'package:outage_app/features/Manage/IncidentDetails/domain/model/filter_key_enum.dart';
@@ -251,7 +252,7 @@ class CreateAlertFormBloc
   }
 
   _captureCameraPhoto(CaptureCameraPhotoEvent event, emit) async {
-    var photoPath = await GetImageWidget.cameraCapture();
+    var photoPath = await MediaPickerHelper.cameraCapture(context: event.context);
     log("photo-->$photoPath");
     if (photoPath?.path != null) {
       photo = photoPath!;
@@ -260,9 +261,9 @@ class CreateAlertFormBloc
   }
 
   _captureGalleryPhoto(CaptureGalleryPhotoEvent event, emit) async {
-    var photoPath = await GetImageWidget.galleryCapture();
+    var photoPath = await MediaPickerHelper.galleryCapture(context: event.context);
     log("photo-->$photoPath");
-    if (photoPath.path.isNotEmpty) {
+    if (photoPath!.path.isNotEmpty) {
       photo = photoPath;
     }
     _eventCompleted(emit);

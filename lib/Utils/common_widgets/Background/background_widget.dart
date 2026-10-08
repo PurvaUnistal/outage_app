@@ -54,7 +54,7 @@ class BackgroundWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(AppString.companyName, style: Styles.rel),
-                Text(AppString.version, style: Styles.rel),
+                Text( "Version-${AppConfig.instanceInit()!.buildNumber}${AppString.date}", style: Styles.rel),
               ],
             ),
           ),

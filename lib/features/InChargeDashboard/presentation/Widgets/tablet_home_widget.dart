@@ -7,7 +7,7 @@ import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
 import 'package:outage_app/features/InChargeDashboard/domain/bloc/in_charge_dashboard_bloc.dart';
 import 'package:outage_app/features/InChargeDashboard/domain/bloc/in_charge_dashboard_state.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/card_widget.dart';
-import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
+import 'package:outage_app/Utils/common_widgets/logout_widget.dart';
 
 class TabletInChargeDashboardWidget extends StatefulWidget {
   const TabletInChargeDashboardWidget({super.key});
@@ -43,16 +43,13 @@ class _PhoneInChargeDashboardWidgetState extends State<TabletInChargeDashboardWi
 
   _appBarWidget() {
     return AppBarWidget(
-      title: "GIS App",
+      title: "Dashboard",
       boolLeading: false,
       actions: [
         IconButton(
-            onPressed: () => showModalBottomSheet(
-                context: context, builder: (context) => const LogoutWidget()),
-            icon: Icon(
-              Icons.logout,
-              color: AppColor.white,
-            ))
+          onPressed: () => LogoutWidget.show(context),
+          icon: Icon(Icons.logout, color: AppColor.white),
+        ),
       ],
     );
   }

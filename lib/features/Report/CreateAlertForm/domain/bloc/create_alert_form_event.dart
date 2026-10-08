@@ -56,15 +56,19 @@ class SelectTfGisValueEvent extends CreateAlertFormEvent {
 
 
 class CaptureCameraPhotoEvent extends CreateAlertFormEvent {
+  final BuildContext context;
+  CaptureCameraPhotoEvent({required this.context});
   @override
   // TODO: implement props
-  List<Object> get props => [];
+  List<Object> get props => [context];
 }
 
 class CaptureGalleryPhotoEvent extends CreateAlertFormEvent {
+  final BuildContext context;
+  CaptureGalleryPhotoEvent({required this.context});
   @override
   // TODO: implement props
-  List<Object> get props => [];
+  List<Object> get props => [context];
 }
 
 class SelectAudioEvent extends CreateAlertFormEvent {

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:outage_app/Utils/common_widgets/res/app_color.dart';
+import 'package:outage_app/Utils/common_widgets/res/environment_config.dart';
+import 'package:outage_app/Utils/common_widgets/text_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:outage_app/Utils/common_widgets/res/app_styles.dart';
-
-import 'res/app_color.dart';
-import 'res/environment_config.dart';
 
 class GPSSettingPermissionPopWidget extends StatelessWidget {
   const GPSSettingPermissionPopWidget({super.key});
@@ -50,9 +49,9 @@ class GPSSettingPermissionPopWidget extends StatelessWidget {
   Widget _text({required BuildContext context}) {
     return Padding(
       padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.03),
-      child: Text(
+      child: TextWidget(
         "Your GPS Permission Status is Denied.\n Please Allow all the time app Permission.",
-        style: Styles.texts,
+        textAlign: TextAlign.center,
       ),
     );
   }
@@ -61,7 +60,7 @@ class GPSSettingPermissionPopWidget extends StatelessWidget {
     return TextButton(
         style: ButtonStyle(
             padding: WidgetStateProperty.all<EdgeInsets>(const EdgeInsets.all(15)),
-            foregroundColor: WidgetStateProperty.all<Color>(EnvironmentConfig.of(context)!.primaryTheme,),
+            foregroundColor: WidgetStateProperty.all<Color>( EnvironmentConfig.of(context)!.primaryTheme,),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
@@ -71,13 +70,15 @@ class GPSSettingPermissionPopWidget extends StatelessWidget {
         ),
         onPressed: () async {
           await openAppSettings();
-          if(!context.mounted) return;
-          Navigator.pop(context);
+          if(context.mounted){
+            Navigator.pop(context);
+          }
         },
         child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.30,
-          child: Text(
-            "Open Setting",style: Styles.texts,
+          child: TextWidget(
+            "Open Setting",
+            textAlign: TextAlign.center,
           ),
         )
     );

@@ -1,23 +1,23 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
-  static getString({required String key}) async {
+  static Future<String> getString({required String key}) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(key) ?? "";
   }
 
-  static setString({required String key, required String value}) async {
+  static Future<void> setString({required String key, required String value}) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    await prefs.setString(key, value);
   }
 
-  static clearAll() async {
+  static Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.clear();
+    await prefs.clear();
   }
 
-  static remove({required String key}) async {
+  static Future<void> remove({required String key}) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.remove(key);
+    await prefs.remove(key);
   }
 }

@@ -14,7 +14,7 @@ import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboar
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_event.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/bloc/ho_grid_dashboard_state.dart';
 import 'package:outage_app/features/HoGridDashboard/domain/model/GridDataModel.dart';
-import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
+import 'package:outage_app/Utils/common_widgets/logout_widget.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/phone/phone_in_charge_dashboard_widget.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/page/in_charge_dashboard_view.dart';
 
@@ -61,13 +61,10 @@ class _HoGridDashboardViewState extends State<HoGridDashboardView> {
   _appBarWidget() {
     return AppBarWidget(
     boolLeading: true,
+      title: "Grids Dashboard",
       actions: [
         IconButton(
-          onPressed:
-              () => showModalBottomSheet(
-                context: context,
-                builder: (context) => const LogoutWidget(),
-              ),
+          onPressed: () => LogoutWidget.show(context),
           icon: Icon(Icons.logout, color: AppColor.white),
         ),
       ],

@@ -11,7 +11,7 @@ import 'package:outage_app/features/HoDistrictDashboard/presentation/widget/summ
 import 'package:outage_app/features/InChargeDashboard/domain/bloc/in_charge_dashboard_bloc.dart';
 import 'package:outage_app/features/InChargeDashboard/domain/bloc/in_charge_dashboard_state.dart';
 import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/card_widget.dart';
-import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
+import 'package:outage_app/Utils/common_widgets/logout_widget.dart';
 import 'package:outage_app/features/Manage/IncidentManage/presentation/page/incident_manage_view.dart';
 import 'package:outage_app/features/Navigate/NavigateAlert/presentation/navigate_alert_page.dart';
 import 'package:outage_app/features/Report/ReportOutage/presentation/incident_report_page.dart';
@@ -48,15 +48,12 @@ class _PhoneInChargeDashboardWidgetState extends State<PhoneInChargeDashboardWid
   AppBarWidget _appBarWidget() {
     return AppBarWidget(
    //   title: "GIS App",
+      title: "Dashboard",
       boolLeading:
           AppConfig.instanceInit()?.loginData.user!.isHo == "1" ? true : false,
       actions: [
         IconButton(
-          onPressed:
-              () => showModalBottomSheet(
-                context: context,
-                builder: (context) => const LogoutWidget(),
-              ),
+          onPressed: () => LogoutWidget.show(context),
           icon: Icon(Icons.logout, color: AppColor.white),
         ),
       ],

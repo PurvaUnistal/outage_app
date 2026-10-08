@@ -15,7 +15,7 @@ import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashb
 import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashboard_event.dart';
 import 'package:outage_app/features/HoDistrictDashboard/domain/bloc/ho_dis_dashboard_state.dart';
 import 'package:outage_app/features/HoGridDashboard/presentation/ho_grid_dashboard_view.dart';
-import 'package:outage_app/features/InChargeDashboard/presentation/Widgets/logout_widget.dart';
+import 'package:outage_app/Utils/common_widgets/logout_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'widget/summery_card.dart';
@@ -94,13 +94,10 @@ class _HoDisDashboardViewState extends State<HoDisDashboardView> {
   _appBarWidget() {
     return AppBarWidget(
      boolLeading: true,
+      title: "Districts Dashboard",
       actions: [
         IconButton(
-          onPressed:
-              () => showModalBottomSheet(
-                context: context,
-                builder: (context) => const LogoutWidget(),
-              ),
+          onPressed: () => LogoutWidget.show(context),
           icon: Icon(Icons.logout, color: AppColor.white),
         ),
       ],
