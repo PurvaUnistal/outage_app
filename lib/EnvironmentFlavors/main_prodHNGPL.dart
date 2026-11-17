@@ -29,7 +29,7 @@ Future<void> main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   var environmentConfig = EnvironmentConfig(
-    flavor: EnvironmentFlavor.prodHNGPL,
+    flavor: EnvironmentFlavors.prodHNGPL,
     child: RootApp(client: Client.hngpl),
   );
   runApp(environmentConfig);

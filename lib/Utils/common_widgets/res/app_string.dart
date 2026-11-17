@@ -11,8 +11,9 @@ class AppString {
     Client.igl: "11-06-2025",
     Client.agcl: "1/08/2025",
     Client.hpoil: "6-03-2026",
-    Client.hpcl: "07-10-2026",
-    Client.hngpl: "07-10-2026",
+    Client.hpcl: "10-10-2026",
+    Client.hngpl: "12-10-2026",
+    Client.cugl: "17-11-2026",
   };
 
   static String get date => "-${_releaseDates[AppConfig.instanceInit()!.client] ?? ""}";

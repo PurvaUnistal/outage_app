@@ -16,7 +16,7 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
   var environmentConfig = EnvironmentConfig(
-      flavor: EnvironmentFlavor.prodHPOIL,
+      flavor: EnvironmentFlavors.prodHPOIL,
       child: RootApp(
         client: Client.hpoil,
       ));

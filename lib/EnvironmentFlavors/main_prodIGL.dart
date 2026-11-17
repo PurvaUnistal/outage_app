@@ -28,13 +28,11 @@ Future<void> main() async {
   var appDir = (await getTemporaryDirectory()).path;
   new Directory(appDir).delete(recursive: true);
   await IncidentReportHelper.clearCache();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-
-  var environmentConfig = EnvironmentConfig(flavor: EnvironmentFlavor.prodIGL, child: RootApp(
-    client: Client.igl,
-  ));
+  var environmentConfig = EnvironmentConfig(
+    flavor: EnvironmentFlavors.prodIGL,
+    child: RootApp(client: Client.igl),
+  );
   runApp(environmentConfig);
 }

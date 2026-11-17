@@ -16,6 +16,8 @@ class AssetPath {
         ? AssetPath.hpclLogo
         : AppConfig.instanceInit()!.client == Client.hngpl
         ? AssetPath.hngplLogo
+        : AppConfig.instanceInit()!.client == Client.cugl
+        ? AssetPath.cuglLogo
         : AssetPath.unistalLogo;
   }
 
@@ -30,6 +32,7 @@ class AssetPath {
   static String hpOilLogo = 'assets/icons/hp_oil_logo.png';
   static String hngplLogo = 'assets/icons/hngpl_logo.png';
   static String unistalLogo = 'assets/icons/unistal_logo.png';
+  static String cuglLogo = 'assets/icons/cugl_logo.png';
   static String iglLogo = 'assets/gis/igl_logo.png';
 
 

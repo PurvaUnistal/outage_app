@@ -30,7 +30,7 @@ Future<void> main() async {
   DeviceOrientation.portraitUp,
   ]);
 
-  var environmentConfig = EnvironmentConfig(flavor: EnvironmentFlavor.prodAGCL, child: RootApp(
+  var environmentConfig = EnvironmentConfig(flavor: EnvironmentFlavors.prodAGCL, child: RootApp(
     client: Client.agcl,
   ));
   runApp(environmentConfig);

@@ -12,13 +12,10 @@ Future<void> main() async {
   var appDir = (await getTemporaryDirectory()).path;
   new Directory(appDir).delete(recursive: true);
   await IncidentReportHelper.clearCache();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   var environmentConfig = EnvironmentConfig(
-      flavor: EnvironmentFlavor.prodPBGPL,
-      child: RootApp(
-        client: Client.purvaBharti,
-      ));
+    flavor: EnvironmentFlavors.prodPBGPL,
+    child: RootApp(client: Client.purvaBharti),
+  );
   runApp(environmentConfig);
 }
